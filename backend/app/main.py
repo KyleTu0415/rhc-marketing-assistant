@@ -2,7 +2,7 @@
 RHC Marketing Assistant - Main Application
 """
 import json
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -56,13 +56,13 @@ except ImportError:
         animal_image_url: str = ""
 
     class ProductUpsertRequest(BaseModel):
-        name: str = ""
-        description: str = ""
+        product_model: str = ""
+        product_name: str = ""
         category: str = ""
-        specifications: Dict[str, Any] = {}
-        certifications: List[str] = []
-        target_market: str = ""
-        custom_fields: Dict[str, Any] = {}
+        main_selling_point: str = ""
+        product_image_url: str = ""
+        price_tier: str = ""
+        status: str = "active"
 
 try:
     from app.llm import generate_copy
@@ -184,30 +184,142 @@ async def api_animal_image(animal: str):
 async def api_animals_list():
     return {"items": ["cat", "dog", "rabbit", "horse", "cow", "sheep", "goat", "pig"]}
 
-@app.post("/api/products", response_model=dict)
-async def api_product_upsert(req: ProductUpsertRequest):
+FEISHU_AID = os.getenv("FEISHU_APP_ID", "")
+FEISHU_ASE = os.getenv("FEISHU_APP_SECRET", "")
+FEISHU_ATK = os.getenv("FEISHU_APP_TOKEN", "")
+FEISHU_TID = os.getenv("FEISHU_TABLE_ID", "")
+
+def _feishu_token():
+    import urllib.request as _ur
+    tr = _ur.Request(
+        "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
+        data=json.dumps({"app_id": FEISHU_AID, "app_secret": FEISHU_ASE}).encode(),
+        headers={"Content-Type": "application/json"}, method="POST")
+    with _ur.urlopen(tr, timeout=10) as r:
+        return json.loads(r.read()).get("tenant_access_token")
+
+def _feishu_headers():
+    return {"Authorization": f"Bearer {_feishu_token()}", "Content-Type": "application/json"}
+
+def _tv(v):
+    if v is None: return ""
+    if isinstance(v, list): return ", ".join(str(x.get("text", x) if isinstance(x, dict) else x) for x in v)
+    if isinstance(v, dict): return v.get("text", str(v))
+    return str(v)
+
+@app.post("/api/products")
+async def api_product_create(req: ProductUpsertRequest):
+    import urllib.request as _ur
     try:
-        return {"status": "ok", "message": "Product upserted", "product": req.model_dump()}
+        fields = {"product_model": req.product_model, "product_name_cn": req.product_name,
+                  "category": req.category, "main_selling_point": req.main_selling_point,
+                  "product_image_url": req.product_image_url, "status": req.status or "active"}
+        rq = _ur.Request(
+            f"https://open.feishu.cn/open-apis/bitable/v1/apps/{FEISHU_ATK}/tables/{FEISHU_TID}/records",
+            data=json.dumps({"fields": fields}).encode(), headers=_feishu_headers(), method="POST")
+        with _ur.urlopen(rq, timeout=15) as r:
+            resp = json.loads(r.read())
+        rec = resp.get("data", {}).get("record", {})
+        fl = rec.get("fields", {})
+        return {"record_id": rec.get("record_id", ""),
+                "product_model": _tv(fl.get("product_model", req.product_model)),
+                "product_name": _tv(fl.get("product_name_cn", fl.get("product_name", req.product_name))),
+                "category": _tv(fl.get("category", req.category)),
+                "main_selling_point": _tv(fl.get("main_selling_point", req.main_selling_point)),
+                "product_image_url": _tv(fl.get("product_image_url", req.product_image_url)),
+                "status": _tv(fl.get("status", req.status))}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/products/{record_id}")
+async def api_product_update(record_id: str, req: ProductUpsertRequest):
+    import urllib.request as _ur
+    try:
+        fields = {}
+        if req.product_model: fields["product_model"] = req.product_model
+        if req.product_name: fields["product_name_cn"] = req.product_name
+        if req.category: fields["category"] = req.category
+        if req.main_selling_point: fields["main_selling_point"] = req.main_selling_point
+        if req.product_image_url: fields["product_image_url"] = req.product_image_url
+        rq = _ur.Request(
+            f"https://open.feishu.cn/open-apis/bitable/v1/apps/{FEISHU_ATK}/tables/{FEISHU_TID}/records/{record_id}",
+            data=json.dumps({"fields": fields}).encode(), headers=_feishu_headers(), method="PUT")
+        with _ur.urlopen(rq, timeout=15) as r:
+            resp = json.loads(r.read())
+        rec = resp.get("data", {}).get("record", {})
+        fl = rec.get("fields", {})
+        return {"record_id": record_id,
+                "product_model": _tv(fl.get("product_model", req.product_model)),
+                "product_name": _tv(fl.get("product_name_cn", fl.get("product_name", req.product_name))),
+                "category": _tv(fl.get("category", req.category)),
+                "main_selling_point": _tv(fl.get("main_selling_point", req.main_selling_point)),
+                "product_image_url": _tv(fl.get("product_image_url", req.product_image_url)),
+                "status": _tv(fl.get("status", req.status))}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/products/{record_id}")
+async def api_product_delete(record_id: str):
+    import urllib.request as _ur
+    try:
+        rq = _ur.Request(
+            f"https://open.feishu.cn/open-apis/bitable/v1/apps/{FEISHU_ATK}/tables/{FEISHU_TID}/records/{record_id}",
+            headers=_feishu_headers(), method="DELETE")
+        with _ur.urlopen(rq, timeout=15) as r:
+            json.loads(r.read())
+        return {"status": "ok", "record_id": record_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/upload-image")
+async def api_upload_image(request: Request):
+    import urllib.request as _ur
+    import uuid
+    try:
+        form = await request.form()
+        file = form.get("file")
+        if not file or not hasattr(file, "read"):
+            raise HTTPException(status_code=400, detail="No file provided")
+        file_data = await file.read()
+        filename = file.filename or "upload.png"
+        boundary = uuid.uuid4().hex
+        body = _build_multipart(boundary, file_data, filename)
+        rq = _ur.Request("https://freeimage.host/api/1/upload", data=body,
+            headers={"Content-Type": f"multipart/form-data; boundary={boundary}"}, method="POST")
+        with _ur.urlopen(rq, timeout=30) as r:
+            resp = json.loads(r.read())
+        if resp and resp.get("image") and resp["image"].get("url"):
+            return {"url": resp["image"]["url"], "status": "ok"}
+        err = resp.get("error", {}).get("message", "Upload failed") if resp else "Upload failed"
+        raise HTTPException(status_code=502, detail=err)
+    except HTTPException: raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+def _build_multipart(boundary, file_data, filename):
+    api_key = os.getenv("FREEIMAGE_API_KEY", "6d207e02198a847aa98d0a2a901485a5").encode()
+    CRLF = b"\r\n"
+    parts = [b"--" + boundary.encode(),
+        b'Content-Disposition: form-data; name="key"', b"", api_key,
+        b"--" + boundary.encode(),
+        b'Content-Disposition: form-data; name="action"', b"", b"upload",
+        b"--" + boundary.encode(),
+        b'Content-Disposition: form-data; name="type"', b"", b"file",
+        b"--" + boundary.encode(),
+        b'Content-Disposition: form-data; name="source"; filename="' + filename.encode() + b'"',
+        b"Content-Type: application/octet-stream", b"", file_data,
+        b"--" + boundary.encode() + b"--"]
+    return CRLF.join(parts)
 
 @app.get("/api/products")
 async def api_products_list():
     import urllib.request as _ur
-    _AID="cli_aa0228e3abf8dcbd"
-    _ASE="o645YodfdUCBKagae4LpMchcD1AL2mp2"
-    _ATK="BwhybTEUVacyTksmocbcKvgCnQf"
-    _TID="tbl2r6IQqgKiiEnE"
     try:
-        tr=_ur.Request("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
-            data=json.dumps({"app_id":_AID,"app_secret":_ASE}).encode(),
-            headers={"Content-Type":"application/json"}, method="POST")
-        with _ur.urlopen(tr,timeout=10) as r:
-            _tk=json.loads(r.read()).get("tenant_access_token")
+        _tk=_feishu_token()
         _all=[]
         _pt=None
         while True:
-            _u=f"https://open.feishu.cn/open-apis/bitable/v1/apps/{_ATK}/tables/{_TID}/records?page_size=100"
+            _u=f"https://open.feishu.cn/open-apis/bitable/v1/apps/{FEISHU_ATK}/tables/{FEISHU_TID}/records?page_size=100"
             if _pt:
                 _u+=f"&page_token={_pt}"
             _rq=_ur.Request(_u, headers={"Authorization":f"Bearer {_tk}"})
