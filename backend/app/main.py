@@ -271,6 +271,76 @@ async def api_product_delete(record_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@app.post("/api/cutout")
+async def api_cutout(request: Request):
+    """Accept image upload, remove background via rembg, return transparent PNG URL."""
+    try:
+        form = await request.form()
+        file = form.get("file")
+        if not file or not hasattr(file, "read"):
+            raise HTTPException(status_code=400, detail="No file provided")
+        file_data = await file.read()
+        if not file_data:
+            raise HTTPException(status_code=400, detail="Empty file")
+
+        # Remove background
+        from rembg import remove
+        from PIL import Image
+        import io as _io
+        input_img = Image.open(_io.BytesIO(file_data))
+        output_img = remove(input_img)
+        buf = _io.BytesIO()
+        output_img.save(buf, format="PNG")
+        cutout_bytes = buf.getvalue()
+
+        # Upload to freeimage
+        import urllib.request as _ur
+        import uuid
+        boundary = uuid.uuid4().hex
+        filename = f"cutout_{uuid.uuid4().hex[:8]}.png"
+        body = _build_multipart(boundary, cutout_bytes, filename)
+        rq = _ur.Request(
+            "https://freeimage.host/api/1/upload",
+            data=body,
+            headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+            method="POST",
+        )
+        with _ur.urlopen(rq, timeout=60) as r:
+            resp = json.loads(r.read())
+        if resp and resp.get("image") and resp["image"].get("url"):
+            return {"url": resp["image"]["url"], "status": "ok"}
+        raise HTTPException(status_code=502, detail="Failed to upload cutout result")
+    except HTTPException:
+        raise
+    except ImportError as e:
+        raise HTTPException(status_code=500, detail=f"rembg not available: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/proxy-image")
+async def api_proxy_image(url: str):
+    """Proxy image to avoid CORS taint on canvas. Returns image bytes with CORS headers."""
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
+            resp = await client.get(url)
+            resp.raise_for_status()
+        from fastapi.responses import Response
+        content_type = resp.headers.get("content-type", "image/png")
+        return Response(
+            content=resp.content,
+            media_type=content_type,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Cache-Control": "public, max-age=86400",
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Proxy failed: {e}")
+
+
 @app.post("/api/upload-image")
 async def api_upload_image(request: Request):
     import urllib.request as _ur
