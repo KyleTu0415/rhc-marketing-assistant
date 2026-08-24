@@ -625,7 +625,7 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 <div class="post-gen-layout">
 <div class="config-panel">
 <h3>输出内容配置</h3>
-<div class="form-group"><label>选择产品</label><select id="post-product-select"><option value="">— 正在加载产品 —</option></select></div>
+<div class="form-group"><label>选择产品</label><select id="post-product-select"><option value="">选择产品</option></select></div>
 <div class="form-group"><label>发布平台</label><div class="platform-tags" id="platform-tags">
 <span class="platform-tag selected" data-platform="linkedin" onclick="togglePlatform(this)">LinkedIn</span>
 <span class="platform-tag" data-platform="facebook" onclick="togglePlatform(this)">Facebook</span>
@@ -866,7 +866,7 @@ function escapeJs(s){if(!s)return'';return String(s).replace(/'/g,"\\'").replace
 
 function renderProducts(products){var g=document.getElementById('product-grid');if(!g)return;if(!products||!products.length){g.innerHTML='<div class="state-message"><div style="font-size:14px;color:var(--color-text-secondary)">未找到产品</div></div>';return}g.innerHTML=products.map(function(p){var m=getProductModel(p),c=getProductCategory(p),pn=getProductDisplayName(p),img=getProductImageUrl(p)||placeholderSvg(m);return'<div class="media-item" onclick="onProductCardClick(\''+escapeJs(m)+'\')"><img class="media-thumb" style="object-fit:contain;background:#FFFFFF" src="'+escapeHtml(img)+'" alt="'+escapeHtml(m)+'" loading="lazy" onerror="this.src=\''+placeholderSvg(m)+'\'"><div class="media-meta"><div class="media-name">'+escapeHtml(m)+'</div><div class="media-tag">'+escapeHtml(pn)+'</div></div></div>'}).join('')}
 
-function renderProductSelect(products){var s=document.getElementById('post-product-select');if(!s)return;if(!products||!products.length){s.innerHTML='<option value="">暂无可用产品</option>';return}s.innerHTML=products.map(function(p){var m=getProductModel(p),n=getProductDisplayName(p);return'<option value="'+escapeHtml(m)+'">'+escapeHtml(m)+' — '+escapeHtml(n)+'</option>'}).join('');var cs=document.getElementById('comp-product');if(cs){cs.innerHTML='<option value="">无</option>'+products.map(function(p){var m=getProductModel(p);return'<option value="'+escapeHtml(m)+'">'+escapeHtml(m)+'</option>'}).join('');cs.value='V5 Plus';if(typeof updateMiniCanvas==='function')updateMiniCanvas()}}
+function renderProductSelect(products){var s=document.getElementById('post-product-select');if(!s)return;if(!products||!products.length){s.innerHTML='<option value="">暂无可用产品</option>';return}s.innerHTML='<option value="">选择产品</option>'+products.map(function(p){var m=getProductModel(p),n=getProductDisplayName(p);return'<option value="'+escapeHtml(m)+'">'+escapeHtml(m)+' — '+escapeHtml(n)+'</option>'}).join('');var cs=document.getElementById('comp-product');if(cs){cs.innerHTML='<option value="">无</option>'+products.map(function(p){var m=getProductModel(p);return'<option value="'+escapeHtml(m)+'">'+escapeHtml(m)+'</option>'}).join('');cs.value='V5 Plus';if(typeof updateMiniCanvas==='function')updateMiniCanvas()}}
 
 function onProductCardClick(model){var p=state.products.find(function(x){return getProductModel(x)===model});if(p&&p.record_id){showProductDetail(p.record_id)}else{showProductDetailFallback(model)}}
 
