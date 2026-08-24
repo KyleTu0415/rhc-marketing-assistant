@@ -553,16 +553,20 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 .cp2-paper.cp2-dragging .cp2-resize-handle{opacity:1}
 
 /* Cutout mode */
-.cp2-cutout-ws{display:flex;gap:16px;height:calc(100vh - 200px);min-height:400px}
+.cp2-cutout-ws{display:flex;gap:16px;height:calc(100vh - 200px);min-height:480px}
 .cp2-cutout-col{flex:1;display:flex;flex-direction:column;min-width:0}
 .cp2-upload-zone{border:2px dashed var(--color-border);border-radius:var(--radius-md);padding:40px 20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--color-surface)}
 .cp2-upload-zone:hover{border-color:var(--color-primary);background:var(--color-primary-xlight)}
-.cp2-cutout-area{flex:1;border:2px dashed var(--color-border);border-radius:var(--radius-md);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;cursor:pointer;transition:all .15s;background:var(--color-surface);overflow:hidden;position:relative}
+.cp2-cutout-area{flex:1;border:2px dashed var(--color-border);border-radius:var(--radius-md);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;cursor:pointer;transition:all .15s;background:var(--color-surface);overflow:hidden;position:relative;min-height:360px}
 .cp2-cutout-area:hover{border-color:var(--color-primary);background:var(--color-primary-xlight)}
 .cp2-cutout-area img{max-width:100%;max-height:100%;object-fit:contain}
-.cp2-cutout-actions{display:flex;gap:10px;margin-top:12px}
-.cp2-cutout-actions .btn{flex:1}
+.cp2-cutout-actions{display:flex;gap:10px;margin-top:14px;flex-shrink:0}
+.cp2-cutout-actions .btn{flex:1;justify-content:center}
+.cp2-cutout-actions .btn:disabled{opacity:.45;cursor:not-allowed}
 .cp2-cutout-status{text-align:center;padding:20px;color:var(--color-text-secondary)}
+.cp2-cutout-hint{display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.cp2-cutout-hint p{margin:0;font-weight:500;color:var(--color-text-secondary)}
+.cp2-cutout-hint span{font-size:12px;color:var(--color-text-tertiary)}
 
 </style>
 </head>
@@ -705,25 +709,25 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 </div>
 <div class="cp2-cutout-ws">
 <div class="cp2-cutout-col">
-<div class="cp2-cutout-area" id="cp2-cutout-left" onclick="if(!cp2State.cutout.loading)document.getElementById(\'cp2-cutout-file\').click()">
-<div id="cp2-cutout-placeholder">
+<div class="cp2-cutout-area" id="cp2-cutout-left" role="button" tabindex="0">
+<div id="cp2-cutout-placeholder" class="cp2-cutout-hint">
 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-<p style="margin-top:12px;font-weight:500;color:var(--color-text-secondary)">点击上传图片</p>
-<span style="font-size:12px;color:var(--color-text-tertiary)">支持 JPG、PNG，建议使用主体清晰的图片</span>
+<p>点击上传图片</p>
+<span>支持 JPG、PNG，建议使用主体清晰的图片</span>
 </div>
 <img id="cp2-cutout-orig-img" style="display:none">
 </div>
-<input type="file" id="cp2-cutout-file" accept="image/*" style="display:none" onchange="cp2OnCutoutUpload(this)">
+<input type="file" id="cp2-cutout-file" accept="image/*" style="display:none">
 <div class="cp2-cutout-actions">
-<button class="btn btn-outline" id="cp2-cutout-cancel" style="display:none" onclick="cp2ResetCutout()">取消</button>
-<button class="btn btn-primary" id="cp2-cutout-start" style="display:none" onclick="cp2DoCutout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图</button>
+<button class="btn btn-outline" id="cp2-cutout-cancel" onclick="cp2ResetCutout()" disabled>取消</button>
+<button class="btn btn-primary" id="cp2-cutout-start" onclick="cp2DoCutout()" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图</button>
 </div>
 </div>
 <div class="cp2-cutout-col">
 <div class="cp2-cutout-area" id="cp2-cutout-right" style="cursor:default">
-<div id="cp2-cutout-result-placeholder">
+<div id="cp2-cutout-result-placeholder" class="cp2-cutout-hint">
 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-<p style="margin-top:12px;color:var(--color-text-secondary)">抠图结果将显示在这里</p>
+<p>抠图结果将显示在这里</p>
 </div>
 <img id="cp2-cutout-result-img" style="display:none">
 <div id="cp2-cutout-spinner" style="display:none" class="cp2-cutout-status">
@@ -732,7 +736,7 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 </div>
 </div>
 <div class="cp2-cutout-actions">
-<button class="btn btn-primary" id="cp2-cutout-dl" style="display:none" onclick="cp2DownloadCutout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 下载透明底 PNG</button>
+<button class="btn btn-primary" id="cp2-cutout-dl" onclick="cp2DownloadCutout()" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 下载透明底 PNG</button>
 </div>
 </div>
 </div>
@@ -1115,6 +1119,24 @@ function downloadComposed(){
 (function init(){var ai=document.getElementById('api-url-input');if(ai){ai.value=state.apiBase;ai.addEventListener('keydown',function(e){if(e.key==='Enter')connectAPI()})}initComposer();checkHealth()})();
 
 // ============ CUTOUT FEATURE ============
+(function(){
+  var fileInput=document.getElementById('cp2-cutout-file');
+  var leftArea=document.getElementById('cp2-cutout-left');
+  if(leftArea){
+    leftArea.addEventListener('click',function(){
+      if(!cp2State.cutout.loading) fileInput.click();
+    });
+    leftArea.addEventListener('keydown',function(e){
+      if((e.key==='Enter'||e.key===' ')&&!cp2State.cutout.loading){e.preventDefault();fileInput.click();}
+    });
+  }
+  if(fileInput){
+    fileInput.addEventListener('change',function(){cp2OnCutoutUpload(this);});
+  }
+})();
+
+function cp2SetBtn(id,enabled){var b=document.getElementById(id);if(b)b.disabled=!enabled;}
+
 function cp2OnCutoutUpload(input){
   var file=input.files&&input.files[0];if(!file)return;
   if(file.size>12*1024*1024){showToast('图片不能超过12MB','error');input.value='';return}
@@ -1126,12 +1148,13 @@ function cp2OnCutoutUpload(input){
     var img=document.getElementById('cp2-cutout-orig-img');
     img.src=e.target.result;img.style.display='block';
     document.getElementById('cp2-cutout-placeholder').style.display='none';
-    document.getElementById('cp2-cutout-start').style.display='block';
-    document.getElementById('cp2-cutout-cancel').style.display='block';
+    cp2SetBtn('cp2-cutout-start',true);
+    cp2SetBtn('cp2-cutout-cancel',true);
     document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
     var rimg=document.getElementById('cp2-cutout-result-img');rimg.style.display='none';rimg.src='';
-    document.getElementById('cp2-cutout-dl').style.display='none';
+    cp2SetBtn('cp2-cutout-dl',false);
     document.getElementById('cp2-cutout-spinner').style.display='none';
+    showToast('图片已上传，点击开始抠图','success');
   };
   reader.readAsDataURL(file);
 }
@@ -1139,8 +1162,10 @@ function cp2OnCutoutUpload(input){
 function cp2DoCutout(){
   if(!cp2State.cutout.origFile){showToast('请先上传图片','error');return}
   cp2State.cutout.loading=true;
+  cp2SetBtn('cp2-cutout-start',false);
+  cp2SetBtn('cp2-cutout-cancel',false);
   var btn=document.getElementById('cp2-cutout-start');
-  btn.disabled=true;btn.innerHTML='<span class="loading-spinner" style="width:14px;height:14px;border-width:2px;vertical-align:-2px"></span> 抠图中...';
+  btn.innerHTML='<span class="loading-spinner" style="width:14px;height:14px;border-width:2px;vertical-align:-2px"></span> 抠图中...';
   document.getElementById('cp2-cutout-spinner').style.display='block';
   document.getElementById('cp2-cutout-result-placeholder').style.display='none';
   var fd=new FormData();
@@ -1154,11 +1179,13 @@ function cp2DoCutout(){
         img.onload=function(){
           document.getElementById('cp2-cutout-spinner').style.display='none';
           img.style.display='block';
-          document.getElementById('cp2-cutout-dl').style.display='block';
+          cp2SetBtn('cp2-cutout-dl',true);
+          cp2SetBtn('cp2-cutout-cancel',true);
         };
         img.onerror=function(){
           document.getElementById('cp2-cutout-spinner').style.display='none';
           document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+          cp2SetBtn('cp2-cutout-cancel',true);
           showToast('结果图片加载失败','error');
         };
         img.src=d.url;
@@ -1168,6 +1195,8 @@ function cp2DoCutout(){
     .catch(function(err){
       document.getElementById('cp2-cutout-spinner').style.display='none';
       document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+      cp2SetBtn('cp2-cutout-cancel',true);
+      cp2SetBtn('cp2-cutout-start',true);
       showToast('抠图失败: '+err.message,'error');
     })
     .finally(function(){
@@ -1189,14 +1218,17 @@ function cp2DownloadCutout(){
 
 function cp2ResetCutout(){
   cp2State.cutout={origUrl:null,origFile:null,resultUrl:null,loading:false};
-  document.getElementById('cp2-cutout-file').value='';
+  var fileInput=document.getElementById('cp2-cutout-file');
+  if(fileInput)fileInput.value='';
   var img=document.getElementById('cp2-cutout-orig-img');img.src='';img.style.display='none';
-  document.getElementById('cp2-cutout-placeholder').style.display='block';
-  document.getElementById('cp2-cutout-start').style.display='none';
-  document.getElementById('cp2-cutout-cancel').style.display='none';
+  document.getElementById('cp2-cutout-placeholder').style.display='flex';
+  cp2SetBtn('cp2-cutout-start',false);
+  cp2SetBtn('cp2-cutout-cancel',false);
+  cp2SetBtn('cp2-cutout-dl',false);
+  var btn=document.getElementById('cp2-cutout-start');
+  btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图';
   var rimg=document.getElementById('cp2-cutout-result-img');rimg.src='';rimg.style.display='none';
   document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
-  document.getElementById('cp2-cutout-dl').style.display='none';
   document.getElementById('cp2-cutout-spinner').style.display='none';
 }
 
@@ -1304,7 +1336,7 @@ function cp2Download(){
 </script>
 
 <script>
-var cp2State={mode:null,pages:[],activePageId:0,nextId:1,cutout:{origUrl:null,resultUrl:null,loading:false}};
+var cp2State={mode:null,pages:[],activePageId:0,nextId:1,cutout:{origUrl:null,origFile:null,resultUrl:null,loading:false}};
 var CP2_PAPER={'A4':[210,297],'A5':[148,210],'B5':[176,250],'Letter':[216,279],'1:1 (Instagram)':[1080,1080],'16:9':[1920,1080],'9:16':[1080,1920],'4:3':[1400,1050]};
 var CP2_LOGOS=[{name:'RHC 主Logo（透明底）',url:'https://iili.io/CZ0tVNn.png'},{name:'RHC 圆形头像',url:'https://iili.io/CtTySJ2.png'},{name:'RHC 主Logo（白底）',url:'https://iili.io/CZ19Hcx.jpg'}];
 var CP2_FONTS=['Microsoft YaHei','SimSun','KaiTi','Arial','Helvetica','Times New Roman','Georgia','Verdana'];
