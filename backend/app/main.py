@@ -98,6 +98,10 @@ async def root():
 async def health():
     return {"status": "ok"}
 
+@app.get("/api/health")
+async def api_health():
+    return {"status": "ok"}
+
 @app.post("/api/copy/generate", response_model=CopyResponse)
 async def api_copy_generate(req: CopyRequest):
     try:
@@ -149,6 +153,10 @@ async def api_animal_image(animal: str):
         return {"animal": animal, "image_url": url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/animals")
+async def api_animals_list():
+    return {"items": ["cat", "dog", "rabbit", "horse", "cow", "sheep", "goat", "pig"]}
 
 @app.post("/api/products", response_model=dict)
 async def api_product_upsert(req: ProductUpsertRequest):
