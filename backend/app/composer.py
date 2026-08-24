@@ -1,676 +1,1349 @@
 """
+
 RHC Medical - 图片合成引擎（Pillow 实现）
+
 支持：背景图/渐变 + 产品图 + 动物图 + 文字卡片 多层合成
+
 """
+
 import base64
+
 import io
+
 import math
+
 import urllib.request
+
 import urllib.parse
+
 import json
+
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+
+
 UPLOAD_KEY = "6d207e02198a847aa98d0a2a901485a5"
+
 UPLOAD_URL = "https://freeimage.host/api/1/upload"
 
+
+
 CANVAS_W = 1200
+
 CANVAS_H = 800
 
+
+
 # 位置锚点（相对坐标 0~1）
+
 POS_MAP = {
+
     "nw":      (0.0, 0.0),
+
     "north":   (0.5, 0.0),
+
     "ne":      (1.0, 0.0),
+
     "west":    (0.0, 0.5),
+
     "center":  (0.5, 0.5),
+
     "east":    (1.0, 0.5),
+
     "sw":      (0.0, 1.0),
+
     "south":   (0.5, 1.0),
+
     "se":      (1.0, 1.0),
+
 }
 
+
+
 # 主题配色
+
 THEMES = {
+
     "medical-teal": {
+
         "bg_start": (15, 46, 47),
+
         "bg_end":   (35, 85, 88),
+
         "accent":   (200, 168, 93),
+
         "card_bg":  (255, 255, 255, 235),
+
         "card_title": (15, 46, 47),
+
         "card_subtitle": (80, 80, 80),
+
     },
+
     "deep-blue": {
+
         "bg_start": (12, 35, 64),
+
         "bg_end":   (30, 80, 140),
+
         "accent":   (91, 192, 235),
+
         "card_bg":  (255, 255, 255, 235),
+
         "card_title": (12, 35, 64),
+
         "card_subtitle": (80, 80, 80),
+
     },
+
     "clean-white": {
+
         "bg_start": (240, 245, 248),
+
         "bg_end":   (255, 255, 255),
+
         "accent":   (15, 110, 110),
+
         "card_bg":  (15, 46, 47, 240),
+
         "card_title": (255, 255, 255),
+
         "card_subtitle": (200, 210, 210),
+
     },
+
     "warm-gold": {
+
         "bg_start": (45, 32, 22),
+
         "bg_end":   (90, 65, 40),
+
         "accent":   (220, 190, 110),
+
         "card_bg":  (255, 255, 255, 235),
+
         "card_title": (45, 32, 22),
+
         "card_subtitle": (80, 80, 80),
+
     },
+
 }
+
+
+
 
 
 def download_image(url: str) -> Image.Image:
+
     """下载图片并转为 RGBA。支持 http(s):// 和 file:///"""
+
     if not url:
+
         return None
+
     if url.startswith("file:///"):
+
         path = url[8:].lstrip("/")
+
         # Windows 路径修正: /C:/path -> C:/path
+
         if len(path) >= 3 and path[1] == ":":
+
             path = path[0].upper() + path[1:]
+
         return Image.open(path).convert("RGBA")
+
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+
     with urllib.request.urlopen(req, timeout=30) as r:
+
         data = r.read()
+
     return Image.open(io.BytesIO(data)).convert("RGBA")
 
 
+
+
+
 def upload_image(img: Image.Image) -> str:
+
     """保存图片到本地 uploads 目录，返回本地 URL"""
+
     import os
+
     import time
+
     uploads_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
+
     os.makedirs(uploads_dir, exist_ok=True)
+
     
+
     has_alpha = img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info)
+
     if has_alpha:
+
         filename = f"animal_{int(time.time()*1000)}.png"
+
         filepath = os.path.join(uploads_dir, filename)
+
         img.save(filepath, format="PNG")
+
     else:
+
         filename = f"bg_{int(time.time()*1000)}.jpg"
+
         filepath = os.path.join(uploads_dir, filename)
+
         img.convert("RGB").save(filepath, format="JPEG", quality=92)
+
     
+
     print(f"[info] saved to: {filepath}")
+
     # Return local URL that backend will serve
+
     return f"http://localhost:8000/uploads/{filename}"
 
 
+
+
+
 def make_gradient_bg_fast(w: int, h: int, theme: dict) -> Image.Image:
+
     """快速生成渐变背景（numpy 对角渐变）"""
+
     import numpy as np
+
     start = theme["bg_start"]
+
     end = theme["bg_end"]
 
+
+
     x = np.linspace(0, 1, w, dtype=np.float32)
+
     y = np.linspace(0, 1, h, dtype=np.float32)
+
     xx, yy = np.meshgrid(x, y)
+
     t = (xx + yy) / 2.0
 
+
+
     arr = np.zeros((h, w, 4), dtype=np.uint8)
+
     for i in range(3):
+
         arr[:, :, i] = (start[i] + (end[i] - start[i]) * t).astype(np.uint8)
+
     arr[:, :, 3] = 255
+
+
 
     return Image.fromarray(arr, "RGBA")
 
 
+
+
+
 def add_decorations(bg: Image.Image, theme: dict) -> Image.Image:
+
     """添加装饰元素：半透明圆形、线条等"""
+
     overlay = Image.new("RGBA", bg.size, (0, 0, 0, 0))
+
     draw = ImageDraw.Draw(overlay)
+
     w, h = bg.size
+
     accent = theme["accent"]
 
+
+
     # 右上角大圆（半透明）
+
     draw.ellipse(
+
         [w - 300, -100, w + 100, 300],
+
         fill=(*accent, 25),
+
     )
+
     # 左下角小圆
+
     draw.ellipse(
+
         [-80, h - 200, 120, h + 80],
+
         fill=(*accent, 18),
+
     )
+
     # 左侧细线条
+
     for i in range(3):
+
         y = 120 + i * 60
+
         draw.line([(0, y), (60, y)], fill=(*accent, 60), width=2)
 
+
+
     bg = Image.alpha_composite(bg, overlay)
+
     return bg
 
 
+
+
+
 def _get_font(size: int, bold: bool = False):
+
     """尝试加载字体，失败则用默认字体"""
+
     font_paths = [
+
         "C:/Windows/Fonts/msyhbd.ttc" if bold else "C:/Windows/Fonts/msyh.ttc",
+
         "C:/Windows/Fonts/arialbd.ttf" if bold else "C:/Windows/Fonts/arial.ttf",
+
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+
     ]
+
     for fp in font_paths:
+
         try:
+
             return ImageFont.truetype(fp, size)
+
         except (OSError, IOError):
+
             continue
+
     return ImageFont.load_default()
 
 
+
+
+
 def _wrap_text(text: str, font, max_width: int, draw) -> list:
+
     """将文本按宽度自动换行"""
+
     words = text.split()
+
     lines = []
+
     current = ""
+
     for word in words:
+
         test = (current + " " + word).strip()
+
         bbox = draw.textbbox((0, 0), test, font=font)
+
         if bbox[2] - bbox[0] <= max_width:
+
             current = test
+
         else:
+
             if current:
+
                 lines.append(current)
+
             current = word
+
     if current:
+
         lines.append(current)
+
     return lines
 
 
+
+
+
 def make_text_card(
+
     title: str,
+
     subtitle: str = "",
+
     theme_name: str = "medical-teal",
+
     max_width: int = 560,
+
 ) -> Image.Image:
+
     """生成文字卡片（自动宽度 + 自动换行）"""
+
     theme = THEMES.get(theme_name, THEMES["medical-teal"])
+
     title_font = _get_font(30, bold=True)
+
     sub_font = _get_font(16, bold=False)
+
+
 
     pad_x, pad_y = 28, 22
 
+
+
     # 先测量文字
+
     dummy = Image.new("RGBA", (10, 10))
+
     d = ImageDraw.Draw(dummy)
 
+
+
     # 标题换行
+
     text_area_w = max_width - pad_x * 2 - 8  # 8 for accent line
+
     title_lines = _wrap_text(title, title_font, text_area_w, d)
 
+
+
     # 计算标题高度
+
     title_line_h = 0
+
     for line in title_lines:
+
         bbox = d.textbbox((0, 0), line, font=title_font)
+
         title_line_h = max(title_line_h, bbox[3] - bbox[1])
+
     title_total_h = title_line_h * len(title_lines) + (len(title_lines) - 1) * 6
 
+
+
     # 副标题
+
     sub_h = 0
+
     if subtitle:
+
         sub_lines = _wrap_text(subtitle, sub_font, text_area_w, d)
+
         sub_line_h = 0
+
         for line in sub_lines:
+
             bbox = d.textbbox((0, 0), line, font=sub_font)
+
             sub_line_h = max(sub_line_h, bbox[3] - bbox[1])
+
         sub_h = sub_line_h * len(sub_lines) + (len(sub_lines) - 1) * 4
+
     else:
+
         sub_lines = []
+
+
 
     height = pad_y * 2 + title_total_h + sub_h + (12 if subtitle else 0)
 
+
+
     card = Image.new("RGBA", (max_width, height), (0, 0, 0, 0))
+
     draw = ImageDraw.Draw(card)
 
+
+
     # 圆角矩形背景
+
     radius = 14
+
     card_bg = theme["card_bg"]
+
     draw.rounded_rectangle(
+
         [(0, 0), (max_width - 1, height - 1)],
+
         radius=radius,
+
         fill=card_bg,
+
     )
+
+
 
     # 左侧强调竖线
+
     draw.rectangle(
+
         [(0, 12), (4, height - 12)],
+
         fill=theme["accent"],
+
     )
 
+
+
     # 绘制标题行
+
     ty = pad_y
+
     for line in title_lines:
+
         draw.text(
+
             (pad_x + 8, ty),
+
             line,
+
             fill=theme["card_title"],
+
             font=title_font,
+
         )
+
         ty += title_line_h + 6
 
+
+
     # 副标题
+
     if subtitle:
+
         ty += 6  # extra gap
+
         for line in sub_lines:
+
             draw.text(
+
                 (pad_x + 8, ty),
+
                 line,
+
                 fill=theme["card_subtitle"],
+
                 font=sub_font,
+
             )
+
             ty += sub_line_h + 4
+
+
 
     return card
 
 
+
+
+
 def paste_layer(
+
     base: Image.Image,
+
     layer: Image.Image,
+
     location: str = "center",
+
     zoom_pct: int = 50,
+
     margin: int = 30,
+
 ) -> None:
+
     """将图层按位置和缩放比例贴到画布上（就地修改 base）"""
+
     anchor = POS_MAP.get(location, POS_MAP["center"])
+
     z = max(5, min(95, zoom_pct)) / 100.0
 
+
+
     # 缩放以画布宽度为基准，但保持图层宽高比
+
     target_w = int(base.width * z)
+
     ratio = target_w / layer.width
+
     target_h = int(layer.height * ratio)
 
+
+
     # 如果缩放后高度超过画布高度的 90%，改为以高度为基准
+
     if target_h > base.height * 0.9:
+
         target_h = int(base.height * 0.9)
+
         ratio = target_h / layer.height
+
         target_w = int(layer.width * ratio)
+
+
 
     layer = layer.resize((target_w, target_h), Image.LANCZOS)
 
+
+
     # 以锚点为中心定位
+
     x = int((base.width - target_w) * anchor[0])
+
     y = int((base.height - target_h) * anchor[1])
 
+
+
     # 边界检查
+
     x = max(margin, min(x, base.width - target_w - margin))
+
     y = max(margin, min(y, base.height - target_h - margin))
+
+
 
     base.paste(layer, (x, y), layer)
 
 
+
+
+
 def generate_ai_background(prompt: str = "", style: str = "professional") -> dict:
+
     """Generate pure AI scene background via Coze workflow, return {image_url, debug_log}"""
+
     from app.config import settings
+
     log = []
+
     pat = settings.COZE_PAT
+
     workflow_id = settings.COZE_WORKFLOW_ID
+
     if not pat or not workflow_id:
+
         log.append("[error] Coze PAT or WORKFLOW_ID not configured")
+
         return {"image_url": "", "debug_log": "\n".join(log)}
+
+
 
     api_url = "https://api.coze.cn/v1/workflow/run"    # Pass user description + style to workflow; no product image needed
+
     effective_style = style
+
     if prompt and prompt.strip():
+
         effective_style = f"{style}, user scene description: {prompt.strip()}"
+
     payload = {
+
         "workflow_id": workflow_id,
+
         "parameters": {
+
             "style": effective_style,
+
         }
+
     }
+
     log.append(f"[info] calling Coze workflow {workflow_id}")
+
     log.append(f"[info] effective_style={effective_style[:80]}")
 
+
+
     try:
+
         body = json.dumps(payload).encode("utf-8")
+
         req = urllib.request.Request(
+
             api_url,
+
             data=body,
+
             headers={
+
                 "Authorization": f"Bearer {pat}",
+
                 "Content-Type": "application/json; charset=utf-8",
+
             },
+
             method="POST",
+
         )
+
         with urllib.request.urlopen(req, timeout=120) as resp:
+
             result = json.loads(resp.read().decode("utf-8"))
+
         code = result.get("code")
+
         if code != 0:
+
             log.append(f"[error] Coze workflow failed: code={code}, msg={result.get('msg','')}")
+
             return {"image_url": "", "debug_log": "\n".join(log)}
+
+
 
         # Parse output: data is a JSON string like {"output": ["https://..."]}
+
         data_str = result.get("data", "")
+
         if isinstance(data_str, str):
+
             data_obj = json.loads(data_str)
+
         else:
+
             data_obj = data_str
 
+
+
         output_list = data_obj.get("output", [])
+
         if output_list:
+
             img_url = output_list[0]
+
             log.append(f"[ok] AI background generated: {img_url}")
+
             return {"image_url": img_url, "debug_log": "\n".join(log)}
+
         else:
+
             log.append("[error] No output URL in workflow response")
+
             return {"image_url": "", "debug_log": "\n".join(log)}
 
+
+
     except Exception as e:
+
         log.append(f"[error] Coze workflow call failed: {type(e).__name__}: {e}")
+
         return {"image_url": "", "debug_log": "\n".join(log)}
+
+
+
 
 
 def generate_background(theme: str = "medical-teal") -> dict:
+
     """生成纯净背景图（无文字、无产品），返回 {image_url, debug_log}"""
+
     log = []
+
     theme_cfg = THEMES.get(theme, THEMES["medical-teal"])
+
     bg = make_gradient_bg_fast(CANVAS_W, CANVAS_H, theme_cfg)
+
     bg = add_decorations(bg, theme_cfg)
+
     log.append(f"[ok] clean background generated ({theme}), no text")
+
     try:
+
         url = upload_image(bg)
+
         log.append(f"[ok] uploaded: {url}")
+
         return {"image_url": url, "debug_log": "\n".join(log)}
+
     except Exception as e:
+
         log.append(f"[error] upload failed: {e}")
+
         buf = io.BytesIO()
+
         bg.convert("RGB").save(buf, format="JPEG", quality=85)
+
         b64 = base64.b64encode(buf.getvalue()).decode()
+
         return {"image_url": f"data:image/jpeg;base64,{b64}", "image_base64": b64, "debug_log": "\n".join(log)}
 
 
+
+
+
 def _translate_to_english(text: str) -> str:
+
     """调用 DeepSeek 将中文描述翻译为英文图片搜索词"""
+
     from app.config import settings
+
     api_key = settings.OPENAI_API_KEY
+
     base_url = settings.OPENAI_BASE_URL
+
     if not api_key:
+
         return text
+
     try:
+
         import httpx
+
         resp = httpx.post(
+
             f"{base_url}/chat/completions",
+
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+
             json={
+
                 "model": settings.OPENAI_TEXT_MODEL,
+
                 "messages": [
+
                     {"role": "system", "content": "Translate the user's Chinese animal description into concise English keywords suitable for an image search engine. Output ONLY the English keywords, nothing else. Example input: '金毛，正对，坐着' -> 'golden retriever sitting facing camera'"},
+
                     {"role": "user", "content": text},
+
                 ],
+
                 "temperature": 0.2,
+
                 "max_tokens": 60,
+
             },
+
             timeout=15,
+
         )
+
         resp.raise_for_status()
+
         result = resp.json()["choices"][0]["message"]["content"].strip()
+
         return result or text
+
     except Exception:
+
         return text
+
+
+
 
 
 def _http_get_with_retry(url, params=None, timeout=60, retries=3, headers=None):
+
     """带重试的 HTTP GET，应对国内网络不稳定"""
+
     import httpx
+
     import time
+
     last_err = None
+
     for attempt in range(retries):
+
         try:
+
             resp = httpx.get(url, params=params, timeout=timeout,
+
                              follow_redirects=True, headers=headers,
+
                              verify=True)
+
             resp.raise_for_status()
+
             return resp
+
         except Exception as e:
+
             last_err = e
+
             print(f"[warn] HTTP attempt {attempt+1}/{retries} failed: {type(e).__name__}: {e}")
+
             if attempt < retries - 1:
+
                 time.sleep(2 * (attempt + 1))
+
     raise last_err
 
 
+
+
+
 def _search_animal_unsplash(query: str) -> list:
+
     """Search animal images via keyword-matched Unsplash direct URLs (no key needed)"""
+
     import urllib.parse
+
     query_lower = query.lower().strip()
 
+
+
     # Chinese keyword -> English keyword pre-mapping (for when translation fails)
+
     cn_to_en = {
+
         "金毛": "golden retriever", "拉布拉多": "labrador", "哈士奇": "husky",
+
         "柯基": "corgi", "贵宾": "poodle", "泰迪": "poodle",
+
         "比格": "beagle", "斗牛犬": "bulldog", "牧羊犬": "german shepherd",
+
         "狗": "dog", "犬": "dog",
+
         "猫": "cat", "小猫": "kitten", "波斯猫": "persian cat",
+
         "兔": "rabbit", "兔子": "rabbit",
+
         "鹦鹉": "parrot", "鸟": "bird",
+
         "马": "horse",
+
         "牛": "cow", "奶牛": "cow",
+
         "羊": "sheep",
+
         "猪": "pig",
+
         "仓鼠": "hamster",
+
         "龟": "turtle", "乌龟": "turtle",
+
         "蛇": "snake",
+
         "鸡": "chicken", "鸭": "duck",
+
         "狐狸": "fox", "鹿": "deer", "狮子": "lion", "老虎": "tiger",
+
         "熊": "bear", "熊猫": "panda", "大象": "elephant", "猴子": "monkey",
+
     }
+
     # Apply Chinese mapping: if any Chinese keyword found, use its English equivalent
+
     for cn_kw, en_kw in cn_to_en.items():
+
         if cn_kw in query_lower:
+
             query_lower = en_kw
+
             break
 
+
+
     # Common veterinary animal -> Unsplash direct image URL mapping
+
     animal_urls = {
+
         # Dogs
+
         "golden retriever": "https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=1200&q=80",
+
         "dog": "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200&q=80",
+
         "labrador": "https://images.unsplash.com/photo-1579213838770-ca50d594f892?w=1200&q=80",
+
         "husky": "https://images.unsplash.com/photo-1605568427561-40dd23c2acea?w=1200&q=80",
+
         "corgi": "https://images.unsplash.com/photo-1612536057832-2b78b096076e?w=1200&q=80",
+
         "poodle": "https://images.unsplash.com/photo-1616149562384-01890ea39022?w=1200&q=80",
+
         "beagle": "https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=1200&q=80",
+
         "bulldog": "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=1200&q=80",
+
         "german shepherd": "https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=1200&q=80",
+
         # Cats
+
         "cat": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1200&q=80",
+
         "kitten": "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=1200&q=80",
+
         "persian cat": "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=1200&q=80",
+
         # Rabbits
+
         "rabbit": "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=1200&q=80",
+
         "bunny": "https://images.unsplash.com/photo-1535295972055-1c762f4483e5?w=1200&q=80",
+
         # Birds
+
         "parrot": "https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=1200&q=80",
+
         "bird": "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=80",
+
         # Horses
+
         "horse": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=1200&q=80",
+
         "pony": "https://images.unsplash.com/photo-1598974357801-cbca100e65d3?w=1200&q=80",
+
         # Cows/Cattle
+
         "cow": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=1200&q=80",
+
         "cattle": "https://images.unsplash.com/photo-1546458656-83b86556a884?w=1200&q=80",
+
         # Sheep/Goats
+
         "sheep": "https://images.unsplash.com/photo-1484552078227-5a7285f66306?w=1200&q=80",
+
         "goat": "https://images.unsplash.com/photo-1524024973431-2ad916746881?w=1200&q=80",
+
         # Pigs
+
         "pig": "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=1200&q=80",
+
         # Hamsters/Guinea pigs
+
         "hamster": "https://images.unsplash.com/photo-1425082661507-d6d2f6a11844?w=1200&q=80",
+
         "guinea pig": "https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=1200&q=80",
+
         # Exotic
+
         "ferret": "https://images.unsplash.com/photo-1615266895738-11f1371cd7e5?w=1200&q=80",
+
         "reptile": "https://images.unsplash.com/photo-1504450874802-0ba2bcd659e3?w=1200&q=80",
+
         "snake": "https://images.unsplash.com/photo-1531386816498-818d35661c93?w=1200&q=80",
+
         "lizard": "https://images.unsplash.com/photo-1504450874802-0ba2bcd659e3?w=1200&q=80",
+
         "turtle": "https://images.unsplash.com/photo-1437622645530-1885ce061ad6?w=1200&q=80",
+
         # Farm
+
         "chicken": "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1200&q=80",
+
         "duck": "https://images.unsplash.com/photo-1555852095-64e7428df0fa?w=1200&q=80",
+
     }
+
     
+
     candidates = []
+
     
+
     # 1. Exact or partial match
+
     for keyword, url in animal_urls.items():
+
         if keyword in query_lower or query_lower in keyword:
+
             if url not in candidates:
+
                 candidates.append(url)
+
     
+
     # 2. If no match, try individual word matching
+
     if not candidates:
+
         words = query_lower.split()
+
         for word in words:
+
             for keyword, url in animal_urls.items():
+
                 if word in keyword or keyword in word:
+
                     if url not in candidates:
+
                         candidates.append(url)
+
     
+
     # 3. Fallback: try Unsplash source redirect (may work for some queries)
+
     if not candidates:
+
         try:
+
             encoded = urllib.parse.quote(query + " animal")
+
             fallback_url = f"https://source.unsplash.com/1200x800/?{encoded}"
+
             # Just add it, the download step will verify
+
             candidates.append(fallback_url)
+
         except Exception:
+
             pass
+
     
+
     print(f"[info] Unsplash search: {len(candidates)} candidates for '{query}'")
+
     return candidates
 
 
 
+
+
+
+
 def _search_animal_pixabay(query: str) -> list:
+
     """Pixabay API 备用搜索（免费，需key，这里用公共demo key受限）"""
+
     # Pixabay 不需要key也能通过网页搜索，但API需要key
+
     # 改用开放的 Openverse API (WordPress)，无需key
+
     api_url = "https://api.openverse.org/v1/images/"
+
     params = {
+
         "q": f"{query} animal",
+
         "license_type": "all",
+
         "page_size": 10,
+
         "mature": "false",
+
     }
+
     try:
+
         resp = _http_get_with_retry(api_url, params=params, timeout=30, retries=2,
+
                                     headers={"User-Agent": "RHC-Marketing/1.0"})
+
         data = resp.json()
+
         candidates = []
+
         for item in data.get("results", []):
+
             url = item.get("url") or item.get("thumbnail")
+
             if url and item.get("width", 0) >= 400:
+
                 candidates.append(url)
+
         return candidates
+
     except Exception as e:
+
         print(f"[warn] Openverse search failed: {e}")
+
         return []
 
 
+
+
+
 def search_animal_image(prompt: str) -> bytes:
+
     """搜索动物图片并下载，返回二进制；Wikimedia为主，Openverse为备"""
+
     # 先翻译为英文搜索词
+
     query = _translate_to_english(prompt)
+
     print(f"[info] searching animal (query='{query}')")
 
+
+
     candidates = []
+
     # 尝试 Wikimedia（3次重试）
+
     try:
+
         candidates = _search_animal_unsplash(query)
+
         print(f"[info] Unsplash: {len(candidates)} candidates")
+
     except Exception as e:
+
         print(f"[warn] Unsplash search failed: {e}")
 
+
+
     # Wikimedia 无结果时尝试 Openverse
+
     if not candidates:
+
         candidates = _search_animal_pixabay(query)
+
         print(f"[info] Openverse: {len(candidates)} candidates")
 
+
+
     if not candidates:
+
         raise RuntimeError(f"No images found for: {query} (both sources failed)")
 
+
+
     # 逐个尝试下载（用 urllib 绕过国内对 httpx 的连接限制）
+
     import urllib.request as _urllib
+
     for img_url in candidates[:5]:
+
         try:
+
             print(f"[info] downloading from: {img_url[:80]}")
+
             req = _urllib.Request(img_url, headers={
+
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+
                 "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
+
                 "Referer": "https://unsplash.com/",
+
             })
+
             resp = _urllib.urlopen(req, timeout=30)
+
             data = resp.read()
+
             print(f"[info] downloaded {len(data)} bytes from {img_url[:60]}")
+
             if len(data) > 5000:
+
                 return data
+
         except Exception as e:
+
             print(f"[warn] download failed for {img_url[:60]}: {type(e).__name__}: {e}")
+
             continue
+
+
 
     raise RuntimeError(f"Failed to download any image for: {query}")
 
 
+
+
+
 def generate_animal_cutout(prompt: str, api_key: str = "") -> dict:
+
     """Generate animal image (demo mode: no cutout, returns original animal image)"""
+
     import random
+
     result = {"status": "success", "log": [], "image_url": ""}
+
     try:
+
         # Step 1: Translate to English for better matching
+
         query = _translate_to_english(prompt)
+
         result["log"].append(f"[info] searching animal (query='{query}')")
 
+
+
         # Step 2: Search - returns a LIST of URLs
+
         candidates = _search_animal_unsplash(query)
+
         if not candidates:
+
             result["status"] = "failed"
+
             result["log"].append("[error] no animal image found")
+
             return result
+
         result["log"].append(f"[ok] found {len(candidates)} candidates")
 
+
+
         # Step 3: Randomly pick one
+
         img_url = random.choice(candidates)
+
         result["log"].append(f"[ok] picked: {img_url[:80]}")
 
+
+
         # Step 4: Download image
+
         import urllib.request
+
         req = urllib.request.Request(img_url, headers={
+
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+
             "Accept": "image/webp,image/*,*/*;q=0.8",
+
             "Referer": "https://unsplash.com/",
+
         })
+
         with urllib.request.urlopen(req, timeout=30) as resp:
+
             img_bytes = resp.read()
+
         result["log"].append(f"[ok] downloaded: {len(img_bytes)} bytes")
 
+
+
         # Step 5: Convert to PIL Image
+
         img = Image.open(io.BytesIO(img_bytes))
+
         result["log"].append(f"[ok] image loaded: {img.size[0]}x{img.size[1]}")
 
+
+
         # Step 6: [Demo mode] Skip cutout, save original directly
+
         result["log"].append("[info] demo mode: skipping cutout, using original image")
 
+
+
         # Step 7: Upload (save locally)
+
         image_url = upload_image(img)
+
         result["image_url"] = image_url
+
         result["log"].append(f"[ok] uploaded: {image_url}")
 
+
+
     except Exception as e:
+
         result["status"] = "failed"
+
         result["log"].append(f"[error] {str(e)}")
+
         import traceback
+
         result["log"].append(traceback.format_exc())
 
+
+
     return result
+
 def compose_image(
-    product_image_url: str = "",
-    prompt: str = "",
-    style: str = "professional"
+    animal: str = "",
+    product_id: str = "",
+    style: str = "professional",
+    text: str = ""
 ) -> dict:
+
     """Compose product image with AI background via Coze workflow."""
-    result = generate_ai_background(prompt=prompt, style=style)
+
+    result = generate_ai_background(prompt=text, style=style)
+
     return result
+
