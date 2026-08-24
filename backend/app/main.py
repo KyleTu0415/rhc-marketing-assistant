@@ -43,6 +43,11 @@ except ImportError:
         product_id: str = ""
         style: str = "professional"
         text: str = ""
+        mode: str = ""
+        prompt: str = ""
+        ai_background: bool = False
+        ai_prompt: str = ""
+        ai_style: str = ""
 
     class ComposeResponse(BaseModel):
         composed_image_url: str = ""
@@ -129,13 +134,27 @@ async def api_copy_generate(req: CopyRequest):
 @app.post("/api/compose", response_model=ComposeResponse)
 async def api_compose(req: ComposeRequest):
     try:
-        from app.composer import compose_image
-        result = compose_image(
-            animal=req.animal,
-            text=req.text,
-            style=req.style
-        )
-        return ComposeResponse(**result)
+        # Handle mode-based routing
+        mode = getattr(req, 'mode', '') or ''
+        if mode == 'animal_cutout':
+            from app.composer import generate_animal_cutout
+            prompt = getattr(req, 'prompt', '') or ''
+            result = generate_animal_cutout(prompt=prompt)
+            return {"image_url": result.get("image_url", ""), "status": result.get("status", "failed")}
+        elif mode == 'background' or getattr(req, 'ai_background', False):
+            from app.composer import generate_ai_background
+            ai_prompt = getattr(req, 'ai_prompt', '') or getattr(req, 'text', '') or ''
+            ai_style = getattr(req, 'ai_style', '') or getattr(req, 'style', 'professional') or 'professional'
+            result = generate_ai_background(prompt=ai_prompt, style=ai_style)
+            return result
+        else:
+            from app.composer import compose_image
+            result = compose_image(
+                animal=req.animal,
+                text=req.text,
+                style=req.style
+            )
+            return ComposeResponse(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
