@@ -557,8 +557,12 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 .cp2-cutout-col{flex:1;display:flex;flex-direction:column;min-width:0}
 .cp2-upload-zone{border:2px dashed var(--color-border);border-radius:var(--radius-md);padding:40px 20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--color-surface)}
 .cp2-upload-zone:hover{border-color:var(--color-primary);background:var(--color-primary-xlight)}
-.cp2-cutout-result{flex:1;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;min-height:300px}
-.cp2-cutout-result img{max-width:100%;max-height:100%}
+.cp2-cutout-area{flex:1;border:2px dashed var(--color-border);border-radius:var(--radius-md);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;cursor:pointer;transition:all .15s;background:var(--color-surface);overflow:hidden;position:relative}
+.cp2-cutout-area:hover{border-color:var(--color-primary);background:var(--color-primary-xlight)}
+.cp2-cutout-area img{max-width:100%;max-height:100%;object-fit:contain}
+.cp2-cutout-actions{display:flex;gap:10px;margin-top:12px}
+.cp2-cutout-actions .btn{flex:1}
+.cp2-cutout-status{text-align:center;padding:20px;color:var(--color-text-secondary)}
 
 </style>
 </head>
@@ -701,27 +705,35 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 </div>
 <div class="cp2-cutout-ws">
 <div class="cp2-cutout-col">
-<div class="cp2-upload-zone" id="cp2-upload-zone" onclick="document.getElementById('cp2-cutout-file').click()">
+<div class="cp2-cutout-area" id="cp2-cutout-left" onclick="if(!cp2State.cutout.loading)document.getElementById(\'cp2-cutout-file\').click()">
+<div id="cp2-cutout-placeholder">
 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
 <p style="margin-top:12px;font-weight:500;color:var(--color-text-secondary)">点击上传图片</p>
 <span style="font-size:12px;color:var(--color-text-tertiary)">支持 JPG、PNG，建议使用主体清晰的图片</span>
 </div>
-<input type="file" id="cp2-cutout-file" accept="image/*" style="display:none" onchange="cp2OnCutoutUpload(this)">
-<div id="cp2-cutout-original" style="display:none;margin-top:12px;text-align:center">
-<img id="cp2-cutout-orig-img" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid var(--color-border)">
+<img id="cp2-cutout-orig-img" style="display:none">
 </div>
-<button class="btn btn-primary" id="cp2-cutout-start" style="width:100%;margin-top:12px;display:none" onclick="cp2DoCutout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/></svg> 开始抠图</button>
-<div id="cp2-cutout-loading" style="display:none;text-align:center;padding:32px">
-<div class="loading-spinner"></div>
-<p style="margin-top:10px;color:var(--color-text-secondary)">正在抠图，请稍候...</p>
+<input type="file" id="cp2-cutout-file" accept="image/*" style="display:none" onchange="cp2OnCutoutUpload(this)">
+<div class="cp2-cutout-actions">
+<button class="btn btn-outline" id="cp2-cutout-cancel" style="display:none" onclick="cp2ResetCutout()">取消</button>
+<button class="btn btn-primary" id="cp2-cutout-start" style="display:none" onclick="cp2DoCutout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图</button>
 </div>
 </div>
 <div class="cp2-cutout-col">
-<div class="cp2-cutout-result" id="cp2-cutout-result">
+<div class="cp2-cutout-area" id="cp2-cutout-right" style="cursor:default">
+<div id="cp2-cutout-result-placeholder">
 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
 <p style="margin-top:12px;color:var(--color-text-secondary)">抠图结果将显示在这里</p>
 </div>
-<button class="btn btn-primary" id="cp2-cutout-dl" style="display:none;margin-top:12px;width:100%" onclick="cp2DownloadCutout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 下载透明底 PNG</button>
+<img id="cp2-cutout-result-img" style="display:none">
+<div id="cp2-cutout-spinner" style="display:none" class="cp2-cutout-status">
+<div class="loading-spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto"></div>
+<p style="margin-top:12px">正在抠图，请稍候...</p>
+</div>
+</div>
+<div class="cp2-cutout-actions">
+<button class="btn btn-primary" id="cp2-cutout-dl" style="display:none" onclick="cp2DownloadCutout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 下载透明底 PNG</button>
+</div>
 </div>
 </div>
 </div>
@@ -1101,6 +1113,194 @@ function downloadComposed(){
 }
 
 (function init(){var ai=document.getElementById('api-url-input');if(ai){ai.value=state.apiBase;ai.addEventListener('keydown',function(e){if(e.key==='Enter')connectAPI()})}initComposer();checkHealth()})();
+
+// ============ CUTOUT FEATURE ============
+function cp2OnCutoutUpload(input){
+  var file=input.files&&input.files[0];if(!file)return;
+  if(file.size>12*1024*1024){showToast('图片不能超过12MB','error');input.value='';return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    cp2State.cutout.origUrl=e.target.result;
+    cp2State.cutout.origFile=file;
+    cp2State.cutout.resultUrl=null;
+    var img=document.getElementById('cp2-cutout-orig-img');
+    img.src=e.target.result;img.style.display='block';
+    document.getElementById('cp2-cutout-placeholder').style.display='none';
+    document.getElementById('cp2-cutout-start').style.display='block';
+    document.getElementById('cp2-cutout-cancel').style.display='block';
+    document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+    var rimg=document.getElementById('cp2-cutout-result-img');rimg.style.display='none';rimg.src='';
+    document.getElementById('cp2-cutout-dl').style.display='none';
+    document.getElementById('cp2-cutout-spinner').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function cp2DoCutout(){
+  if(!cp2State.cutout.origFile){showToast('请先上传图片','error');return}
+  cp2State.cutout.loading=true;
+  var btn=document.getElementById('cp2-cutout-start');
+  btn.disabled=true;btn.innerHTML='<span class="loading-spinner" style="width:14px;height:14px;border-width:2px;vertical-align:-2px"></span> 抠图中...';
+  document.getElementById('cp2-cutout-spinner').style.display='block';
+  document.getElementById('cp2-cutout-result-placeholder').style.display='none';
+  var fd=new FormData();
+  fd.append('file',cp2State.cutout.origFile);
+  fetch(apiUrl('/api/cutout'),{method:'POST',body:fd,signal:AbortSignal.timeout(120000)})
+    .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'抠图失败')});return r.json()})
+    .then(function(d){
+      if(d.url){
+        cp2State.cutout.resultUrl=d.url;
+        var img=document.getElementById('cp2-cutout-result-img');
+        img.onload=function(){
+          document.getElementById('cp2-cutout-spinner').style.display='none';
+          img.style.display='block';
+          document.getElementById('cp2-cutout-dl').style.display='block';
+        };
+        img.onerror=function(){
+          document.getElementById('cp2-cutout-spinner').style.display='none';
+          document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+          showToast('结果图片加载失败','error');
+        };
+        img.src=d.url;
+        showToast('抠图完成','success');
+      }else{throw new Error('未返回结果')}
+    })
+    .catch(function(err){
+      document.getElementById('cp2-cutout-spinner').style.display='none';
+      document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+      showToast('抠图失败: '+err.message,'error');
+    })
+    .finally(function(){
+      cp2State.cutout.loading=false;
+      btn.disabled=false;
+      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图';
+    });
+}
+
+function cp2DownloadCutout(){
+  if(!cp2State.cutout.resultUrl)return;
+  var a=document.createElement('a');
+  a.href=cp2State.cutout.resultUrl;
+  a.download='RHC_cutout_'+Date.now()+'.png';
+  a.target='_blank';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast('已开始下载','success');
+}
+
+function cp2ResetCutout(){
+  cp2State.cutout={origUrl:null,origFile:null,resultUrl:null,loading:false};
+  document.getElementById('cp2-cutout-file').value='';
+  var img=document.getElementById('cp2-cutout-orig-img');img.src='';img.style.display='none';
+  document.getElementById('cp2-cutout-placeholder').style.display='block';
+  document.getElementById('cp2-cutout-start').style.display='none';
+  document.getElementById('cp2-cutout-cancel').style.display='none';
+  var rimg=document.getElementById('cp2-cutout-result-img');rimg.src='';rimg.style.display='none';
+  document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+  document.getElementById('cp2-cutout-dl').style.display='none';
+  document.getElementById('cp2-cutout-spinner').style.display='none';
+}
+
+// ============ BROCHURE DOWNLOAD (canvas) ============
+function cp2ProxyUrl(url){
+  if(!url)return '';
+  if(url.startsWith('data:')||url.startsWith('blob:'))return url;
+  return apiUrl('/api/proxy-image?url=')+encodeURIComponent(url);
+}
+
+function cp2LoadImage(src){
+  return new Promise(function(resolve,reject){
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){resolve(img)};
+    img.onerror=function(){reject(new Error('图片加载失败'))};
+    img.src=src;
+  });
+}
+
+function cp2Download(){
+  var pg=cp2ActivePage();if(!pg)return;
+  var dims=CP2_PAPER[pg.paperSize]||CP2_PAPER.A4;
+  var scale=2;
+  var W=dims[0],H=dims[1];
+  var canvas=document.createElement('canvas');
+  canvas.width=W*scale;canvas.height=H*scale;
+  var ctx=canvas.getContext('2d');
+  ctx.scale(scale,scale);
+  showToast('正在生成图片...','info');
+
+  var bgPromise;
+  if(pg.bgType==='image'&&pg.bgImageUrl){
+    bgPromise=cp2LoadImage(cp2ProxyUrl(pg.bgImageUrl)).then(function(img){
+      ctx.drawImage(img,0,0,W,H);
+    }).catch(function(){
+      ctx.fillStyle=pg.bgValue||'#fff';ctx.fillRect(0,0,W,H);
+    });
+  }else{
+    ctx.fillStyle=pg.bgValue||'#fff';ctx.fillRect(0,0,W,H);
+    bgPromise=Promise.resolve();
+  }
+
+  bgPromise.then(function(){
+    var promises=[];
+    pg.products.forEach(function(l){
+      if(!l.img)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.img)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    pg.animals.forEach(function(l){
+      if(!l.imgUrl)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.imgUrl)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    pg.logos.forEach(function(l){
+      if(!l.url)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.url)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    return Promise.all(promises);
+  }).then(function(){
+    pg.texts.forEach(function(l){
+      if(!l.text)return;
+      var x=W*l.x/100,y=H*l.y/100,maxW=W*l.w/100,fs=l.fontSize;
+      ctx.font=(l.italic?'italic ':'')+(l.bold?'bold ':'')+fs+'px '+l.fontFamily;
+      ctx.fillStyle=l.color;ctx.textBaseline='top';
+      var lines=String(l.text).split('\n');var lineY=y;
+      lines.forEach(function(line){
+        var words=line.split(' ');var curLine='';
+        words.forEach(function(word){
+          var test=curLine?curLine+' '+word:word;
+          if(ctx.measureText(test).width>maxW&&curLine){
+            ctx.fillText(curLine,x,lineY);lineY+=fs*1.3;curLine=word;
+          }else{curLine=test}
+        });
+        if(curLine){ctx.fillText(curLine,x,lineY);lineY+=fs*1.3}
+      });
+    });
+    var pIdx=0;
+    for(var j=0;j<cp2State.pages.length;j++){if(cp2State.pages[j].id===pg.id){pIdx=j+1;break}}
+    pg.pageNums.forEach(function(pn){
+      ctx.font='12px sans-serif';ctx.fillStyle='#999';ctx.textAlign='center';
+      ctx.fillText('- '+pIdx+' -',W*pn.x/100,H*pn.y/100);ctx.textAlign='start';
+    });
+    canvas.toBlob(function(blob){
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url;a.download='RHC_brochure_'+(pg.paperSize||'A4').replace(/[^a-z0-9]/gi,'_')+'_'+Date.now()+'.png';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url)},1000);
+      showToast('图片已下载','success');
+    },'image/png');
+  }).catch(function(err){
+    showToast('生成失败: '+err.message,'error');
+  });
+}
+
 </script>
 
 <script>
@@ -1683,6 +1883,194 @@ function cp2GenerateBg(){
     if(btn){btn.disabled=false;btn.textContent=pg.bgImageUrl?'重新生成AI背景':'AI 生成背景';}
   });
 }
+
+// ============ CUTOUT FEATURE ============
+function cp2OnCutoutUpload(input){
+  var file=input.files&&input.files[0];if(!file)return;
+  if(file.size>12*1024*1024){showToast('图片不能超过12MB','error');input.value='';return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    cp2State.cutout.origUrl=e.target.result;
+    cp2State.cutout.origFile=file;
+    cp2State.cutout.resultUrl=null;
+    var img=document.getElementById('cp2-cutout-orig-img');
+    img.src=e.target.result;img.style.display='block';
+    document.getElementById('cp2-cutout-placeholder').style.display='none';
+    document.getElementById('cp2-cutout-start').style.display='block';
+    document.getElementById('cp2-cutout-cancel').style.display='block';
+    document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+    var rimg=document.getElementById('cp2-cutout-result-img');rimg.style.display='none';rimg.src='';
+    document.getElementById('cp2-cutout-dl').style.display='none';
+    document.getElementById('cp2-cutout-spinner').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function cp2DoCutout(){
+  if(!cp2State.cutout.origFile){showToast('请先上传图片','error');return}
+  cp2State.cutout.loading=true;
+  var btn=document.getElementById('cp2-cutout-start');
+  btn.disabled=true;btn.innerHTML='<span class="loading-spinner" style="width:14px;height:14px;border-width:2px;vertical-align:-2px"></span> 抠图中...';
+  document.getElementById('cp2-cutout-spinner').style.display='block';
+  document.getElementById('cp2-cutout-result-placeholder').style.display='none';
+  var fd=new FormData();
+  fd.append('file',cp2State.cutout.origFile);
+  fetch(apiUrl('/api/cutout'),{method:'POST',body:fd,signal:AbortSignal.timeout(120000)})
+    .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'抠图失败')});return r.json()})
+    .then(function(d){
+      if(d.url){
+        cp2State.cutout.resultUrl=d.url;
+        var img=document.getElementById('cp2-cutout-result-img');
+        img.onload=function(){
+          document.getElementById('cp2-cutout-spinner').style.display='none';
+          img.style.display='block';
+          document.getElementById('cp2-cutout-dl').style.display='block';
+        };
+        img.onerror=function(){
+          document.getElementById('cp2-cutout-spinner').style.display='none';
+          document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+          showToast('结果图片加载失败','error');
+        };
+        img.src=d.url;
+        showToast('抠图完成','success');
+      }else{throw new Error('未返回结果')}
+    })
+    .catch(function(err){
+      document.getElementById('cp2-cutout-spinner').style.display='none';
+      document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+      showToast('抠图失败: '+err.message,'error');
+    })
+    .finally(function(){
+      cp2State.cutout.loading=false;
+      btn.disabled=false;
+      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图';
+    });
+}
+
+function cp2DownloadCutout(){
+  if(!cp2State.cutout.resultUrl)return;
+  var a=document.createElement('a');
+  a.href=cp2State.cutout.resultUrl;
+  a.download='RHC_cutout_'+Date.now()+'.png';
+  a.target='_blank';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast('已开始下载','success');
+}
+
+function cp2ResetCutout(){
+  cp2State.cutout={origUrl:null,origFile:null,resultUrl:null,loading:false};
+  document.getElementById('cp2-cutout-file').value='';
+  var img=document.getElementById('cp2-cutout-orig-img');img.src='';img.style.display='none';
+  document.getElementById('cp2-cutout-placeholder').style.display='block';
+  document.getElementById('cp2-cutout-start').style.display='none';
+  document.getElementById('cp2-cutout-cancel').style.display='none';
+  var rimg=document.getElementById('cp2-cutout-result-img');rimg.src='';rimg.style.display='none';
+  document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+  document.getElementById('cp2-cutout-dl').style.display='none';
+  document.getElementById('cp2-cutout-spinner').style.display='none';
+}
+
+// ============ BROCHURE DOWNLOAD (canvas) ============
+function cp2ProxyUrl(url){
+  if(!url)return '';
+  if(url.startsWith('data:')||url.startsWith('blob:'))return url;
+  return apiUrl('/api/proxy-image?url=')+encodeURIComponent(url);
+}
+
+function cp2LoadImage(src){
+  return new Promise(function(resolve,reject){
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){resolve(img)};
+    img.onerror=function(){reject(new Error('图片加载失败'))};
+    img.src=src;
+  });
+}
+
+function cp2Download(){
+  var pg=cp2ActivePage();if(!pg)return;
+  var dims=CP2_PAPER[pg.paperSize]||CP2_PAPER.A4;
+  var scale=2;
+  var W=dims[0],H=dims[1];
+  var canvas=document.createElement('canvas');
+  canvas.width=W*scale;canvas.height=H*scale;
+  var ctx=canvas.getContext('2d');
+  ctx.scale(scale,scale);
+  showToast('正在生成图片...','info');
+
+  var bgPromise;
+  if(pg.bgType==='image'&&pg.bgImageUrl){
+    bgPromise=cp2LoadImage(cp2ProxyUrl(pg.bgImageUrl)).then(function(img){
+      ctx.drawImage(img,0,0,W,H);
+    }).catch(function(){
+      ctx.fillStyle=pg.bgValue||'#fff';ctx.fillRect(0,0,W,H);
+    });
+  }else{
+    ctx.fillStyle=pg.bgValue||'#fff';ctx.fillRect(0,0,W,H);
+    bgPromise=Promise.resolve();
+  }
+
+  bgPromise.then(function(){
+    var promises=[];
+    pg.products.forEach(function(l){
+      if(!l.img)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.img)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    pg.animals.forEach(function(l){
+      if(!l.imgUrl)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.imgUrl)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    pg.logos.forEach(function(l){
+      if(!l.url)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.url)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    return Promise.all(promises);
+  }).then(function(){
+    pg.texts.forEach(function(l){
+      if(!l.text)return;
+      var x=W*l.x/100,y=H*l.y/100,maxW=W*l.w/100,fs=l.fontSize;
+      ctx.font=(l.italic?'italic ':'')+(l.bold?'bold ':'')+fs+'px '+l.fontFamily;
+      ctx.fillStyle=l.color;ctx.textBaseline='top';
+      var lines=String(l.text).split('\n');var lineY=y;
+      lines.forEach(function(line){
+        var words=line.split(' ');var curLine='';
+        words.forEach(function(word){
+          var test=curLine?curLine+' '+word:word;
+          if(ctx.measureText(test).width>maxW&&curLine){
+            ctx.fillText(curLine,x,lineY);lineY+=fs*1.3;curLine=word;
+          }else{curLine=test}
+        });
+        if(curLine){ctx.fillText(curLine,x,lineY);lineY+=fs*1.3}
+      });
+    });
+    var pIdx=0;
+    for(var j=0;j<cp2State.pages.length;j++){if(cp2State.pages[j].id===pg.id){pIdx=j+1;break}}
+    pg.pageNums.forEach(function(pn){
+      ctx.font='12px sans-serif';ctx.fillStyle='#999';ctx.textAlign='center';
+      ctx.fillText('- '+pIdx+' -',W*pn.x/100,H*pn.y/100);ctx.textAlign='start';
+    });
+    canvas.toBlob(function(blob){
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url;a.download='RHC_brochure_'+(pg.paperSize||'A4').replace(/[^a-z0-9]/gi,'_')+'_'+Date.now()+'.png';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url)},1000);
+      showToast('图片已下载','success');
+    },'image/png');
+  }).catch(function(err){
+    showToast('生成失败: '+err.message,'error');
+  });
+}
+
 </script>
 </body>
 </html>
