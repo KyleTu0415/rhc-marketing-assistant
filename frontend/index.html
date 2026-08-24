@@ -875,16 +875,29 @@ function showProductDetail(recordId){var p=state.products.find(function(x){retur
 function showProductDetailFallback(model){
 var p=state.products.find(function(x){return getProductModel(x)===model})||{product_model:model};
 var m=getProductModel(p),n=getProductDisplayName(p),c=getProductCategory(p),selling=_txt(p.main_selling_point);
+var img=getProductImageUrl(p)||PRODUCT_IMAGE_MAP[m]||placeholderSvg(m);
 var main=document.getElementById('media-main'),det=document.getElementById('product-detail');
 main.style.display='none';det.style.display='block';
 det.innerHTML='<div class="back-btn" onclick="backToProductGrid()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> 返回产品列表</div>'+
-'<div class="product-detail-card"><div class="product-detail-header"><div class="product-detail-info"><h2>'+escapeHtml(m)+'</h2><div class="detail-name">'+escapeHtml(n)+'</div></div></div>'+
+'<div class="product-detail-card">'+
+'<div class="product-detail-header">'+
+'<div class="product-detail-img-wrap">'+
+'<img class="product-detail-img" id="det-fallback-img" src="'+escapeHtml(img)+'" alt="'+escapeHtml(m)+'" onerror="this.src=\''+placeholderSvg(m)+'\'">'+
+'<div class="product-detail-img-overlay" onclick="document.getElementById(\'det-fallback-file\').click()">'+
+'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 更换图片</div>'+
+'<input type="file" id="det-fallback-file" accept="image/*" style="display:none" onchange="handleFallbackImageUpload(this,\'det-fallback-img\',\'det-fallback-image\')">'+
+'<input type="hidden" id="det-fallback-image" value="'+escapeHtml(img)+'">'+
+'</div>'+
+'<div class="product-detail-info"><h2>'+escapeHtml(m)+'</h2><div class="detail-name">'+escapeHtml(n)+'</div></div>'+
+'</div>'+
 '<div class="product-detail-body">'+
 '<div class="detail-section"><h4>产品名称</h4><input type="text" id="det-fallback-name" value="'+escapeHtml(n)+'"></div>'+
 '<div class="detail-section"><h4>产品型号</h4><input type="text" id="det-fallback-model" value="'+escapeHtml(m)+'"></div>'+
 '<div class="detail-section"><h4>产品分类</h4><input type="text" id="det-fallback-category" value="'+escapeHtml(c)+'"></div>'+
 '<div class="detail-section"><h4>核心卖点</h4><textarea id="det-fallback-selling" rows="5" placeholder="输入产品核心卖点...">'+escapeHtml(selling)+'</textarea></div>'+
-'</div><div class="detail-actions"><button class="btn btn-outline" onclick="backToProductGrid()">返回</button></div></div>';
+'</div>'+
+'<div class="detail-actions"><button class="btn btn-outline" onclick="backToProductGrid()">返回</button></div>'+
+'</div>';
 }
 
 function backToProductGrid(){var main=document.getElementById('media-main'),det=document.getElementById('product-detail');main.style.display='';det.style.display='none';det.innerHTML=''}
