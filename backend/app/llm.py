@@ -77,7 +77,9 @@ Output format (JSON only, no markdown):
         )
         content = response.choices[0].message.content.strip()
         if content.startswith("```"):
-            content = content.split("\n", 1)[1] if "\n" in content else content
+            content = content.split("
+", 1)[1] if "
+" in content else content
             content = content.rsplit("```", 1)[0].strip()
         result = json.loads(content)
         return {"title": result.get("headline", ""), "body": result.get("body", ""), "hashtags": result.get("hashtags", [])}
