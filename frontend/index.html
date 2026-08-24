@@ -914,10 +914,10 @@ function handleImageUpload(input,hiddenId,previewId,filenameId){
   var file=input.files&&input.files[0];if(!file)return;
   if(file.size>8*1024*1024){showToast('图片不能超过8MB','error');input.value='';return}
   var fname=document.getElementById(filenameId);if(fname)fname.textContent='上传中...';
-  var fd=new FormData();fd.append('source',file);fd.append('type','file');fd.append('action','upload');fd.append('key','6d207e02198a847aa98d0a2a901485a5');
-  fetch('https://freeimage.host/api/1/upload',{method:'POST',body:fd,signal:AbortSignal.timeout(30000)})
-    .then(function(r){return r.json()})
-    .then(function(d){if(d&&d.image&&d.image.url){var url=d.image.url;document.getElementById(hiddenId).value=url;var prev=document.getElementById(previewId);if(prev){prev.src=url;prev.style.display='block'}if(fname)fname.textContent=file.name+' ✓';showToast('图片上传成功','success')}else{throw new Error(d&&d.error?d.error.message:'上传失败')}})
+  var fd=new FormData();fd.append('file',file);
+  fetch(apiUrl('/api/upload-image'),{method:'POST',body:fd,signal:AbortSignal.timeout(30000)})
+    .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'上传失败')});return r.json()})
+    .then(function(d){if(d&&d.url){var url=d.url;document.getElementById(hiddenId).value=url;var prev=document.getElementById(previewId);if(prev){prev.src=url;prev.style.display='block'}if(fname)fname.textContent=file.name+' ✓';showToast('图片上传成功','success')}else{throw new Error('上传失败')}})
     .catch(function(err){if(fname)fname.textContent='';showToast('图片上传失败: '+err.message,'error');input.value=''})
 }
 
