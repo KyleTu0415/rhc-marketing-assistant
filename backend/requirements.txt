@@ -5,5 +5,3 @@ python-dotenv==1.0.0
 Pillow==10.4.0
 httpx==0.26.0
 numpy==1.26.3
-
-openai>=1.0.0
