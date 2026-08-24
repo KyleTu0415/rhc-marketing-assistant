@@ -1274,49 +1274,9 @@ def generate_animal_cutout(prompt: str, api_key: str = "") -> dict:
 
 
 
-        # Step 4: Download image
-
-        import urllib.request
-
-        req = urllib.request.Request(img_url, headers={
-
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-
-            "Accept": "image/webp,image/*,*/*;q=0.8",
-
-            "Referer": "https://unsplash.com/",
-
-        })
-
-        with urllib.request.urlopen(req, timeout=30) as resp:
-
-            img_bytes = resp.read()
-
-        result["log"].append(f"[ok] downloaded: {len(img_bytes)} bytes")
-
-
-
-        # Step 5: Convert to PIL Image
-
-        img = Image.open(io.BytesIO(img_bytes))
-
-        result["log"].append(f"[ok] image loaded: {img.size[0]}x{img.size[1]}")
-
-
-
-        # Step 6: [Demo mode] Skip cutout, save original directly
-
-        result["log"].append("[info] demo mode: skipping cutout, using original image")
-
-
-
-        # Step 7: Upload (save locally)
-
-        image_url = upload_image(img)
-
-        result["image_url"] = image_url
-
-        result["log"].append(f"[ok] uploaded: {image_url}")
+        # Step 4: Return the Unsplash image URL directly (publicly accessible)
+        result["log"].append(f"[ok] using public URL: {img_url[:100]}")
+        result["image_url"] = img_url
 
 
 
