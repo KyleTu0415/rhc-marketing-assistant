@@ -131,7 +131,7 @@ async def api_copy_generate(req: CopyRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/compose", response_model=ComposeResponse)
+@app.post("/api/compose")
 async def api_compose(req: ComposeRequest):
     try:
         # Handle mode-based routing
