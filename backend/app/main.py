@@ -167,7 +167,7 @@ async def api_product_upsert(req: ProductUpsertRequest):
 
 @app.get("/api/products")
 async def api_products_list():
-    return {"products": [], "message": "Product list endpoint - connect to database for full functionality"}
+    return {"items": [], "message": "Product list endpoint - connect to database for full functionality"}
 
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 if os.path.isdir(static_dir):
