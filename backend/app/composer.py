@@ -27,6 +27,20 @@ UPLOAD_KEY = "6d207e02198a847aa98d0a2a901485a5"
 UPLOAD_URL = "https://freeimage.host/api/1/upload"
 
 
+def _upload_bytes_to_freeimage(img_bytes: bytes, filename: str = "image.png") -> str:
+    """Upload image bytes directly to freeimage.host, return public URL."""
+    import httpx
+    files = {"source": (filename, img_bytes, "image/png")}
+    data = {"key": UPLOAD_KEY, "type": "file", "action": "upload"}
+    with httpx.Client(timeout=30) as client:
+        r = client.post(UPLOAD_URL, data=data, files=files)
+        r.raise_for_status()
+        j = r.json()
+        if j.get("status_code") == 200:
+            return j["image"]["url"]
+        raise RuntimeError(f"freeimage upload failed: {j}")
+
+
 
 CANVAS_W = 1200
 
@@ -1233,65 +1247,60 @@ def search_animal_image(prompt: str) -> bytes:
 
 
 def generate_animal_cutout(prompt: str, api_key: str = "") -> dict:
-
-    """Generate animal image (demo mode: no cutout, returns original animal image)"""
-
+    """Search animal image, remove background via rembg, upload transparent PNG."""
     import random
-
     result = {"status": "success", "log": [], "image_url": ""}
-
     try:
-
         # Step 1: Translate to English for better matching
-
         query = _translate_to_english(prompt)
-
         result["log"].append(f"[info] searching animal (query='{query}')")
 
-
-
         # Step 2: Search - returns a LIST of URLs
-
         candidates = _search_animal_unsplash(query)
-
         if not candidates:
-
             result["status"] = "failed"
-
             result["log"].append("[error] no animal image found")
-
             return result
-
         result["log"].append(f"[ok] found {len(candidates)} candidates")
 
-
-
         # Step 3: Randomly pick one
-
         img_url = random.choice(candidates)
-
         result["log"].append(f"[ok] picked: {img_url[:80]}")
 
+        # Step 4: Download the image
+        import httpx
+        with httpx.Client(timeout=20, follow_redirects=True) as client:
+            resp = client.get(img_url)
+            resp.raise_for_status()
+            img_bytes = resp.content
+        result["log"].append(f"[ok] downloaded {len(img_bytes)} bytes")
 
+        # Step 5: Try rembg background removal
+        cutout_url = None
+        try:
+            from rembg import remove
+            from PIL import Image
+            import io as _io
+            input_img = Image.open(_io.BytesIO(img_bytes))
+            output_img = remove(input_img)
+            buf = _io.BytesIO()
+            output_img.save(buf, format="PNG")
+            cutout_bytes = buf.getvalue()
+            result["log"].append(f"[ok] rembg cutout done, {len(cutout_bytes)} bytes")
+            cutout_url = _upload_bytes_to_freeimage(cutout_bytes, f"animal_{int(__import__('time').time())}.png")
+            result["log"].append(f"[ok] uploaded cutout: {cutout_url[:80]}")
+        except ImportError:
+            result["log"].append("[warn] rembg not installed, returning original image")
+        except Exception as e:
+            result["log"].append(f"[warn] cutout failed ({e}), returning original image")
 
-        # Step 4: Return the Unsplash image URL directly (publicly accessible)
-        result["log"].append(f"[ok] using public URL: {img_url[:100]}")
-        result["image_url"] = img_url
-
-
-
+        # Step 6: Return cutout or fallback original
+        result["image_url"] = cutout_url or img_url
     except Exception as e:
-
         result["status"] = "failed"
-
         result["log"].append(f"[error] {str(e)}")
-
         import traceback
-
         result["log"].append(traceback.format_exc())
-
-
-
     return result
 
 def compose_image(
