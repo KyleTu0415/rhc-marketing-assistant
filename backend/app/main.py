@@ -289,9 +289,17 @@ async def api_cutout(request: Request):
         from PIL import Image
         import io as _io
         input_img = Image.open(_io.BytesIO(file_data))
+        if input_img.mode not in ("RGB", "RGBA"):
+            input_img = input_img.convert("RGBA" if "A" in input_img.getbands() else "RGB")
+        # Downscale to avoid OOM on 512MB Railway instance (rembg is memory-heavy)
+        max_dim = 1400
+        w, h = input_img.size
+        if max(w, h) > max_dim:
+            scale = max_dim / float(max(w, h))
+            input_img = input_img.resize((int(w*scale), int(h*scale)), Image.LANCZOS)
         output_img = remove(input_img)
         buf = _io.BytesIO()
-        output_img.save(buf, format="PNG")
+        output_img.save(buf, format="PNG", optimize=True)
         cutout_bytes = buf.getvalue()
 
         # Upload to freeimage

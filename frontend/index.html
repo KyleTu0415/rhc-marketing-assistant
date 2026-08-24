@@ -1170,7 +1170,7 @@ function cp2DoCutout(){
   document.getElementById('cp2-cutout-result-placeholder').style.display='none';
   var fd=new FormData();
   fd.append('file',cp2State.cutout.origFile);
-  fetch(apiUrl('/api/cutout'),{method:'POST',body:fd,signal:AbortSignal.timeout(120000)})
+  fetch(apiUrl('/api/cutout'),{method:'POST',body:fd,signal:AbortSignal.timeout(180000)})
     .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'抠图失败')});return r.json()})
     .then(function(d){
       if(d.url){
@@ -1197,7 +1197,11 @@ function cp2DoCutout(){
       document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
       cp2SetBtn('cp2-cutout-cancel',true);
       cp2SetBtn('cp2-cutout-start',true);
-      showToast('抠图失败: '+err.message,'error');
+      var msg=err.message||'';
+      if(msg.indexOf('Failed to fetch')>=0||msg.indexOf('NetworkError')>=0||msg.indexOf('network')>=0){
+        msg='服务器处理超时或暂时不可用，请重试，或换一张较小的图片';
+      }
+      showToast('抠图失败: '+msg,'error');
     })
     .finally(function(){
       cp2State.cutout.loading=false;
