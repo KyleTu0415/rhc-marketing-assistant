@@ -28,6 +28,10 @@ except ImportError:
         product_id: str = ""
         target_language: str = "en"
         tone: str = "professional"
+        product_model: str = ""
+        platform: str = ""
+        language: str = ""
+        extra_keywords: str = ""
 
     class CopyResponse(BaseModel):
         title: str = ""
@@ -108,7 +112,11 @@ async def api_copy_generate(req: CopyRequest):
         result = generate_copy(
             product_id=req.product_id,
             target_language=req.target_language,
-            tone=req.tone
+            tone=req.tone,
+            product_model=req.product_model,
+            platform=req.platform,
+            language=req.language,
+            extra_keywords=req.extra_keywords
         )
         return CopyResponse(
             title=result.get("title", ""),
