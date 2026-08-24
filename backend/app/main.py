@@ -132,9 +132,8 @@ async def api_compose(req: ComposeRequest):
         from app.composer import compose_image
         result = compose_image(
             animal=req.animal,
-            product_id=req.product_id,
-            style=req.style,
-            text=req.text
+            prompt=req.text,
+            style=req.style
         )
         return ComposeResponse(**result)
     except Exception as e:
@@ -145,9 +144,8 @@ async def api_ai_background(req: ComposeRequest):
     try:
         from app.composer import generate_ai_background
         result = generate_ai_background(
-            product_id=req.product_id,
-            style=req.style,
-            text=req.text
+            prompt=req.text,
+            style=req.style
         )
         return result
     except Exception as e:
