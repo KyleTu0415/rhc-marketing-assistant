@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-llm.py - 调用 DeepSeek API 生成社媒推文
+llm.py - 调用 DeepSeek API 生成社媒推文（使用 httpx，无需 openai 包）
 """
 import os
 import json
-from openai import OpenAI
+import httpx
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY", os.getenv("DEEPSEEK_API_KEY", "")),
-    base_url=os.getenv("OPENAI_BASE_URL", "https://api.deepseek.com/v1"),
-)
+API_KEY = os.getenv("OPENAI_API_KEY", os.getenv("DEEPSEEK_API_KEY", ""))
+BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.deepseek.com/v1")
 MODEL = os.getenv("OPENAI_TEXT_MODEL", "deepseek-chat")
 
 PRODUCTS = {
@@ -22,18 +20,11 @@ PRODUCTS = {
     "VP100": {"name_cn": "呼吸泵", "name_en": "Ventilation Pump", "category": "辅助设备", "selling_point": "便携式宠物呼吸机，适用于麻醉恢复期"},
 }
 
-PLATFORM_NAMES = {
-    "LinkedIn": "LinkedIn", "Facebook": "Facebook", "Instagram": "Instagram",
-    "Twitter": "Twitter/X", "WhatsApp": "WhatsApp",
-}
-TONE_MAP = {
-    "专业可信": "professional and trustworthy", "友好亲切": "friendly and approachable",
-    "简洁有力": "concise and impactful", "技术导向": "technical and data-driven",
-}
+PLATFORM_NAMES = {"LinkedIn": "LinkedIn", "Facebook": "Facebook", "Instagram": "Instagram", "Twitter": "Twitter/X", "WhatsApp": "WhatsApp"}
+TONE_MAP = {"专业可信": "professional and trustworthy", "友好亲切": "friendly and approachable", "简洁有力": "concise and impactful", "技术导向": "technical and data-driven"}
 
 
-def generate_copy(product_id="", target_language="en", tone="professional",
-                  product_model="", platform="", language="", extra_keywords=""):
+def generate_copy(product_id="", target_language="en", tone="professional", product_model="", platform="", language="", extra_keywords=""):
     model = product_model or product_id
     lang = language or target_language
     plat = platform or "LinkedIn"
@@ -53,7 +44,7 @@ Product: {product_name_en} ({product_name_cn})
 Model: {model}
 Category: {category}
 Key Selling Point: {selling_point}
-{f"Additional Keywords: {keywords}" if keywords else ""}
+{chr(10) + 'Additional Keywords: ' + keywords if keywords else ''}
 
 Generate a {platform_label} post in {lang_label} with a {tone_label} tone.
 
@@ -66,21 +57,16 @@ Output format (JSON only, no markdown):
 {{"headline": "...", "body": "...", "hashtags": ["#tag1", "#tag2", ...]}}
 """
     try:
-        response = client.chat.completions.create(
-            model=MODEL,
-            messages=[
-                {"role": "system", "content": "You are a professional social media copywriter. Always respond in valid JSON format only."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.7,
-            max_tokens=500,
+        resp = httpx.post(
+            f"{BASE_URL}/chat/completions",
+            headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+            json={"model": MODEL, "messages": [{"role": "system", "content": "You are a professional social media copywriter. Always respond in valid JSON format only."}, {"role": "user", "content": prompt}], "temperature": 0.7, "max_tokens": 500},
+            timeout=30.0,
         )
-        content = response.choices[0].message.content.strip()
-        if content.startswith("```"):
-            content = content.split("
-", 1)[1] if "
-" in content else content
-            content = content.rsplit("```", 1)[0].strip()
+        resp.raise_for_status()
+        data = resp.json()
+        content = data["choices"][0]["message"]["content"].strip()
+        if content.startswith("", 1)[0].strip()
         result = json.loads(content)
         return {"title": result.get("headline", ""), "body": result.get("body", ""), "hashtags": result.get("hashtags", [])}
     except Exception as e:
