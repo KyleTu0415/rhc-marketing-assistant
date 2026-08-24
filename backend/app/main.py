@@ -193,28 +193,53 @@ async def api_product_upsert(req: ProductUpsertRequest):
 @app.get("/api/products")
 async def api_products_list():
     import urllib.request as _ur
-        _AID="cli_aa0228e3abf8dcbd";_ASE="o645YodfdUCBKagae4LpMchcD1AL2mp2"
-        _ATK="BwhybTEUVacyTksmocbcKvgCnQf";_TID="tbl2r6IQqgKiiEnE"
-        try:
-            tr=_ur.Request("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",data=json.dumps({"app_id":_AID,"app_secret":_ASE}).encode(),headers={"Content-Type":"application/json"},method="POST")
-            with _ur.urlopen(tr,timeout=10) as r:_tk=json.loads(r.read()).get("tenant_access_token")
-            _all=[];_pt=None
-            while True:
-                _u=f"https://open.feishu.cn/open-apis/bitable/v1/apps/{_ATK}/tables/{_TID}/records?page_size=100"
-                if _pt:_u+=f"&page_token={_pt}"
-                with _ur.urlopen(_ur.Request(_u,headers={"Authorization":f"Bearer {_tk}"}),timeout=15) as r:_d=json.loads(r.read())
-                _all.extend(_d.get("data",{}).get("items",[]))
-                if not _d.get("data",{}).get("has_more"):break
-                _pt=_d.get("data",{}).get("page_token")
-            def _tv(v):
-                if v is None:return ""
-                if isinstance(v,list):return ", ".join(str(x.get("text",x) if isinstance(x,dict) else x) for x in v)
-                if isinstance(v,dict):return v.get("text",str(v))
-                return str(v)
-            ps=[{"record_id":it.get("record_id",""),"product_model":_tv(it.get("fields",{}).get("product_model","")),"product_name":_tv(it.get("fields",{}).get("product_name_cn",it.get("fields",{}).get("product_name",""))),"category":_tv(it.get("fields",{}).get("category","")),"main_selling_point":_tv(it.get("fields",{}).get("main_selling_point","")),"product_image_url":_tv(it.get("fields",{}).get("product_image_url","")),"price_tier":_tv(it.get("fields",{}).get("price_tier","")),"status":_tv(it.get("fields",{}).get("status",""))} for it in _all]
-            return {"items":ps,"total":len(ps)}
-        except Exception as e:
-            return {"items":[],"error":str(e)}
+    _AID="cli_aa0228e3abf8dcbd"
+    _ASE="o645YodfdUCBKagae4LpMchcD1AL2mp2"
+    _ATK="BwhybTEUVacyTksmocbcKvgCnQf"
+    _TID="tbl2r6IQqgKiiEnE"
+    try:
+        tr=_ur.Request("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
+            data=json.dumps({"app_id":_AID,"app_secret":_ASE}).encode(),
+            headers={"Content-Type":"application/json"}, method="POST")
+        with _ur.urlopen(tr,timeout=10) as r:
+            _tk=json.loads(r.read()).get("tenant_access_token")
+        _all=[]
+        _pt=None
+        while True:
+            _u=f"https://open.feishu.cn/open-apis/bitable/v1/apps/{_ATK}/tables/{_TID}/records?page_size=100"
+            if _pt:
+                _u+=f"&page_token={_pt}"
+            _rq=_ur.Request(_u, headers={"Authorization":f"Bearer {_tk}"})
+            with _ur.urlopen(_rq,timeout=15) as r:
+                _d=json.loads(r.read())
+            _all.extend(_d.get("data",{}).get("items",[]))
+            if not _d.get("data",{}).get("has_more"):
+                break
+            _pt=_d.get("data",{}).get("page_token")
+        def _tv(v):
+            if v is None:
+                return ""
+            if isinstance(v,list):
+                return ", ".join(str(x.get("text",x) if isinstance(x,dict) else x) for x in v)
+            if isinstance(v,dict):
+                return v.get("text",str(v))
+            return str(v)
+        ps=[]
+        for it in _all:
+            fl=it.get("fields",{})
+            ps.append({
+                "record_id":it.get("record_id",""),
+                "product_model":_tv(fl.get("product_model","")),
+                "product_name":_tv(fl.get("product_name_cn",fl.get("product_name",""))),
+                "category":_tv(fl.get("category","")),
+                "main_selling_point":_tv(fl.get("main_selling_point","")),
+                "product_image_url":_tv(fl.get("product_image_url","")),
+                "price_tier":_tv(fl.get("price_tier","")),
+                "status":_tv(fl.get("status",""))
+            })
+        return {"items":ps,"total":len(ps)}
+    except Exception as e:
+        return {"items":[],"error":str(e)}
 
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 if os.path.isdir(static_dir):
