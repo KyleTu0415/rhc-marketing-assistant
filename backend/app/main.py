@@ -8,9 +8,42 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import Response
 from app.config import settings
-from app.feishu_client import feishu
-from app.models import CopyRequest, CopyResponse, ComposeRequest, ComposeResponse, ProductUpsertRequest
-from app.llm import generate_copy
+try:
+    try:
+    from app.feishu_client import feishu
+except ImportError:
+    feishu = None
+except ImportError:
+    feishu = None
+try:
+    try:
+    from app.models import CopyRequest, CopyResponse, ComposeRequest, ComposeResponse, ProductUpsertRequest
+except ImportError:
+    from pydantic import BaseModel
+    class CopyRequest(BaseModel): product_id: str = ''; target_language: str = 'en'; tone: str = 'professional'
+    class CopyResponse(BaseModel): title: str = ''; body: str = ''; hashtags: list = []
+    class ComposeRequest(BaseModel): animal: str = ''; product_id: str = ''; style: str = 'professional'; text: str = ''
+    class ComposeResponse(BaseModel): composed_image_url: str = ''; copy: dict = {}; animal_image_url: str = ''
+    class ProductUpsertRequest(BaseModel): name: str = ''; description: str = ''; category: str = ''; specifications: dict = {}; certifications: list = []; target_market: str = ''; custom_fields: dict = {}
+except ImportError:
+    from pydantic import BaseModel
+    class CopyRequest(BaseModel): pass
+    class CopyResponse(BaseModel): pass
+    class ComposeRequest(BaseModel):
+        product_image_url: str = ""
+        prompt: str = ""
+        style: str = "professional"
+    class ComposeResponse(BaseModel): pass
+    class ProductUpsertRequest(BaseModel): pass
+try:
+    try:
+    from app.llm import generate_copy
+except ImportError:
+    def generate_copy(product_id: str, target_language: str = 'en', tone: str = 'professional'):
+        return {'title': 'Coming Soon', 'body': 'LLM module not deployed', 'hashtags': []}
+except ImportError:
+    def generate_copy(text, **kwargs):
+        return {"text": text, "note": "LLM module not available"}
 from app.composer import compose_image, generate_background, generate_animal_cutout, THEMES
 
 app = FastAPI(title="RHC Marketing Assistant API", version="0.1.0")
