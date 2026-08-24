@@ -132,7 +132,7 @@ async def api_compose(req: ComposeRequest):
         from app.composer import compose_image
         result = compose_image(
             animal=req.animal,
-            prompt=req.text,
+            text=req.text,
             style=req.style
         )
         return ComposeResponse(**result)
