@@ -432,8 +432,18 @@ async def api_products_list():
     except Exception as e:
         return {"items":[],"error":str(e)}
 
-static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
-if os.path.isdir(static_dir):
+# Serve frontend - try multiple possible locations
+_candidate_dirs = [
+    os.path.join(os.path.dirname(__file__), "frontend"),                              # Railway root=backend/: /app/frontend
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend"),              # Railway root=repo: /backend/frontend
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend"),  # extra fallback
+]
+static_dir = None
+for _d in _candidate_dirs:
+    if os.path.isdir(_d):
+        static_dir = _d
+        break
+if static_dir:
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="frontend")
 
 if __name__ == "__main__":
