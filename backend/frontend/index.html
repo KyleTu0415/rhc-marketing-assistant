@@ -1,0 +1,1925 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHC 安瑞康 — 营销助手</title>
+<style>
+:root{
+  --color-bg:#F7F8FA;
+  --color-surface:#FFFFFF;
+  --color-primary:#C8102E;
+  --color-primary-dark:#A50D26;
+  --color-primary-light:#FDE8EB;
+  --color-primary-xlight:#FFF1F3;
+  --color-text:#1A1A1A;
+  --color-text-secondary:#6B7280;
+  --color-text-tertiary:#9CA3AF;
+  --color-border:#E5E7EB;
+  --color-border-light:#F3F4F6;
+  --color-success:#16A37B;
+  --color-warning:#F3A94B;
+  --color-danger:#E5484D;
+  --color-info:#3B82F6;
+  --color-sidebar:#FFFFFF;
+  --color-sidebar-hover:#FFF1F3;
+  --color-sidebar-active:#C8102E;
+  --color-sidebar-text:#6B7280;
+  --color-sidebar-text-active:#C8102E;
+  --font-sans:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.10);
+  --transition-fast:0.15s ease;
+  --transition-normal:0.25s ease;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html,body{
+  height:100%;
+  font-family:var(--font-sans);
+  font-size:14px;
+  line-height:1.5;
+  color:var(--color-text);
+  background:var(--color-bg);
+  overflow:hidden;
+}
+
+a{color:var(--color-primary);text-decoration:none}
+a:hover{text-decoration:underline}
+
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;font-size:13px}
+
+input,select,textarea{
+  font-family:var(--font-sans);
+  font-size:13px;
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-sm);
+  padding:8px 12px;
+  color:var(--color-text);
+  background:var(--color-surface);
+  outline:none;
+  transition:border-color var(--transition-fast);
+}
+input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,46,0.12)}
+
+img{max-width:100%;height:auto;display:block}
+
+/* ===== LAYOUT ===== */
+.app-layout{display:flex;height:100vh;width:100vw}
+
+/* Sidebar — white bg with RHC red accents */
+.sidebar{
+  width:200px;min-width:200px;
+  background:var(--color-sidebar);
+  border-right:1px solid var(--color-border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;z-index:100;
+}
+
+.sidebar-logo{
+  padding:15px 0 20px;
+  text-align:center;
+}
+.sidebar-logo img{
+  height:90px;width:auto;margin:0 auto;display:block;
+}
+.sidebar-logo span{
+  display:block;
+  font-size:12px;font-weight:700;
+  color:var(--color-primary);
+  margin-top:10px;letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.sidebar-nav{padding:0 0;flex:1}
+.sidebar-nav .nav-section{
+  padding:4px 16px 10px;
+  font-size:12px;text-transform:uppercase;letter-spacing:0.5px;
+  color:var(--color-text-secondary);font-weight:700;
+}
+.sidebar-nav .nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px;
+  color:var(--color-sidebar-text);
+  font-size:12px;font-weight:500;
+  cursor:pointer;transition:all var(--transition-fast);
+  border-left:3px solid transparent;
+  position:relative;
+}
+.sidebar-nav .nav-item:hover{
+  background:var(--color-primary-xlight);
+  color:var(--color-primary);
+}
+.sidebar-nav .nav-item.active{
+  background:var(--color-primary-xlight);
+  color:var(--color-sidebar-active);
+  font-weight:600;
+  border-left-color:var(--color-primary);
+}
+.sidebar-nav .nav-item.active .nav-icon{color:var(--color-primary);opacity:1}
+.sidebar-nav .nav-item .nav-icon{width:16px;height:16px;flex-shrink:0;color:var(--color-text-tertiary);opacity:0.7}
+.sidebar-nav .nav-item .badge{
+  margin-left:auto;background:var(--color-danger);color:#fff;
+  font-size:9px;padding:1px 6px;border-radius:10px;font-weight:600;
+}
+
+/* Sidebar dev panel */
+.sidebar-dev-panel{padding:8px 12px;border-top:1px solid var(--color-border-light)}
+.dev-panel-row{display:flex;align-items:center;gap:6px}
+.api-status-dot{width:7px;height:7px;border-radius:50%;background:var(--color-text-tertiary);flex-shrink:0}
+.api-status-dot.connected{background:var(--color-success);box-shadow:0 0 4px rgba(22,163,123,.5)}
+.api-url-input{
+  flex:1;min-width:0;padding:4px 6px;font-size:10px;
+  border:1px solid var(--color-border);border-radius:var(--radius-sm);
+  background:var(--color-bg);color:var(--color-text);outline:none;
+}
+.api-url-input:focus{border-color:var(--color-primary)}
+.btn-connect{
+  padding:4px 8px;font-size:10px;font-weight:600;
+  background:var(--color-primary);color:#fff;border-radius:var(--radius-sm);white-space:nowrap;
+}
+.btn-connect:hover{background:var(--color-primary-dark)}
+
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--color-border-light)}
+.sidebar-user{display:flex;align-items:center;gap:8px}
+.sidebar-user .avatar{
+  width:30px;height:30px;border-radius:50%;background:var(--color-primary);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:12px;font-weight:700;flex-shrink:0;
+}
+.sidebar-user .user-info{flex:1;min-width:0}
+.sidebar-user .user-name{font-size:12px;color:var(--color-text);font-weight:600}
+.sidebar-user .user-role{font-size:10px;color:var(--color-text-tertiary)}
+
+/* Main area */
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+
+/* Top bar */
+.topbar{
+  height:56px;min-height:56px;background:var(--color-surface);
+  border-bottom:1px solid var(--color-border);
+  display:flex;align-items:center;padding:0 28px;gap:16px;
+}
+.topbar-title{font-size:16px;font-weight:600;color:var(--color-text);flex:1}
+.topbar-actions{display:flex;align-items:center;gap:12px}
+
+/* Content */
+.content-area{flex:1;overflow-y:auto;padding:20px 28px 28px}
+.page{display:none;animation:fadeIn 0.3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Page Header */
+.page-header{margin-bottom:24px}
+.page-header h1,.page-header h2{font-size:18px;font-weight:700;color:var(--color-text);margin-bottom:4px}
+.page-header p{font-size:14px;color:var(--color-text-secondary)}
+
+/* Metric Cards — exact v1 params */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.metric-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-md);padding:20px;transition:box-shadow var(--transition-fast);
+}
+.metric-card:hover{box-shadow:var(--shadow-md)}
+.metric-card .metric-icon{
+  width:40px;height:40px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+}
+.metric-card .metric-value{font-size:28px;font-weight:700;color:var(--color-text);line-height:1.1;font-variant-numeric:tabular-nums}
+.metric-card .metric-label{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.metric-card .metric-change{font-size:12px;font-weight:600;margin-top:8px}
+.metric-card .metric-change.up{color:var(--color-success)}
+.metric-card .metric-change.down{color:var(--color-danger)}
+
+/* Cards */
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--color-border-light);display:flex;align-items:center;justify-content:space-between}
+.card-header h3{font-size:14px;font-weight:600}
+.card-body{padding:20px}
+
+/* Activity list */
+.activity-list{list-style:none}
+.activity-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--color-border-light)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.activity-content{flex:1}
+.activity-text{font-size:13px;color:var(--color-text)}
+.activity-text strong{font-weight:600}
+.activity-time{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+
+/* Dashboard grid */
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+.chart-container{display:flex;align-items:center;gap:30px;padding:10px 0}
+.chart-legend{display:flex;flex-direction:column;gap:10px}
+.chart-legend-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text)}
+.chart-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.chart-legend-pct{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums;padding-left:16px}
+
+/* Tags */
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.2px;white-space:nowrap}
+.tag-success{background:#E6F9F1;color:#0D7B57}
+.tag-warning{background:#FFF4E0;color:#B27A1B}
+.tag-gray{background:#F0F2F3;color:#637089}
+.tag-primary{background:var(--color-primary-light);color:var(--color-primary-dark)}
+
+/* Filter tabs */
+.filter-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.filter-tab{
+  padding:7px 16px;border-radius:20px;font-size:13px;font-weight:500;
+  color:var(--color-text-secondary);background:var(--color-surface);
+  border:1px solid var(--color-border);cursor:pointer;transition:all var(--transition-fast);
+}
+.filter-tab:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.filter-tab.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+
+/* Product grid */
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.product-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all var(--transition-fast);
+}
+.product-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.product-card .product-img{width:100%;aspect-ratio:1;object-fit:contain;background:#F8F8F8;padding:12px}
+.product-card .product-info{padding:12px 14px;border-top:1px solid var(--color-border-light)}
+.product-card .product-name{font-size:14px;font-weight:600;color:var(--color-text)}
+.product-card .product-category{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+
+/* Search bar */
+.search-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.search-bar input{flex:1;max-width:360px;padding:9px 14px 9px 36px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;font-size:13px}
+.search-wrapper{position:relative;flex:0 0 360px;max-width:360px;display:flex}
+
+/* Media tabs */
+.media-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--color-border)}
+.media-tab{
+  padding:10px 20px;font-size:13px;font-weight:500;color:var(--color-text-secondary);
+  cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all var(--transition-fast);
+}
+.media-tab:hover{color:var(--color-text)}
+.media-tab.active{color:var(--color-primary);border-bottom-color:var(--color-primary);font-weight:600}
+
+/* Media grid */
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.media-item{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all var(--transition-fast);
+}
+.media-item:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.media-item .media-thumb{width:100%;aspect-ratio:1;object-fit:cover;background:#F8F8F8}
+.media-item .media-meta{padding:10px 12px}
+.media-item .media-name{font-size:12px;font-weight:600;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.media-item .media-tag{font-size:10px;color:var(--color-text-tertiary);margin-top:2px}
+
+/* Post generator — exact v1 params */
+.post-gen-layout{display:grid;grid-template-columns:340px 1fr;gap:24px;min-height:500px}
+.config-panel{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:24px}
+.config-panel h3{font-size:15px;font-weight:600;margin-bottom:20px;color:var(--color-text)}
+.post-preview{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);display:flex;flex-direction:column}
+.post-preview-header{padding:16px 20px;border-bottom:1px solid var(--color-border-light);font-size:14px;font-weight:600}
+.post-preview-body{padding:24px;flex:1}
+.post-actions{display:flex;gap:10px;padding:16px 20px;border-top:1px solid var(--color-border-light);flex-wrap:wrap}
+
+.platform-tags{display:flex;flex-wrap:wrap;gap:6px}
+.platform-tag{
+  padding:6px 14px;border:1px solid var(--color-border);border-radius:20px;
+  font-size:12px;font-weight:500;cursor:pointer;color:var(--color-text-secondary);
+  background:var(--color-surface);transition:all var(--transition-fast);
+}
+.platform-tag:hover{border-color:var(--color-primary)}
+.platform-tag.selected{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+
+.linkedin-mock{border:1px solid #E0E0E0;border-radius:var(--radius-md);padding:20px;background:#fff;max-width:560px}
+.linkedin-header{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.linkedin-avatar{width:56px;height:56px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.linkedin-avatar img{width:100%;height:100%;object-fit:contain}
+.linkedin-name{font-size:14px;font-weight:600;color:#000000E6}
+.linkedin-sub{font-size:12px;color:#00000099}
+.linkedin-text{font-size:14px;line-height:1.65;color:#000000E6;white-space:pre-line}
+.linkedin-text .hashtag{color:var(--color-primary);font-weight:500}
+
+/* Forms */
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.form-group select,.form-group input,.form-group textarea{width:100%}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;
+  font-weight:600;transition:all var(--transition-fast);
+}
+.btn-primary{background:var(--color-primary);color:#fff}
+.btn-primary:hover{background:var(--color-primary-dark)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-outline{border:1px solid var(--color-border);color:var(--color-text-secondary);background:var(--color-surface)}
+.btn-outline:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-danger{background:var(--color-danger);color:#fff}
+.btn-danger:hover{opacity:.9}
+
+/* Data table — exact v1 params */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table thead{background:var(--color-bg)}
+.data-table th{
+  text-align:left;padding:12px 16px;font-weight:600;font-size:12px;
+  color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.4px;
+  border-bottom:1px solid var(--color-border);white-space:nowrap;
+}
+.data-table td{padding:14px 16px;border-bottom:1px solid var(--color-border-light);vertical-align:middle}
+.data-table tbody tr{transition:background var(--transition-fast)}
+.data-table tbody tr:hover{background:var(--color-primary-light)}
+.row-actions{display:flex;gap:6px}
+.row-actions button{
+  padding:4px 10px;font-size:11px;border-radius:4px;
+  color:var(--color-text-secondary);border:1px solid var(--color-border);
+  background:var(--color-surface);transition:all var(--transition-fast);
+}
+.row-actions button:hover{border-color:var(--color-primary);color:var(--color-primary)}
+
+/* History filters */
+.history-filters{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.4);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.show{display:flex}
+.modal-card{
+  background:var(--color-surface);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;
+}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--color-border-light);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:16px;font-weight:700}
+.modal-close{font-size:22px;color:var(--color-text-tertiary);cursor:pointer;line-height:1}
+.modal-close:hover{color:var(--color-text)}
+.modal-body{padding:20px 24px}
+.modal-body .form-group{margin-bottom:12px}
+.modal-body .form-group:last-child{margin-bottom:0}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--color-border-light);display:flex;justify-content:flex-end;gap:8px}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--color-text);color:#fff;padding:12px 24px;border-radius:var(--radius-md);
+  font-size:13px;font-weight:500;z-index:2000;opacity:0;
+  transition:all .3s ease;box-shadow:var(--shadow-lg);pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-success{background:var(--color-success)}
+.toast-error{background:var(--color-danger)}
+.toast-warning{background:var(--color-warning)}
+
+/* Loading spinner */
+.loading-spinner{width:20px;height:20px;border:2.5px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--color-text-tertiary)}
+
+/* SVG icon */
+.icon-svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Focus */
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:2px}
+.nav-item:focus-visible{outline-offset:-2px;border-radius:0}
+
+/* Product detail */
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--color-text-secondary);cursor:pointer;margin-bottom:16px;padding:6px 0;background:none;border:none}
+.back-btn:hover{color:var(--color-primary)}
+.product-detail-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.product-detail-header{display:flex;gap:24px;padding:24px;border-bottom:1px solid var(--color-border-light);align-items:flex-start}
+.product-detail-img-wrap{position:relative;width:200px;flex-shrink:0}
+.product-detail-img{width:100%;aspect-ratio:1;object-fit:contain;background:#FFFFFF;border-radius:var(--radius-sm);border:1px solid var(--color-border-light)}
+.product-detail-img-overlay{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.55);color:#fff;padding:8px;text-align:center;font-size:12px;cursor:pointer;opacity:0;transition:opacity .2s;border-radius:0 0 var(--radius-sm) var(--radius-sm)}
+.product-detail-img-wrap:hover .product-detail-img-overlay{opacity:1}
+.product-detail-info{flex:1;padding-top:8px}
+.product-detail-info h2{font-size:25px;font-weight:700;margin-bottom:6px}
+.product-detail-info .detail-name{font-size:15px;color:var(--color-text-secondary)}
+.product-detail-body{padding:24px}
+.detail-section{margin-bottom:16px}
+.detail-section:last-child{margin-bottom:0}
+.detail-section h4{font-size:12px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.detail-section input,.detail-section textarea{width:100%;padding:9px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--color-surface)}
+.detail-section input:focus,.detail-section textarea:focus{outline:none;border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-light)}
+.detail-section textarea{resize:vertical;min-height:100px}
+.detail-actions{display:flex;justify-content:flex-start;align-items:center;padding:16px 24px;border-top:1px solid var(--color-border-light);gap:8px}
+.detail-actions .btn-outline{margin-left:auto}
+.btn-delete-product{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--color-primary);background:var(--color-surface);border:1px solid var(--color-primary);cursor:pointer;transition:all var(--transition-fast)}
+.btn-delete-product:hover{background:var(--color-primary);color:#fff}
+.state-message{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;color:var(--color-text-secondary);font-size:14px;grid-column:1/-1}
+input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;background:var(--color-surface);color:var(--color-text);cursor:pointer}
+.product-count{font-size:12px;color:var(--color-text-tertiary);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:860px){
+  .sidebar{width:56px;min-width:56px}
+  .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-item .badge,
+  .sidebar .sidebar-user .user-info,.sidebar .nav-section{display:none}
+  .sidebar-logo{padding:16px 8px;text-align:center}
+  .sidebar-logo img{height:28px;margin:0 auto}
+  .sidebar-nav .nav-item{padding:12px 0;justify-content:center;border-left:none;border-bottom:2px solid transparent}
+  .sidebar-nav .nav-item.active{border-bottom-color:var(--color-sidebar-active)}
+  .content-area{padding:16px}
+  .metric-grid{grid-template-columns:1fr 1fr}
+  .dashboard-grid{grid-template-columns:1fr}
+  .post-gen-layout{grid-template-columns:1fr}
+}
+@media(max-width:480px){.metric-grid{grid-template-columns:1fr}}
+
+.post-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:300px}
+.post-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:300px;text-align:center}
+
+/* Image composer mode select - title top-left, cards centered */
+#cp2-mode-select{display:flex;flex-direction:column;min-height:calc(100vh - 200px);width:100%}
+#cp2-mode-select .cp2-mode-cards{margin:auto}
+
+
+
+/* ===== CP2 Composer Styles ===== */
+.cp2-mode-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:720px;margin:12px auto 0}
+.cp2-mode-card{background:var(--color-surface);border:2px solid var(--color-border);border-radius:var(--radius-lg);padding:32px 28px;cursor:pointer;transition:all var(--transition-fast);text-align:center}
+.cp2-mode-card:hover{border-color:var(--color-primary);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.cp2-mode-icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.cp2-mode-card h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.cp2-mode-card p{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.cp2-topbar{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin-bottom:16px}
+.cp2-topbar-title{font-size:18px;font-weight:700;color:var(--color-text);margin-top:8px}
+.cp2-workspace{display:flex;gap:16px;height:calc(100vh - 180px);min-height:500px}
+.cp2-left{width:320px;min-width:320px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);display:flex;flex-direction:column;overflow:hidden}
+.cp2-left-scroll{flex:1;overflow-y:auto;padding:0}
+.cp2-right{flex:1;display:flex;flex-direction:column;min-width:0}
+.cp2-preview-wrap{flex:1;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px;position:relative}
+.cp2-actions-bar{display:flex;justify-content:flex-end;gap:10px;padding-top:10px}
+
+/* Pages bar */
+.cp2-pages-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--color-border);flex-wrap:wrap;background:var(--color-bg)}
+.cp2-page-tab{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-secondary);transition:all .15s}
+.cp2-page-tab.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+.cp2-page-tab:hover:not(.active){border-color:var(--color-primary);color:var(--color-primary)}
+.cp2-add-page-btn{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px dashed var(--color-border);background:none;color:var(--color-text-tertiary);transition:all .15s}
+.cp2-add-page-btn:hover{border-color:var(--color-primary);color:var(--color-primary)}
+
+/* Sections */
+.cp2-section{padding:14px 16px;border-bottom:1px solid var(--color-border)}
+.cp2-section:last-child{border-bottom:none}
+.cp2-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cp2-section-label{font-size:12px;font-weight:700;color:var(--color-text);letter-spacing:.03em}
+.cp2-add-btn{font-size:11px;color:var(--color-primary);cursor:pointer;font-weight:600;padding:3px 10px;border:1px solid var(--color-primary);border-radius:12px;background:none;transition:all .15s;white-space:nowrap;line-height:1.4}
+.cp2-add-btn:hover{background:var(--color-primary);color:#fff}
+
+/* Fields */
+.cp2-field{margin-bottom:0}
+.cp2-field+.cp2-field{margin-top:8px}
+.cp2-field label{display:block;font-size:11px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px}
+.cp2-field select,.cp2-field input[type=text],.cp2-field input[type=number],.cp2-field textarea{width:100%;padding:7px 10px;font-size:12px;border:1px solid var(--color-border);border-radius:6px;background:var(--color-surface);box-sizing:border-box;color:var(--color-text);outline:none;transition:border-color .15s}
+.cp2-field select:focus,.cp2-field input:focus,.cp2-field textarea:focus{border-color:var(--color-primary)}
+.cp2-field textarea{resize:vertical;min-height:60px;font-family:inherit;line-height:1.5}
+
+/* Layer cards */
+.cp2-layer-card{background:var(--color-bg);border:1px solid var(--color-border);border-radius:8px;padding:12px;margin-top:8px}
+.cp2-layer-card:first-of-type{margin-top:0}
+.cp2-layer-head{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.cp2-layer-name{font-size:11px;font-weight:700;color:var(--color-text-secondary);flex:1;text-transform:uppercase;letter-spacing:.03em}
+.cp2-layer-del{color:var(--color-text-tertiary);cursor:pointer;font-size:18px;padding:0 4px;line-height:1;border:none;background:none}
+.cp2-layer-del:hover{color:var(--color-danger)}
+
+/* Buttons row */
+.cp2-btn-row{display:flex;gap:8px;margin-bottom:10px}
+.cp2-tb{flex:1;padding:7px 10px;font-size:12px;border-radius:6px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-secondary);cursor:pointer;text-align:center;transition:all .15s;font-weight:500}
+.cp2-tb:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.cp2-tb.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+
+/* Color picker row */
+.cp2-color-row{display:flex;align-items:center;gap:10px}
+.cp2-color-input{width:36px;height:32px;border:1px solid var(--color-border);border-radius:6px;cursor:pointer;padding:2px;background:none;flex-shrink:0}
+.cp2-color-input-sm{width:28px;height:28px;border:1px solid var(--color-border);border-radius:4px;cursor:pointer;padding:1px;background:none;flex-shrink:0}
+.cp2-hint{font-size:11px;color:var(--color-text-tertiary);line-height:1.4}
+.cp2-success-text{margin-top:8px;font-size:11px;color:var(--color-success);font-weight:500}
+
+/* Generate button */
+.cp2-gen-btn{font-size:12px;padding:9px 12px;border-radius:6px;border:1px solid var(--color-primary);background:var(--color-primary-light);color:var(--color-primary);cursor:pointer;font-weight:600;width:100%;transition:all .15s;margin-top:4px}
+.cp2-gen-btn:hover{background:var(--color-primary);color:#fff}
+.cp2-gen-btn:disabled{opacity:.6;cursor:not-allowed}
+.cp2-animal-status{font-size:11px;color:var(--color-text-tertiary);margin-top:6px;min-height:16px}
+
+/* Text formatting toolbar */
+.cp2-text-tools{display:flex;align-items:center;gap:5px;margin-bottom:8px}
+.cp2-text-tools .cp2-tb{flex:0 0 auto;width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;font-size:13px}
+.cp2-font-sel{font-size:11px;padding:5px 8px;border:1px solid var(--color-border);border-radius:4px;flex:1;min-width:70px;background:var(--color-surface);color:var(--color-text);outline:none}
+.cp2-fs-input{width:48px;font-size:11px;padding:5px 6px;border:1px solid var(--color-border);border-radius:4px;text-align:center;outline:none}
+
+/* X/Y/W inputs row */
+.cp2-xyz-row{display:flex;gap:8px;margin-top:10px}
+.cp2-xyz-field{flex:1}
+.cp2-xyz-field label{display:block;font-size:10px;font-weight:600;color:var(--color-text-tertiary);margin-bottom:3px;text-align:center;text-transform:uppercase;letter-spacing:.03em}
+.cp2-xyz-field input{width:100%;padding:5px 6px;font-size:11px;border:1px solid var(--color-border);border-radius:4px;text-align:center;box-sizing:border-box;outline:none}
+.cp2-xyz-field input:focus{border-color:var(--color-primary)}
+
+/* Position preset - inline label */
+.cp2-pos-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.cp2-pos-row label{font-size:11px;font-weight:600;color:var(--color-text-secondary);white-space:nowrap;margin:0}
+.cp2-pos-row select{flex:1;padding:6px 10px;font-size:12px;border:1px solid var(--color-border);border-radius:6px;background:var(--color-surface);box-sizing:border-box;outline:none}
+
+/* Preview paper */
+.cp2-paper{position:relative;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.12);overflow:hidden;flex-shrink:0}
+
+/* Draggable layers */
+.cp2-layer-item{position:absolute;display:flex;align-items:center;justify-content:center}
+.cp2-layer-item img{max-width:100%;max-height:100%;display:block;pointer-events:none;-webkit-user-drag:none;user-select:none}
+.cp2-text-item{position:absolute;word-break:break-word;white-space:pre-wrap;box-sizing:border-box;cursor:move;user-select:none}
+.cp2-logo-item{display:flex;align-items:center;justify-content:center;position:absolute;cursor:move}
+.cp2-logo-item img{max-width:100%;max-height:100%;display:block;pointer-events:none;-webkit-user-drag:none;user-select:none}
+.cp2-page-num{font-size:10px;color:#666;font-weight:600;position:absolute}
+
+/* Drag visual feedback */
+.cp2-draggable{position:absolute;cursor:move;outline:1.5px dashed transparent;outline-offset:2px;transition:outline-color .12s ease,box-shadow .12s ease}
+.cp2-draggable:hover{outline-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,46,.1)}
+.cp2-paper.cp2-dragging .cp2-draggable{transition:none}
+.cp2-paper.cp2-dragging .cp2-draggable:hover{outline-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,46,.2)}
+
+/* Resize handle */
+.cp2-resize-handle{position:absolute;right:-4px;bottom:-4px;width:12px;height:12px;background:var(--color-primary);border:2px solid #fff;border-radius:50%;cursor:nwse-resize;z-index:10;box-shadow:0 1px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .15s}
+.cp2-draggable:hover .cp2-resize-handle{opacity:1}
+.cp2-paper.cp2-dragging .cp2-resize-handle{opacity:1}
+
+/* Cutout mode */
+.cp2-cutout-ws{display:flex;gap:16px;height:calc(100vh - 200px);min-height:480px}
+.cp2-cutout-col{flex:1;display:flex;flex-direction:column;min-width:0}
+.cp2-upload-zone{border:2px dashed var(--color-border);border-radius:var(--radius-md);padding:40px 20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--color-surface)}
+.cp2-upload-zone:hover{border-color:var(--color-primary);background:var(--color-primary-xlight)}
+.cp2-cutout-area{flex:1;border:2px dashed var(--color-border);border-radius:var(--radius-md);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;cursor:pointer;transition:all .15s;background:var(--color-surface);overflow:hidden;position:relative;min-height:360px}
+.cp2-cutout-area:hover{border-color:var(--color-primary);background:var(--color-primary-xlight)}
+.cp2-cutout-area img{max-width:100%;max-height:100%;object-fit:contain}
+.cp2-cutout-actions{display:flex;gap:10px;margin-top:14px;flex-shrink:0}
+.cp2-cutout-actions .btn{flex:1;justify-content:center}
+.cp2-cutout-actions .btn:disabled{opacity:.45;cursor:not-allowed}
+.cp2-cutout-status{text-align:center;padding:20px;color:var(--color-text-secondary)}
+.cp2-cutout-hint{display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.cp2-cutout-hint p{margin:0;font-weight:500;color:var(--color-text-secondary)}
+.cp2-cutout-hint span{font-size:12px;color:var(--color-text-tertiary)}
+
+</style>
+</head>
+<body>
+<div class="app-layout">
+<nav class="sidebar" aria-label="Main navigation">
+<div class="sidebar-logo"><img src="https://iili.io/CZ0tVNn.png" alt="RHC Medical"></div>
+<div class="sidebar-nav">
+<div class="nav-section">营销助手-工作台</div>
+<div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>仪表盘</span></div>
+<div class="nav-item" data-page="media" onclick="switchPage('media',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><span>营销中心</span></div>
+<div class="nav-item" data-page="posts" onclick="switchPage('posts',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>社媒营销</span></div>
+<div class="nav-item" data-page="composer" onclick="switchPage('composer',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片合成</span></div>
+<div class="nav-item" data-page="history" onclick="switchPage('history',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>内容历史</span></div>
+<div class="nav-item" data-page="notifications" onclick="switchPage('notifications',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>通知</span><span class="badge" id="sidebar-notif-badge">3</span></div>
+<div class="nav-item" data-page="settings" onclick="switchPage('settings',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>设置</span></div>
+</div>
+<div class="sidebar-dev-panel">
+<div class="dev-panel-row"><span class="api-status-dot" id="api-status-dot" title="API未连接"></span><input type="text" class="api-url-input" id="api-url-input" placeholder="localhost:8000" aria-label="API 地址"><button class="btn-connect" id="btn-connect" onclick="connectAPI()">连接</button></div>
+</div>
+<div class="sidebar-footer"><div class="sidebar-user"><div class="avatar">E</div><div class="user-info"><div class="user-name">Ella</div><div class="user-role">市场部</div></div></div></div>
+</nav>
+<div class="main-area">
+<main class="content-area">
+<section class="page active" id="page-dashboard">
+<div class="page-header"><h2>仪表盘</h2><p>查看 RHC 安瑞康营销数据概览与最近动态</p></div>
+<div class="metric-grid">
+<div class="metric-card"><div class="metric-icon" style="background:var(--color-primary-light)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div><div class="metric-value" id="metric-products">—</div><div class="metric-label">产品数量</div><div class="metric-change up" id="metric-products-change">加载中...</div></div>
+<div class="metric-card"><div class="metric-icon" style="background:var(--color-primary-light)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div><div class="metric-value" id="metric-media">—</div><div class="metric-label">素材总数</div><div class="metric-change up" id="metric-media-change">加载中...</div></div>
+<div class="metric-card"><div class="metric-icon" style="background:#FFF4E0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B27A1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div class="metric-value" id="metric-posts">0</div><div class="metric-label">已生成推文</div><div class="metric-change" style="color:var(--color-text-tertiary)">暂无记录</div></div>
+<div class="metric-card"><div class="metric-icon" style="background:#E6F9F1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D7B57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="metric-value" id="metric-images">0</div><div class="metric-label">已合成图片</div><div class="metric-change" style="color:var(--color-text-tertiary)">暂无记录</div></div>
+</div>
+<div class="dashboard-grid">
+<div class="card"><div class="card-header"><h3>最近动态</h3><button class="btn btn-outline btn-sm">查看全部</button></div><div class="card-body"><ul class="activity-list">
+<li class="activity-item"><span class="activity-dot" style="background:var(--color-success)"></span><div class="activity-content"><div class="activity-text"><strong>V5 Plus LinkedIn 推文</strong> 发布成功</div><div class="activity-time">2 小时前</div></div></li>
+<li class="activity-item"><span class="activity-dot" style="background:var(--color-primary)"></span><div class="activity-content"><div class="activity-text">新产品 <strong>Q800</strong> 已添加到产品库</div><div class="activity-time">5 小时前</div></div></li>
+<li class="activity-item"><span class="activity-dot" style="background:var(--color-warning)"></span><div class="activity-content"><div class="activity-text">图片合成 <strong>X55VET + 金毛</strong> 待审核</div><div class="activity-time">昨天 15:42</div></div></li>
+<li class="activity-item"><span class="activity-dot" style="background:var(--color-success)"></span><div class="activity-content"><div class="activity-text"><strong>Facebook 推广</strong> — V3 监护仪系列 3 篇推文已生成</div><div class="activity-time">昨天 10:15</div></div></li>
+<li class="activity-item"><span class="activity-dot" style="background:var(--color-text-tertiary)"></span><div class="activity-content"><div class="activity-text"><strong>金毛</strong> 图片已上传到素材库</div><div class="activity-time">2 天前</div></div></li>
+</ul></div></div>
+<div class="card"><div class="card-header"><h3>平台分布</h3></div><div class="card-body"><div class="chart-container">
+<svg viewBox="0 0 200 200" width="170" height="170" role="img" aria-label="平台分布环形图"><title>平台分布</title><desc>LinkedIn 35%, Facebook 28%, Instagram 22%, Twitter 10%, YouTube 5%</desc>
+<circle cx="100" cy="100" r="80" fill="none" stroke="#C8102E" stroke-width="32" stroke-dasharray="175.93 503.2" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+<circle cx="100" cy="100" r="80" fill="none" stroke="#E8435A" stroke-width="32" stroke-dasharray="140.74 503.2" stroke-dashoffset="-175.93" transform="rotate(-90 100 100)"/>
+<circle cx="100" cy="100" r="80" fill="none" stroke="#F28494" stroke-width="32" stroke-dasharray="110.70 503.2" stroke-dashoffset="-316.67" transform="rotate(-90 100 100)"/>
+<circle cx="100" cy="100" r="80" fill="none" stroke="#999999" stroke-width="32" stroke-dasharray="50.27 503.2" stroke-dashoffset="-427.37" transform="rotate(-90 100 100)"/>
+<circle cx="100" cy="100" r="80" fill="none" stroke="#FBD3D9" stroke-width="32" stroke-dasharray="25.13 503.2" stroke-dashoffset="-477.64" transform="rotate(-90 100 100)"/>
+<circle cx="100" cy="100" r="60" fill="white"/>
+<text x="100" y="96" text-anchor="middle" font-size="22" font-weight="700" fill="var(--color-text)">128</text>
+<text x="100" y="114" text-anchor="middle" font-size="11" fill="var(--color-text-secondary)">推文总数</text>
+</svg>
+<div class="chart-legend">
+<div class="chart-legend-item"><span class="chart-legend-dot" style="background:#C8102E"></span>LinkedIn<span class="chart-legend-pct">35%</span></div>
+<div class="chart-legend-item"><span class="chart-legend-dot" style="background:#E8435A"></span>Facebook<span class="chart-legend-pct">28%</span></div>
+<div class="chart-legend-item"><span class="chart-legend-dot" style="background:#F28494"></span>Instagram<span class="chart-legend-pct">22%</span></div>
+<div class="chart-legend-item"><span class="chart-legend-dot" style="background:#999999"></span>Twitter<span class="chart-legend-pct">10%</span></div>
+<div class="chart-legend-item"><span class="chart-legend-dot" style="background:#FBD3D9"></span>YouTube<span class="chart-legend-pct">5%</span></div>
+</div></div></div></div>
+</div>
+</section>
+
+<section class="page" id="page-posts">
+<div class="page-header"><h2>社媒营销</h2><p>为 RHC 安瑞康产品快速生成专业、适配各海外社交平台的推广文案</p></div>
+<div class="post-gen-layout">
+<div class="config-panel">
+<h3>输出内容配置</h3>
+<div class="form-group"><label>选择产品</label><select id="post-product-select"><option value="">-</option></select></div>
+<div class="form-group"><label>发布平台</label><div class="platform-tags" id="platform-tags">
+<span class="platform-tag" data-platform="linkedin" onclick="togglePlatform(this)">LinkedIn</span>
+<span class="platform-tag" data-platform="facebook" onclick="togglePlatform(this)">Facebook</span>
+<span class="platform-tag" data-platform="instagram" onclick="togglePlatform(this)">Instagram</span>
+<span class="platform-tag" data-platform="twitter" onclick="togglePlatform(this)">Twitter</span>
+<span class="platform-tag" data-platform="whatsapp" onclick="togglePlatform(this)">WhatsApp</span>
+</div></div>
+<div class="form-group"><label>语气风格</label><select id="post-tone-select"><option value="" selected>-</option><option>专业可信</option><option>友好亲切</option><option>技术专业</option><option>鼓舞人心</option></select></div>
+<div class="form-group"><label>输出语言</label><select id="post-language-select"><option value="" selected>-</option><option value="English">English</option><option value="Spanish">Spanish</option><option value="Portuguese">Portuguese</option></select></div>
+<div class="form-group"><label>补充说明（选填）</label><textarea id="post-notes" rows="3" placeholder="例如：突出兽医临床应用，强调数据准确性..."></textarea></div>
+<button class="btn btn-primary" id="btn-generate" style="width:100%;margin-top:8px" onclick="generatePost()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 生成推文</button>
+</div>
+<div class="post-preview">
+<div class="post-preview-header">推文预览</div>
+<div class="post-preview-body" id="post-preview-body">
+<div class="post-placeholder" id="post-placeholder">
+<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+<div style="font-size:14px;color:var(--color-text-secondary);font-weight:500;margin-bottom:4px">尚未生成推文</div>
+<div style="font-size:12px">选择产品和平台，点击<strong>生成推文</strong></div>
+</div>
+</div>
+<div class="post-actions" id="post-actions" style="display:none">
+<button class="btn btn-outline btn-sm" onclick="copyPost()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> 复制</button>
+<button class="btn btn-outline btn-sm" id="btn-edit" onclick="toggleEdit()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> 编辑</button>
+<button class="btn btn-outline btn-sm" onclick="generatePost()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> 重新生成</button>
+</div>
+</div>
+</div>
+</section>
+<section class="page" id="page-composer">
+<div id="cp2-mode-select">
+<div class="page-header"><h2>图片合成</h2><p>选择合成模式开始创作</p></div>
+<div class="cp2-mode-cards">
+<div class="cp2-mode-card" onclick="cp2Start('brochure')">
+<div class="cp2-mode-icon" style="background:var(--color-primary-light);color:var(--color-primary)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/><path d="M14 3h7v7"/><path d="M17 6l-7 7"/></svg></div>
+<h3>彩页 / 产品手册 / 社媒宣传图</h3>
+<p>多页面排版，支持产品图、动物图、文字卡片、Logo、页码等图层自由组合</p>
+</div>
+<div class="cp2-mode-card" onclick="cp2Start('cutout')">
+<div class="cp2-mode-icon" style="background:#E6F9F1;color:#0D7B57"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+<h3>仅抠图</h3>
+<p>上传图片，一键去除背景，生成高清透明底 PNG</p>
+</div>
+</div>
+</div>
+<div id="cp2-brochure" style="display:none">
+<div class="cp2-topbar">
+<button class="back-btn" onclick="cp2Exit()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> 返回</button>
+<span class="cp2-topbar-title">图片生成配置</span>
+</div>
+<div class="cp2-workspace">
+<div class="cp2-left">
+<div class="cp2-left-scroll" id="cp2-left-scroll">
+<div id="cp2-config-area"></div>
+</div>
+</div>
+<div class="cp2-right">
+<div class="cp2-preview-wrap" id="cp2-preview-wrap">
+<div id="cp2-paper" class="cp2-paper"></div>
+</div>
+<div class="cp2-actions-bar">
+<button class="btn btn-outline" onclick="cp2ClearPage()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> 删除当前页</button>
+<button class="btn btn-outline" onclick="cp2Exit()">取消</button>
+<button class="btn btn-primary" onclick="cp2Download()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 下载图片</button>
+</div>
+</div>
+</div>
+</div>
+<div id="cp2-cutout" style="display:none">
+<div class="cp2-topbar">
+<button class="back-btn" onclick="cp2Exit()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> 返回</button>
+<span class="cp2-topbar-title">仅抠图</span>
+</div>
+<div class="cp2-cutout-ws">
+<div class="cp2-cutout-col">
+<div class="cp2-cutout-area" id="cp2-cutout-left" role="button" tabindex="0">
+<div id="cp2-cutout-placeholder" class="cp2-cutout-hint">
+<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+<p>点击上传图片</p>
+<span>支持 JPG、PNG，建议使用主体清晰的图片</span>
+</div>
+<img id="cp2-cutout-orig-img" style="display:none">
+</div>
+<input type="file" id="cp2-cutout-file" accept="image/*" style="display:none">
+<div class="cp2-cutout-actions">
+<button class="btn btn-outline" id="cp2-cutout-cancel" onclick="cp2ResetCutout()" disabled>取消</button>
+<button class="btn btn-primary" id="cp2-cutout-start" onclick="cp2DoCutout()" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图</button>
+</div>
+</div>
+<div class="cp2-cutout-col">
+<div class="cp2-cutout-area" id="cp2-cutout-right" style="cursor:default">
+<div id="cp2-cutout-result-placeholder" class="cp2-cutout-hint">
+<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+<p>抠图结果将显示在这里</p>
+</div>
+<img id="cp2-cutout-result-img" style="display:none">
+<div id="cp2-cutout-spinner" style="display:none" class="cp2-cutout-status">
+<div class="loading-spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto"></div>
+<p style="margin-top:12px">正在抠图，请稍候...</p>
+</div>
+</div>
+<div class="cp2-cutout-actions">
+<button class="btn btn-primary" id="cp2-cutout-dl" onclick="cp2DownloadCutout()" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 下载透明底 PNG</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="page" id="page-media">
+<div class="page-header"><h2>营销中心</h2><p>产品、品牌资源与最佳实践集中管理</p></div>
+<div id="media-main">
+<div class="media-tabs" id="media-tabs">
+<div class="media-tab active" onclick="switchMediaTab('products',this)">产品库</div>
+<div class="media-tab" onclick="switchMediaTab('brand',this)">品牌资源</div>
+<div class="media-tab" onclick="switchMediaTab('cases',this)">最佳实践</div>
+</div>
+<div id="media-products-tab">
+<div class="search-bar" id="media-products-toolbar"><div class="search-wrapper"><svg class="icon-svg" viewBox="0 0 24 24" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--color-text-tertiary)" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="product-search-input" placeholder="搜索产品..." aria-label="搜索产品" oninput="applyProductFilters()"></div><select id="product-category-filter" class="filter-select" onchange="applyProductFilters()" aria-label="按分类筛选"><option value="">全部分类</option></select><span class="product-count" id="product-count"></span><button class="btn btn-primary" onclick="openProductModal()" style="margin-left:auto;white-space:nowrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新增产品</button></div>
+<div class="media-grid" id="product-grid"><div class="state-message"><div class="loading-spinner"></div><div>正在加载产品...</div></div></div>
+</div>
+<div id="media-brand" class="media-grid" style="display:none">
+<div class="media-item" style="max-width:220px"><img class="media-thumb" src="https://iili.io/CZ0tVNn.png" alt="RHC Logo" loading="lazy" style="background:#fff;object-fit:contain;padding:10px"><div class="media-meta"><div class="media-name">RHC 主Logo（透明底）</div><div class="media-tag">品牌资源 · PNG</div></div></div>
+<div class="media-item" style="max-width:220px"><img class="media-thumb" src="https://iili.io/CthILR2.jpg" alt="RHC Avatar" loading="lazy" style="background:#fff;object-fit:contain;padding:10px"><div class="media-meta"><div class="media-name">RHC 圆形头像</div><div class="media-tag">品牌资源 · 头像</div></div></div>
+<div class="media-item" style="max-width:220px"><img class="media-thumb" src="https://iili.io/CZ19Hcx.jpg" alt="RHC Logo White" loading="lazy" style="background:#fff;object-fit:contain;padding:10px"><div class="media-meta"><div class="media-name">RHC 主Logo（白底）</div><div class="media-tag">品牌资源 · JPG</div></div></div>
+</div>
+<div id="media-cases" style="display:none">
+<div class="card"><div class="card-body" style="text-align:center;padding:60px 20px">
+<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.2" style="margin:0 auto 16px;display:block;opacity:.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+<div style="font-size:15px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px">暂无最佳实践</div>
+<div style="font-size:13px;color:var(--color-text-tertiary)">案例管理功能即将上线</div>
+</div></div>
+</div>
+</div>
+<div id="product-detail" style="display:none"></div>
+</section>
+<section class="page" id="page-history">
+<div class="page-header"><h2>内容历史</h2><p>查看所有已生成的推文和合成图片</p></div>
+<div class="history-filters">
+<input type="date" value="2025-01-01" aria-label="开始日期">
+<span style="color:var(--color-text-tertiary);font-size:13px">至</span>
+<input type="date" value="2025-06-30" aria-label="结束日期">
+<select aria-label="按平台筛选"><option>全部平台</option><option>LinkedIn</option><option>Facebook</option><option>Instagram</option><option>Twitter</option><option>YouTube</option></select>
+<select aria-label="按产品筛选"><option>全部产品</option><option>V5 Plus</option><option>V5</option><option>X35VET</option><option>X55VET</option><option>V3</option><option>X8</option><option>Q800</option></select>
+<button class="btn btn-primary btn-sm">应用筛选</button>
+</div>
+<div class="card"><div style="overflow-x:auto">
+<table class="data-table">
+<caption style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">内容历史记录</caption>
+<thead><tr><th>日期</th><th>产品</th><th>平台</th><th>内容摘要</th><th>图片</th><th>状态</th><th style="width:140px">操作</th></tr></thead>
+<tbody>
+<tr><td style="white-space:nowrap">2025-06-24</td><td><strong>V5 Plus</strong></td><td>LinkedIn</td><td class="truncate">Introducing the V5 Plus — our most advanced veterinary anesthesia system with integrated multi-gas monitoring...</td><td><span class="tag tag-primary">1 张图</span></td><td><span class="tag tag-success">已发布</span></td><td><div class="row-actions"><button>查看</button><button>编辑</button><button class="delete-btn">删除</button></div></td></tr>
+<tr><td style="white-space:nowrap">2025-06-22</td><td><strong>V3</strong></td><td>Facebook</td><td class="truncate">Real-time patient monitoring redefined. The RHC Medical V3 Monitor delivers precise vitals for every veterinary procedure...</td><td><span class="tag tag-primary">2 张图</span></td><td><span class="tag tag-success">已发布</span></td><td><div class="row-actions"><button>查看</button><button>编辑</button><button class="delete-btn">删除</button></div></td></tr>
+<tr><td style="white-space:nowrap">2025-06-20</td><td><strong>X55VET</strong></td><td>Instagram</td><td class="truncate">Compact. Reliable. Built for veterinary excellence. The X55VET anesthesia machine is designed for modern animal clinics...</td><td><span class="tag tag-primary">3 张图</span></td><td><span class="tag tag-warning">审核中</span></td><td><div class="row-actions"><button>查看</button><button>编辑</button><button class="delete-btn">删除</button></div></td></tr>
+<tr><td style="white-space:nowrap">2025-06-18</td><td><strong>Q800</strong></td><td>LinkedIn</td><td class="truncate">Precision ultrasound imaging for veterinary diagnostics. The Q800 delivers crystal-clear imaging with AI-assisted measurements...</td><td><span class="tag tag-gray">无</span></td><td><span class="tag tag-gray">草稿</span></td><td><div class="row-actions"><button>查看</button><button>编辑</button><button class="delete-btn">删除</button></div></td></tr>
+<tr><td style="white-space:nowrap">2025-06-15</td><td><strong>V5 Plus</strong></td><td>Twitter</td><td class="truncate">Vet anesthesia just got an upgrade. The V5 Plus by RHC Medical — precision, safety, and versatility in one system...</td><td><span class="tag tag-primary">1 张图</span></td><td><span class="tag tag-success">已发布</span></td><td><div class="row-actions"><button>查看</button><button>编辑</button><button class="delete-btn">删除</button></div></td></tr>
+<tr><td style="white-space:nowrap">2025-06-12</td><td><strong>L800</strong></td><td>Instagram</td><td class="truncate">Portable ultrasound for field veterinary work. L800 — imaging anywhere, anytime. Perfect for equine and livestock care...</td><td><span class="tag tag-primary">2 张图</span></td><td><span class="tag tag-success">已发布</span></td><td><div class="row-actions"><button>查看</button><button>编辑</button><button class="delete-btn">删除</button></div></td></tr>
+<tr><td style="white-space:nowrap">2025-06-10</td><td><strong>CV50</strong></td><td>Facebook</td><td class="truncate">Cardiac ultrasound made simple. CV50 brings advanced echocardiography to every veterinary clinic with intuitive workflow...</td><td><span class="tag tag-gray">无</span></td><td><span class="tag tag-warning">审核中</span></td><td><div class="row-actions"><button>查看</button><button>编辑</button><button class="delete-btn">删除</button></div></td></tr>
+<tr><td style="white-space:nowrap">2025-06-08</td><td><strong>M800</strong></td><td>LinkedIn</td><td class="truncate">M800 — where diagnostic imaging meets veterinary precision. Multi-frequency probes, AI-enhanced image quality, and a design...</td><td><span class="tag tag-primary">1 张图</span></td><td><span class="tag tag-gray">草稿</span></td><td><div class="row-actions"><button>查看</button><button>编辑</button><button class="delete-btn">删除</button></div></td></tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section class="page" id="page-notifications">
+<div class="page-header"><h2>通知</h2><p>系统消息与任务提醒</p></div>
+<div class="card"><div class="card-body">
+<ul class="activity-list">
+<li class="activity-item"><span class="activity-dot" style="background:var(--color-primary)"></span><div class="activity-content"><div class="activity-text"><strong>V5 Plus LinkedIn 推文</strong> 已生成成功</div><div class="activity-time">2 小时前</div></div></li>
+<li class="activity-item"><span class="activity-dot" style="background:var(--color-warning)"></span><div class="activity-content"><div class="activity-text">图片合成 <strong>X55VET + 金毛</strong> 待审核</div><div class="activity-time">5 小时前</div></div></li>
+<li class="activity-item"><span class="activity-dot" style="background:var(--color-success)"></span><div class="activity-content"><div class="activity-text">新产品 <strong>Q800</strong> 已添加到产品库</div><div class="activity-time">昨天 15:42</div></div></li>
+</ul>
+</div></div>
+</section>
+<section class="page" id="page-settings">
+<div class="page-header"><h2>设置</h2><p>系统偏好与账户管理</p></div>
+<div class="card"><div class="card-body">
+<div class="form-group"><label>默认语言</label><select><option>中文（简体）</option><option>English</option></select></div>
+<div class="form-group"><label>API 地址</label><input type="text" value="http://localhost:8000"></div>
+<div class="form-group"><label>通知偏好</label><select><option>全部通知</option><option>仅重要通知</option><option>关闭通知</option></select></div>
+</div></div>
+</section>
+</main>
+</div>
+</div>
+<div class="modal-overlay" id="product-modal" onclick="if(event.target===this)closeProductModal()">
+<div class="modal-card">
+<div class="modal-header"><h3 id="modal-title">新增产品</h3><button class="modal-close" onclick="closeProductModal()" aria-label="关闭">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="pf-record-id">
+<div class="form-group"><label>产品型号 *</label><input type="text" id="pf-model" placeholder="如 V5 Plus"></div>
+<div class="form-group"><label>产品名称</label><input type="text" id="pf-name" placeholder="如：动物专用麻醉机"></div>
+<div class="form-group"><label>产品分类</label><select id="pf-category" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;background:#fff" onchange="onPfCatChange()"></select></div>
+<div class="form-group"><label>核心卖点（可输入中文，生成推文时自动翻译）</label><textarea id="pf-selling" rows="4" placeholder="例如：集成多气体监测、精准潮气量控制、适用于猫狗等小动物...&#10;生成英文社媒推文时会自动翻译为目标语言。"></textarea></div>
+<div class="form-group"><label>产品库</label><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><img id="pf-preview" src="" alt="" style="width:60px;height:60px;object-fit:contain;background:#F9F9F9;border:1px solid var(--color-border-light);border-radius:8px;display:none"><button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('pf-file').click()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 选择图片</button><span id="pf-filename" style="font-size:12px;color:var(--color-text-tertiary)"></span><input type="file" id="pf-file" accept="image/*" style="display:none" onchange="handleImageUpload(this,'pf-image','pf-preview','pf-filename')"><input type="hidden" id="pf-image"></div></div>
+</div>
+<div class="modal-footer"><button class="btn btn-outline" onclick="closeProductModal()">取消</button><button class="btn btn-primary" id="pf-save-btn" onclick="saveProduct()">保存</button></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var state={apiBase:localStorage.getItem('rhc_api_base')||'https://rhc-marketing-assistant-production.up.railway.app',apiConnected:false,products:[],animals:[],selectedPlatform:'',isEditing:false,lastGeneratedPost:null};
+
+var PRODUCT_IMAGE_MAP={'V5 Plus':'https://iili.io/CLNP4EJ.png','V5':'https://iili.io/CLNPs7p.png','X35VET':'https://iili.io/CLNi94f.png','X55VET':'https://iili.io/CLNPpBs.png','V3':'https://iili.io/CQFEeN2.jpg','X8':'https://iili.io/CQFMm8J.jpg','V3 MRI':'https://iili.io/CQF8v6v.jpg','QV10':'https://iili.io/CQFVF6X.jpg','Q800':'https://iili.io/CQFji1S.jpg','M800':'https://iili.io/CQFjphx.jpg','L800':'https://iili.io/CQFwHBV.jpg','CV50':'https://iili.io/CQFwFYF.jpg','CV50pro':'https://iili.io/CQFwfpa.jpg','DC50':'https://iili.io/CQFkzts.jpg','DB15S':'https://iili.io/CQFO2Og.jpg','SA Series':'https://iili.io/CQFeSF2.jpg','SP Series':'https://iili.io/CQFOrhJ.jpg'};
+
+var PRODUCT_CATEGORY_MAP={'V5 Plus':'麻醉机','V5':'麻醉机','X35VET':'麻醉机','X55VET':'麻醉工作站','V3':'麻醉机','X8':'呼吸机','V3 MRI':'麻醉机','QV10':'呼吸机','Q800':'麻醉机','M800':'麻醉工作站','L800':'麻醉机','CV50':'麻醉机','CV50pro':'麻醉机','DC50':'辅助设备','DB15S':'辅助设备','SA Series':'注射泵','SP Series':'注射泵'};
+
+var PRODUCT_CN_NAME_MAP={'V5 Plus':'动物专用麻醉机','V5':'动物专用麻醉机','X35VET':'动物专用麻醉机','X55VET':'动物麻醉工作站','V3':'动物专用麻醉机','X8':'动物用麻醉呼吸机','V3 MRI':'MRI核磁兼容型动物麻醉机','QV10':'异宠麻醉呼吸机','Q800':'异宠麻醉机','M800':'大动物麻醉工作站','L800':'实验室用麻醉机','CV50':'动物专用麻醉机','CV50pro':'动物专用麻醉机','DC50':'双气源（氧气&空气）设备','DB15S':'空气泵','SA Series':'注射泵 SA系列','SP Series':'注射泵 SP系列'};
+
+var CATEGORY_CN_MAP={'麻醉工作站':'麻醉工作站','麻醉机':'麻醉机','呼吸机':'呼吸机','注射泵':'注射泵','辅助设备':'辅助设备','Patient Monitor':'监护设备','Ultrasound Imaging':'超声影像','Other Equipment':'其他设备','Medical Equipment':'其他设备'};
+
+var toastTimer=null;
+function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3000)}
+
+function apiUrl(p){return state.apiBase.replace(/\/+$/,'')+p}
+function setAPIStatus(c){state.apiConnected=c;var d=document.getElementById('api-status-dot');if(c){d.classList.add('connected');d.title='API 已连接'}else{d.classList.remove('connected');d.title='API 未连接'}}
+
+function connectAPI(){var v=document.getElementById('api-url-input').value.trim();if(!v){showToast('请输入 API 地址','error');return}state.apiBase=v;localStorage.setItem('rhc_api_base',v);setAPIStatus(false);showToast('正在连接 '+v+'...');checkHealth()}
+
+function checkHealth(){fetch(apiUrl('/api/health'),{method:'GET',signal:AbortSignal.timeout(5000)}).then(function(r){if(!r.ok)throw new Error('fail');return r.json()}).then(function(){setAPIStatus(true);showToast('API 连接成功','success');loadProducts();loadAnimals()}).catch(function(){setAPIStatus(false);showToast('无法连接 API，使用本地数据','error');loadFallbackProducts()})}
+
+function loadProducts(){fetch(apiUrl('/api/products'),{signal:AbortSignal.timeout(8000)}).then(function(r){if(!r.ok)throw new Error('fail');return r.json()}).then(function(d){state.products=(d.items||[]).slice().sort(function(a,b){return(b.record_id||'').localeCompare(a.record_id||'')});if(!state.products.length){loadFallbackProducts();return}populateCategoryFilter(state.products);applyProductFilters();renderProductSelect(state.products);updateDashboardMetrics()}).catch(function(){loadFallbackProducts()})}
+
+function loadFallbackProducts(){state.products=Object.keys(PRODUCT_IMAGE_MAP).map(function(m){return{product_model:m,product_name:m,product_image_url:PRODUCT_IMAGE_MAP[m]}});populateCategoryFilter(state.products);applyProductFilters();renderProductSelect(state.products);updateDashboardMetrics()}
+
+function loadAnimals(){fetch(apiUrl('/api/animals'),{signal:AbortSignal.timeout(8000)}).then(function(r){if(!r.ok)throw new Error('fail');return r.json()}).then(function(d){state.animals=d.items||[];renderAnimals(state.animals);updateDashboardMetrics()}).catch(function(){state.animals=[];renderAnimals([]);updateDashboardMetrics()})}
+
+function updateDashboardMetrics(){var pc=state.products.length,bc=3;var e1=document.getElementById('metric-products');if(e1){e1.textContent=pc;document.getElementById('metric-products-change').textContent=pc+' 款产品'}var e2=document.getElementById('metric-media');if(e2){e2.textContent=pc+bc;document.getElementById('metric-media-change').textContent=pc+' 款产品 + '+bc+' 个品牌资源'}var postCount=parseInt(localStorage.getItem('rhc_post_count')||'0',10);var e3=document.getElementById('metric-posts');if(e3){e3.textContent=postCount;var ce=e3.parentElement.querySelector('.metric-change');if(ce){ce.textContent=postCount>0?'本次会话累计 '+postCount+' 篇':'暂无记录';ce.style.color=postCount>0?'var(--color-success)':'var(--color-text-tertiary)'}}}
+
+function _txt(v){if(v==null)return'';if(typeof v==='string')return v;if(Array.isArray(v))return v.map(function(x){return typeof x==='string'?x:(x&&x.text)||''}).join('');if(typeof v==='object'&&v.text)return v.text;return String(v)}
+var NAME_TO_CAT=(function(){var m={};Object.keys(PRODUCT_CN_NAME_MAP).forEach(function(k){var n=PRODUCT_CN_NAME_MAP[k];if(!m[n])m[n]=PRODUCT_CATEGORY_MAP[k]});return m})();
+function populateDetPnameSelect(currentName,currentCat){var sel=document.getElementById('det-pname');if(!sel)return;var names=Object.keys(PRODUCT_CN_NAME_MAP).map(function(k){return PRODUCT_CN_NAME_MAP[k]});var unique=[];names.forEach(function(n){if(unique.indexOf(n)===-1)unique.push(n)});sel.innerHTML=unique.map(function(n){return'<option value="'+n+'"'+(n===currentName?' selected':'')+'>'+n+'</option>'}).join('');if(!currentName&&currentCat){var cn=getCategoryCn(currentCat);sel.value=cn}}
+function populateDetCatSelect(currentCat,currentName){var sel=document.getElementById('det-category');if(!sel)return;var cats=Object.keys(CATEGORY_CN_MAP).filter(function(k){return CATEGORY_CN_MAP[k]&&['麻醉工作站','麻醉机','呼吸机','注射泵','辅助设备'].indexOf(CATEGORY_CN_MAP[k])>-1});sel.innerHTML=cats.map(function(k){return'<option value="'+k+'"'+(k===currentCat?' selected':'')+'>'+CATEGORY_CN_MAP[k]+'</option>'}).join('')}
+function onDetPnameChange(){var sel=document.getElementById('det-pname');if(!sel)return;var name=sel.value;var cat=NAME_TO_CAT[name];if(cat){var catSel=document.getElementById('det-category');if(catSel)catSel.value=cat}}
+function onDetCatChange(){var sel=document.getElementById('det-category');if(!sel)return;var cat=sel.value;var cn=getCategoryCn(cat);var nameSel=document.getElementById('det-pname');if(nameSel&&nameSel.querySelector('option[value="'+cn+'"]')){nameSel.value=cn}}
+function populatePfCategory(currentCat){var catSel=document.getElementById('pf-category');if(!catSel)return;var cats=Object.keys(CATEGORY_CN_MAP).filter(function(k){return CATEGORY_CN_MAP[k]&&['麻醉工作站','麻醉机','呼吸机','注射泵','辅助设备'].indexOf(CATEGORY_CN_MAP[k])>-1});catSel.innerHTML='<option value="">— 请选择产品分类 —</option>'+cats.map(function(k){return'<option value="'+k+'"'+(k===currentCat?' selected':'')+'>'+CATEGORY_CN_MAP[k]+'</option>'}).join('')}
+function onPfCatChange(){}
+function getProductImageUrl(p){if(p.product_image_url)return _txt(p.product_image_url);if(p.image_url)return _txt(p.image_url);var m=_txt(p.product_model)||_txt(p.product_name);return PRODUCT_IMAGE_MAP[m]||''}
+function getProductCategory(p){if(p.category)return _txt(p.category);if(p.product_category)return _txt(p.product_category);var m=_txt(p.product_model)||_txt(p.product_name);return PRODUCT_CATEGORY_MAP[m]||'Medical Equipment'}
+function getCategoryCn(cat){return CATEGORY_CN_MAP[cat]||cat}
+function getProductModel(p){return _txt(p.product_model)||_txt(p.product_name)||'Unknown'}
+function getProductDisplayName(p){var m=getProductModel(p);if(PRODUCT_CN_NAME_MAP[m])return PRODUCT_CN_NAME_MAP[m];return _txt(p.product_name)||m||'Unknown'}
+
+function placeholderSvg(name){return'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="#FDE8EA" width="200" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#C8102E" font-size="14" font-family="sans-serif">'+name+'</text></svg>')}
+
+function escapeHtml(s){if(!s)return'';var d=document.createElement('div');d.appendChild(document.createTextNode(String(s)));return d.innerHTML}
+function escapeJs(s){if(!s)return'';return String(s).replace(/'/g,"\\'").replace(/"/g,'\\"')}
+
+function renderProducts(products){var g=document.getElementById('product-grid');if(!g)return;if(!products||!products.length){g.innerHTML='<div class="state-message"><div style="font-size:14px;color:var(--color-text-secondary)">未找到产品</div></div>';return}g.innerHTML=products.map(function(p){var m=getProductModel(p),c=getProductCategory(p),pn=getProductDisplayName(p),img=getProductImageUrl(p)||placeholderSvg(m);return'<div class="media-item" onclick="onProductCardClick(\''+escapeJs(m)+'\')"><img class="media-thumb" style="object-fit:contain;background:#FFFFFF" src="'+escapeHtml(img)+'" alt="'+escapeHtml(m)+'" loading="lazy" onerror="this.src=\''+placeholderSvg(m)+'\'"><div class="media-meta"><div class="media-name">'+escapeHtml(m)+'</div><div class="media-tag">'+escapeHtml(pn)+'</div></div></div>'}).join('')}
+
+function renderProductSelect(products){var s=document.getElementById('post-product-select');if(!s)return;if(!products||!products.length){s.innerHTML='<option value="">暂无可用产品</option>';return}s.innerHTML='<option value="">-</option>'+products.map(function(p){var m=getProductModel(p),n=getProductDisplayName(p);return'<option value="'+escapeHtml(m)+'">'+escapeHtml(m)+' — '+escapeHtml(n)+'</option>'}).join('');var cs=document.getElementById('comp-product');if(cs){cs.innerHTML='<option value="">无</option>'+products.map(function(p){var m=getProductModel(p);return'<option value="'+escapeHtml(m)+'">'+escapeHtml(m)+'</option>'}).join('');cs.value='V5 Plus';if(typeof updateMiniCanvas==='function')updateMiniCanvas()}}
+
+function onProductCardClick(model){var p=state.products.find(function(x){return getProductModel(x)===model});if(p&&p.record_id){showProductDetail(p.record_id)}else{showProductDetailFallback(model)}}
+
+function showProductDetail(recordId){var p=state.products.find(function(x){return x.record_id===recordId});if(!p){showToast('未找到产品','error');return}var m=getProductModel(p),n=getProductDisplayName(p),c=getProductCategory(p),img=getProductImageUrl(p)||placeholderSvg(m),selling=_txt(p.main_selling_point),imgUrl=_txt(p.product_image_url)||getProductImageUrl(p);var main=document.getElementById('media-main'),det=document.getElementById('product-detail');main.style.display='none';det.style.display='block';det.innerHTML='<div class="back-btn" onclick="backToProductGrid()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> 返回产品列表</div><div class="product-detail-card"><div class="product-detail-header"><div class="product-detail-img-wrap"><img class="product-detail-img" id="det-img" src="'+escapeHtml(img)+'" alt="'+escapeHtml(m)+'" onerror="this.src=\''+placeholderSvg(m)+'\'"><div class="product-detail-img-overlay" onclick="document.getElementById(\'det-file\').click()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 更换图片</div><input type="file" id="det-file" accept="image/*" style="display:none" onchange="handleImageUpload(this,\'det-image\',\'det-img\',\'det-filename\')"></div><div class="product-detail-info"><h2 id="det-model-display">'+escapeHtml(m)+'</h2><div class="detail-name" id="det-name-display">'+escapeHtml(n)+'</div></div></div><div class="product-detail-body"><input type="hidden" id="det-image" value="'+escapeHtml(imgUrl)+'"><div class="detail-section"><h4>产品名称</h4><input type="text" id="det-pname" value="'+escapeHtml(n)+'" placeholder="如：动物专用麻醉机"></div><div class="detail-section"><h4>产品型号</h4><input type="text" id="det-name" value="'+escapeHtml(m)+'" placeholder="如：V5 Plus"></div><div class="detail-section"><h4>产品分类</h4><input type="text" id="det-category" value="'+escapeHtml(c)+'"></div><div class="detail-section"><h4>核心卖点（可输入中文，生成推文时自动翻译）</h4><textarea id="det-selling" rows="5" placeholder="例如：集成多气体监测、精准潮气量控制、适用于猫狗等小动物...">'+escapeHtml(selling)+'</textarea></div></div><div class="detail-actions"><button class="btn-delete-product" onclick="deleteProduct(\''+recordId+'\',\''+escapeJs(m)+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> 删除产品</button><button class="btn btn-outline" onclick="backToProductGrid()">取消</button><button class="btn btn-primary" onclick="saveProductDetail(\''+recordId+'\',\''+escapeJs(m)+'\')">保存修改</button></div></div>'}
+
+function showProductDetailFallback(model){
+var p=state.products.find(function(x){return getProductModel(x)===model})||{product_model:model};
+var m=getProductModel(p),n=getProductDisplayName(p),c=getProductCategory(p),selling=_txt(p.main_selling_point);
+var img=getProductImageUrl(p)||PRODUCT_IMAGE_MAP[m]||placeholderSvg(m);
+var main=document.getElementById('media-main'),det=document.getElementById('product-detail');
+main.style.display='none';det.style.display='block';
+det.innerHTML='<div class="back-btn" onclick="backToProductGrid()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> 返回产品列表</div>'+
+'<div class="product-detail-card">'+
+'<div class="product-detail-header">'+
+'<div class="product-detail-img-wrap">'+
+'<img class="product-detail-img" id="det-fallback-img" src="'+escapeHtml(img)+'" alt="'+escapeHtml(m)+'" onerror="this.src=\''+placeholderSvg(m)+'\'">'+
+'<div class="product-detail-img-overlay" onclick="document.getElementById(\'det-fallback-file\').click()">'+
+'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 更换图片</div>'+
+'<input type="file" id="det-fallback-file" accept="image/*" style="display:none" onchange="handleFallbackImageUpload(this,\'det-fallback-img\',\'det-fallback-image\')">'+
+'<input type="hidden" id="det-fallback-image" value="'+escapeHtml(img)+'">'+
+'</div>'+
+'<div class="product-detail-info"><h2>'+escapeHtml(m)+'</h2><div class="detail-name">'+escapeHtml(n)+'</div></div>'+
+'</div>'+
+'<div class="product-detail-body">'+
+'<div class="detail-section"><h4>产品名称</h4><input type="text" id="det-fallback-name" value="'+escapeHtml(n)+'"></div>'+
+'<div class="detail-section"><h4>产品型号</h4><input type="text" id="det-fallback-model" value="'+escapeHtml(m)+'"></div>'+
+'<div class="detail-section"><h4>产品分类</h4><input type="text" id="det-fallback-category" value="'+escapeHtml(c)+'"></div>'+
+'<div class="detail-section"><h4>核心卖点</h4><textarea id="det-fallback-selling" rows="5" placeholder="输入产品核心卖点...">'+escapeHtml(selling)+'</textarea></div>'+
+'</div>'+
+'<div class="detail-actions"><button class="btn btn-outline" onclick="backToProductGrid()">返回</button></div>'+
+'</div>';
+}
+
+function backToProductGrid(){var main=document.getElementById('media-main'),det=document.getElementById('product-detail');main.style.display='';det.style.display='none';det.innerHTML=''}
+
+function deleteProduct(recordId,model){if(!confirm('确定要删除产品 "'+model+'" 吗？此操作不可撤销。'))return;fetch(apiUrl('/api/products/'+recordId),{method:'DELETE',signal:AbortSignal.timeout(10000)}).then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'删除失败')});return r.json()}).then(function(){state.products=state.products.filter(function(x){return x.record_id!==recordId});populateCategoryFilter(state.products);applyProductFilters();renderProductSelect(state.products);updateDashboardMetrics();showToast('产品已删除','success');backToProductGrid()}).catch(function(err){showToast(err.message||'删除失败','error')})}
+
+function saveProductDetail(recordId,model){var cat=document.getElementById('det-category').value;var selling=document.getElementById('det-selling').value;var img=document.getElementById('det-image').value;var newModel=document.getElementById('det-name').value||model;var btn=event.target;btn.disabled=true;btn.textContent='保存中...';fetch(apiUrl('/api/products/'+recordId),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_model:newModel,product_name:getCategoryCn(cat),category:cat,main_selling_point:selling,product_image_url:img}),signal:AbortSignal.timeout(15000)}).then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'保存失败')});return r.json()}).then(function(d){var idx=state.products.findIndex(function(x){return x.record_id===recordId});if(idx>-1)state.products[idx]=d;populateCategoryFilter(state.products);applyProductFilters();renderProductSelect(state.products);showToast('产品信息已保存','success');backToProductGrid()}).catch(function(err){showToast(err.message||'保存失败','error');btn.disabled=false;btn.textContent='保存修改'})}
+
+function openProductModal(recordId){var m=document.getElementById('product-modal');document.getElementById('pf-record-id').value=recordId||'';if(recordId){var p=state.products.find(function(x){return x.record_id===recordId});if(p){document.getElementById('modal-title').textContent='编辑产品';document.getElementById('pf-model').value=getProductModel(p);document.getElementById('pf-name').value=getProductDisplayName(p);populatePfCategory(getProductCategory(p));document.getElementById('pf-selling').value=_txt(p.main_selling_point);document.getElementById('pf-image').value=getProductImageUrl(p);var prev=document.getElementById('pf-preview');if(prev){prev.src=getProductImageUrl(p)||'';prev.style.display=getProductImageUrl(p)?'block':'none'}document.getElementById('pf-filename').textContent=''}}else{document.getElementById('modal-title').textContent='新增产品';document.getElementById('pf-model').value='';document.getElementById('pf-name').value='';populatePfCategory('');document.getElementById('pf-selling').value='';document.getElementById('pf-image').value='';document.getElementById('pf-preview').style.display='none';document.getElementById('pf-filename').textContent=''}m.classList.add('show')}
+
+function closeProductModal(){document.getElementById('product-modal').classList.remove('show')}
+
+function handleImageUpload(input,hiddenId,previewId,filenameId){
+  var file=input.files&&input.files[0];if(!file)return;
+  if(file.size>8*1024*1024){showToast('图片不能超过8MB','error');input.value='';return}
+  var fname=document.getElementById(filenameId);if(fname)fname.textContent='上传中...';var saveBtn=document.getElementById('pf-save-btn');if(saveBtn){saveBtn.disabled=true;saveBtn.dataset.wasUploading='1'}
+  var fd=new FormData();fd.append('file',file);
+  fetch(apiUrl('/api/upload-image'),{method:'POST',body:fd,signal:AbortSignal.timeout(30000)})
+    .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'上传失败')});return r.json()})
+    .then(function(d){if(d&&d.url){var url=d.url;document.getElementById(hiddenId).value=url;var prev=document.getElementById(previewId);if(prev){prev.src=url;prev.style.display='block'}if(fname)fname.textContent=file.name+' ✓';showToast('图片上传成功','success');if(saveBtn&&saveBtn.dataset.wasUploading){saveBtn.disabled=false;delete saveBtn.dataset.wasUploading}}else{throw new Error('上传失败')}})
+    .catch(function(err){if(fname)fname.textContent='';showToast('图片上传失败: '+err.message,'error');input.value='';var sb=document.getElementById('pf-save-btn');if(sb&&sb.dataset.wasUploading){sb.disabled=false;delete sb.dataset.wasUploading}})
+}
+
+function saveProduct(){var recordId=document.getElementById('pf-record-id').value;var model=document.getElementById('pf-model').value.trim();if(!model){showToast('请填写产品型号','error');return}var pname=document.getElementById('pf-name').value.trim();var cat=document.getElementById('pf-category').value.trim();if(!pname){showToast('请填写产品名称','error');return}if(!cat){showToast('请选择产品分类','error');return}var body={product_model:model,product_name:pname,category:cat,main_selling_point:document.getElementById('pf-selling').value.trim(),product_image_url:document.getElementById('pf-image').value.trim()};var btn=document.getElementById('pf-save-btn');btn.disabled=true;btn.textContent='保存中...';var method=recordId?'PUT':'POST';var url=recordId?apiUrl('/api/products/'+recordId):apiUrl('/api/products');fetch(url,{method:method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(10000)}).then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'保存失败')});return r.json()}).then(function(d){if(recordId){var idx=state.products.findIndex(function(x){return x.record_id===recordId});if(idx>-1)state.products[idx]=d}else{state.products.unshift(d)}state.products.sort(function(a,b){return(b.record_id||'').localeCompare(a.record_id||'')});populateCategoryFilter(state.products);applyProductFilters();renderProductSelect(state.products);updateDashboardMetrics();showToast(recordId?'产品已更新':'新产品已添加','success');closeProductModal()}).catch(function(err){showToast(err.message||'保存失败','error')}).finally(function(){btn.disabled=false;btn.textContent='保存'})}
+
+function populateCategoryFilter(products){var sel=document.getElementById('product-category-filter');if(!sel)return;var cats=[];products.forEach(function(p){var c=getProductCategory(p);if(c&&cats.indexOf(c)===-1)cats.push(c)});var CATEGORY_ORDER=['麻醉工作站','麻醉机','呼吸机','注射泵','辅助设备'];cats.sort(function(a,b){var ia=CATEGORY_ORDER.indexOf(a),ib=CATEGORY_ORDER.indexOf(b);if(ia===-1)ia=999;if(ib===-1)ib=999;return ia-ib});var cur=sel.value;sel.innerHTML='<option value="">全部分类</option>'+cats.map(function(c){return'<option value="'+escapeHtml(c)+'">'+escapeHtml(getCategoryCn(c))+'</option>'}).join('');if(cur)sel.value=cur}
+function applyProductFilters(){var q=(document.getElementById('product-search-input').value||'').toLowerCase();var cat=document.getElementById('product-category-filter').value||'';var f=state.products.filter(function(p){var m=(getProductModel(p)||'').toLowerCase(),n=(getProductDisplayName(p)||'').toLowerCase(),c=getProductCategory(p)||'';var matchQ=!q||m.indexOf(q)!==-1||n.indexOf(q)!==-1||c.toLowerCase().indexOf(q)!==-1;var matchCat=!cat||c===cat;return matchQ&&matchCat});renderProducts(f);var ce=document.getElementById('product-count');if(ce){ce.textContent=f.length===state.products.length?'共 '+f.length+' 款产品':'共 '+f.length+' / '+state.products.length+' 款产品'}}
+
+function togglePlatform(el){document.querySelectorAll('#platform-tags .platform-tag').forEach(function(t){t.classList.remove('selected')});el.classList.add('selected');state.selectedPlatform=el.getAttribute('data-platform')}
+
+function generatePost(){var pm=document.getElementById('post-product-select').value;var pl=state.selectedPlatform;var lang=document.getElementById('post-language-select').value;var notes=document.getElementById('post-notes').value;if(!pl){showToast('请先选择发布平台','error');return}if(!pm){showToast('请先选择产品','error');return}var btn=document.getElementById('btn-generate'),pb=document.getElementById('post-preview-body'),act=document.getElementById('post-actions');btn.disabled=true;btn.innerHTML='<span class="loading-spinner" style="width:16px;height:16px;border-width:2px"></span> 生成中...';act.style.display='none';state.isEditing=false;pb.innerHTML='<div class="post-loading"><div class="loading-spinner"></div><div style="color:var(--color-text-secondary);font-size:13px">正在生成推文...</div></div>';var body={product_model:pm,platform:pl,language:lang,extra_keywords:notes};fetch(apiUrl('/api/copy/generate'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(30000)}).then(function(r){if(!r.ok)throw new Error('Generation failed (HTTP '+r.status+')');return r.json()}).then(function(d){state.lastGeneratedPost=d;var pc=parseInt(localStorage.getItem('rhc_post_count')||'0',10)+1;localStorage.setItem('rhc_post_count',String(pc));updateDashboardMetrics();renderPostPreview(d)}).catch(function(err){pb.innerHTML='<div class="post-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><div style="font-size:14px;color:var(--color-danger);font-weight:600;margin-bottom:4px">生成失败</div><div style="font-size:12px;color:var(--color-text-secondary)">'+escapeHtml(err.message||'未知错误')+'</div><div style="font-size:12px;color:var(--color-text-tertiary);margin-top:8px">请检查 API 连接后重试。</div></div>';showToast('推文生成失败','error')}).finally(function(){btn.disabled=false;btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 生成推文'})}
+
+function renderPostPreview(data){var pb=document.getElementById('post-preview-body'),act=document.getElementById('post-actions');var hl=data.headline||'',bd=data.body||'',ht=data.hashtags||[];var hh=ht.map(function(t){var c=t.startsWith('#')?t:'#'+t;return'<span class="hashtag">'+escapeHtml(c)+'</span>'}).join(' ');var ft='';if(hl)ft+=hl+'\n\n';if(bd)ft+=bd;if(hh)ft+=(bd?'\n\n':'')+hh;pb.innerHTML='<div class="linkedin-mock"><div class="linkedin-header"><div class="linkedin-avatar" style="padding:0"><img src="https://iili.io/CZ19Hcx.jpg" alt="RHC" style="width:100%;height:100%;object-fit:cover"></div><div><div class="linkedin-name">RHC 安瑞康</div><div class="linkedin-sub">宠物医疗器械 · 🌍</div></div></div><div class="linkedin-text" id="linkedin-text">'+ft+'</div></div>';act.style.display='flex'}
+
+function copyPost(){var te=document.getElementById('linkedin-text');if(!te)return;var pt=te.innerText||te.textContent||'';if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(pt).then(function(){showToast('推文已复制到剪贴板','success')}).catch(function(){fallbackCopy(pt)})}else{fallbackCopy(pt)}}
+function fallbackCopy(t){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showToast('推文已复制到剪贴板','success')}catch(e){showToast('复制失败','error')}document.body.removeChild(ta)}
+
+function toggleEdit(){var te=document.getElementById('linkedin-text'),btn=document.getElementById('btn-edit');if(!te||!btn)return;state.isEditing=!state.isEditing;if(state.isEditing){te.setAttribute('contenteditable','true');te.focus();btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 完成';showToast('编辑模式 — 完成后点击完成')}else{te.removeAttribute('contenteditable');btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> 编辑';showToast('修改已保存')}}
+
+function getAnimalImageUrl(a){return _txt(a.animal_image_url)||_txt(a.material_url)||_txt(a.image_url)||_txt(a.photo_url)||_txt(a.url)||_txt(a.image)||''}
+function getAnimalName(a){return _txt(a.animal_name)||_txt(a.name)||_txt(a.title)||'Unknown'}
+function getAnimalTag(a){return _txt(a.animal_type)||_txt(a.category)||_txt(a.species)||_txt(a.tag)||'Animal'}
+
+function renderAnimals(animals){
+  animals=animals||[];
+  state.animalMap={};
+  // build media grid
+  var g=document.getElementById('media-animals');
+  if(g){
+    if(!animals.length){
+      g.innerHTML='<div class="state-message"><div style="font-size:14px;color:var(--color-text-secondary)">暂无动物素材</div></div>';
+    }else{
+      g.innerHTML=animals.map(function(a){
+        var n=getAnimalName(a),tag=getAnimalTag(a),img=getAnimalImageUrl(a),letter=escapeHtml((n||'?').charAt(0).toUpperCase());
+        if(img){return'<div class="media-item"><img class="media-thumb" src="'+escapeHtml(img)+'" alt="'+escapeHtml(n)+'" loading="lazy" onerror="this.outerHTML=\'<div class=media-thumb-placeholder>'+letter+'</div>\'"><div class="media-meta"><div class="media-name">'+escapeHtml(n)+'</div><div class="media-tag">'+escapeHtml(tag)+'</div></div></div>'}
+        else{return'<div class="media-item"><div class="media-thumb-placeholder">'+letter+'</div><div class="media-meta"><div class="media-name">'+escapeHtml(n)+'</div><div class="media-tag">'+escapeHtml(tag)+'</div></div></div>'}
+      }).join('');
+    }
+  }
+  // build composer dropdown (independent, must always run)
+  var cs=document.getElementById('comp-animal');
+  if(cs){
+    var opts='<option value="">None</option>';
+    animals.forEach(function(a){
+      var n=getAnimalName(a);
+      if(n&&n!=='Unknown'){
+        opts+='<option value="'+escapeHtml(n)+'">'+escapeHtml(n)+'</option>';
+        state.animalMap[n]=getAnimalImageUrl(a);
+      }
+    });
+    cs.innerHTML=opts;
+  }
+  if(typeof updateMiniCanvas==='function'){try{updateMiniCanvas()}catch(e){console.warn('miniCanvas update failed:',e)}}
+}
+
+var pageTitles={dashboard:'仪表盘',posts:'社媒推文生成',composer:'图片合成工作室',media:'营销中心',history:'内容历史',notifications:'通知',settings:'设置'};
+function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');if(pageId==='notifications'){var nb=document.getElementById('sidebar-notif-badge');if(nb)nb.style.display='none'}if(pageId==='media'&&typeof backToProductGrid==='function'){try{backToProductGrid()}catch(e){}}document.getElementById('topbar-title')&&(document.getElementById('topbar-title').textContent=pageTitles[pageId]||pageId)}
+
+function switchMediaTab(tab,el){document.querySelectorAll('#media-tabs .media-tab').forEach(function(t){t.classList.remove('active')});el.classList.add('active');var pt=document.getElementById('media-products-tab'),bd=document.getElementById('media-brand'),cs=document.getElementById('media-cases');pt.style.display='none';bd.style.display='none';cs.style.display='none';if(tab==='products'){pt.style.display=''}else if(tab==='brand'){bd.style.display=''}else if(tab==='cases'){cs.style.display=''}}
+
+var layerProps={text:{title:'文字卡片属性',content:'Veterinary Anesthesia Solutions',x:50,y:6,w:340,h:60,rotation:0,opacity:92,fontSizeTitle:18,fontSizeSub:11,bgColor:'#FFFFFF'},animal:{title:'动物图层属性',x:72,y:28,w:180,h:180,rotation:0,opacity:100},product:{title:'产品图层属性',x:12,y:25,w:240,h:240,rotation:0,opacity:100},background:{title:'背景属性',x:0,y:0,w:640,h:420,rotation:0,opacity:100}};
+function selectLayer(el,layerName){document.querySelectorAll('.layer-item').forEach(function(l){l.classList.remove('active')});el.classList.add('active');var panel=document.getElementById('props-panel'),p=layerProps[layerName],h='<h4>'+p.title+'</h4>';if(layerName==='text')h+='<div class="prop-group"><label>内容</label><input type="text" value="'+p.content+'"></div>';if(layerName!=='background'){h+='<div class="prop-group"><label>位置</label><div class="prop-row"><div><input type="number" value="'+p.x+'" placeholder="X"></div><div><input type="number" value="'+p.y+'" placeholder="Y"></div></div></div>';h+='<div class="prop-group"><label>尺寸</label><div class="prop-row"><div><input type="number" value="'+p.w+'" placeholder="宽"></div><div><input type="number" value="'+p.h+'" placeholder="高"></div></div></div>'}else{h+='<div class="prop-group"><label>画布尺寸</label><div class="prop-row"><div><input type="number" value="640"></div><div><input type="number" value="420"></div></div></div>'}h+='<div class="prop-group"><label>旋转</label><input type="range" min="-180" max="180" value="'+p.rotation+'"></div><div class="prop-group"><label>不透明度</label><input type="range" min="0" max="100" value="'+p.opacity+'"></div>';if(layerName==='text')h+='<div class="prop-group"><label>字体大小</label><div class="prop-row"><div><input type="number" value="'+p.fontSizeTitle+'" placeholder="标题"></div><div><input type="number" value="'+p.fontSizeSub+'" placeholder="副标题"></div></div></div>';if(layerName==='background'){h+='<div class="prop-group"><label>渐变起始色</label><input type="text" value="#FDE8EA" style="font-family:var(--font-mono);font-size:12px"></div><div class="prop-group"><label>渐变结束色</label><input type="text" value="#FDF2F3" style="font-family:var(--font-mono);font-size:12px"></div>'}else if(layerName==='text'){h+='<div class="prop-group"><label>背景颜色</label><input type="text" value="'+p.bgColor+'" style="font-family:var(--font-mono);font-size:12px"></div>'}panel.innerHTML=h}
+
+document.querySelectorAll('.nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
+
+// ========== Image Composer ==========
+var compState={theme:'medical-teal',productPos:'west',productZoom:45,animalPos:'ne',animalZoom:25,textPos:'south',lastImageUrl:null};
+
+var POS_CIRCLE={'nw':{cx:6,cy:6},'north':{cx:15,cy:6},'ne':{cx:24,cy:6},'west':{cx:6,cy:15},'center':{cx:15,cy:15},'east':{cx:24,cy:15},'sw':{cx:6,cy:24},'south':{cx:15,cy:24},'se':{cx:24,cy:24}};
+var POS_DOTS=[['nw','M4 4h6'],['north','M15 4v6'],['ne','M20 4h6v6'],['west','M4 15v6'],['center','M15 10a5 5 0 100 10 5 5 0 000-10z'],['east','M26 15v6'],['sw','M4 20v6h6'],['south','M15 26v-6'],['se','M20 26h6v-6']];
+
+var POS_MAP={nw:[12,15],north:[50,15],ne:[88,15],west:[18,50],center:[50,50],east:[82,50],sw:[12,85],south:[50,86],se:[88,85]};
+function proxyImg(url){if(!url)return'';if(/feishu\.cn\/file\//.test(url))return apiUrl('/api/proxy-image?url='+encodeURIComponent(url));return url}
+function updateMiniCanvas(){
+  function place(id,pos,w,h){var el=document.getElementById(id);if(!el)return;var xy=POS_MAP[pos]||[50,50];el.style.left=xy[0]+'%';el.style.top=xy[1]+'%';if(w){el.style.width=w+'px';el.style.height=h+'px'}}
+  function setLayerImg(layerId,imgId,fallbackLetter,url,pos,w,h){
+    var layer=document.getElementById(layerId);if(!layer)return;
+    var img=document.getElementById(imgId);
+    var fb=layer.querySelector('.mini-fallback');
+    if(url&&img){
+      if(fb)fb.style.display='none';
+      img.style.display='block';
+      if(img.src!==url)img.src=url;
+    }else{
+      if(img)img.style.display='none';
+      if(fb){fb.style.display='flex';fb.textContent=fallbackLetter}
+    }
+    place(layerId,pos,w,h);
+  }
+  // product
+  var pSel=document.getElementById('comp-product');
+  var pModel=pSel?pSel.value:'';
+  var pUrl='';
+  if(pModel){var p=state.products.find(function(x){return getProductModel(x)===pModel});pUrl=getProductImageUrl(p||{})||PRODUCT_IMAGE_MAP[pModel]||''}
+  setLayerImg('mini-product','mini-product-img','P',pUrl,compState.productPos,Math.round(34+compState.productZoom*0.4),Math.round(34+compState.productZoom*0.4));
+  // animal
+  var animalSel=document.getElementById('comp-animal');
+  var aUrl='';
+  if(animalSel&&animalSel.value){aUrl=state.animalMap?state.animalMap[animalSel.value]:''}
+  var animalLayer=document.getElementById('mini-animal');
+  if(animalLayer){animalLayer.style.display=(animalSel&&animalSel.value)?'flex':'none'}
+  setLayerImg('mini-animal','mini-animal-img','A',proxyImg(aUrl),compState.animalPos,Math.round(22+compState.animalZoom*0.75),Math.round(22+compState.animalZoom*0.75));
+  // text
+  var titleEl=document.getElementById('comp-title');
+  var txtEl=document.getElementById('mini-text');
+  if(txtEl&&titleEl){var t=titleEl.value.trim();if(t.length>22)t=t.substring(0,20)+'...';txtEl.textContent=t||'Text'}
+  place('mini-text',compState.textPos,null,14);
+}
+
+function buildPosGrid(containerId,defaultPos){var c=document.getElementById(containerId);if(!c)return;var target=c.getAttribute('data-target');c.innerHTML=POS_DOTS.map(function(d){var key=d[0];var active=key===defaultPos?' active':'';return'<div class="pos-cell'+active+'" data-pos="'+key+'" onclick="setPos(\''+target+'\',\''+key+'\',this)"><svg viewBox="0 0 30 30"><path d="'+d[1]+'"/></svg></div>'}).join('')}
+
+function setPos(target,pos,el){var grid=el.parentElement;grid.querySelectorAll('.pos-cell').forEach(function(c){c.classList.remove('active')});el.classList.add('active');if(target==='product')compState.productPos=pos;else if(target==='animal')compState.animalPos=pos;else if(target==='text')compState.textPos=pos;updateMiniCanvas()}
+
+function initComposer(){
+  try{
+  buildPosGrid('comp-product-pos','west');
+  buildPosGrid('comp-animal-pos','ne');
+  buildPosGrid('comp-text-pos','south');
+  document.querySelectorAll('#comp-themes .theme-swatch').forEach(function(s){s.addEventListener('click',function(){document.querySelectorAll('#comp-themes .theme-swatch').forEach(function(x){x.classList.remove('active')});s.classList.add('active');compState.theme=s.getAttribute('data-theme')})});
+  var pz=document.getElementById('comp-product-zoom'),pzv=document.getElementById('comp-product-zoom-val');
+  if(pz)pz.addEventListener('input',function(){compState.productZoom=parseInt(pz.value);if(pzv)pzv.textContent=pz.value+'%';updateMiniCanvas()});
+  var az=document.getElementById('comp-animal-zoom'),azv=document.getElementById('comp-animal-zoom-val');
+  if(az)az.addEventListener('input',function(){compState.animalZoom=parseInt(az.value);if(azv)azv.textContent=az.value+'%';updateMiniCanvas()});
+  var ca=document.getElementById('comp-animal');if(ca)ca.addEventListener('change',updateMiniCanvas);
+  var cp=document.getElementById('comp-product');if(cp)cp.addEventListener('change',function(){var v=cp.value;if(v){var ct=document.getElementById('comp-title');if(ct)ct.value=v+' Veterinary Medical Equipment'}updateMiniCanvas()});
+  var ct2=document.getElementById('comp-title');if(ct2)ct2.addEventListener('input',updateMiniCanvas);
+  try{updateMiniCanvas()}catch(e){}
+  }catch(e){console.warn('initComposer skipped:',e)}
+}
+
+function composeImage(){
+  var productModel=document.getElementById('comp-product').value;
+  var animalName=document.getElementById('comp-animal').value;
+  var title=document.getElementById('comp-title').value.trim();
+  var subtitle=document.getElementById('comp-subtitle').value.trim();
+  var body={
+    theme:compState.theme,
+    product_position:compState.productPos,
+    product_zoom:compState.productZoom,
+    animal_position:compState.animalPos,
+    animal_zoom:compState.animalZoom,
+    text_position:compState.textPos,
+    text_zoom:50
+  };
+  if(productModel)body.product_model=productModel;
+  if(animalName&&state.animalMap&&state.animalMap[animalName])body.animal_image_url=state.animalMap[animalName];
+  if(title)body.title=title;
+  if(subtitle)body.subtitle=subtitle;
+
+  var btn=document.getElementById('btn-compose');
+  var preview=document.getElementById('comp-preview-body');
+  var actions=document.getElementById('comp-actions');
+  var debug=document.getElementById('comp-debug');
+
+  btn.disabled=true;
+  btn.innerHTML='<span class="loading-spinner" style="width:16px;height:16px;border-width:2px"></span> 正在合成...';
+  actions.style.display='none';
+  debug.style.display='none';
+  preview.innerHTML='<div class="preview-loading"><div class="loading-spinner"></div><div style="color:var(--color-text-secondary);font-size:13px">正在合成图片...</div></div>';
+
+  fetch(apiUrl('/api/compose'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(60000)})
+  .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'Compose failed (HTTP '+r.status+')')});return r.json()})
+  .then(function(d){
+    compState.lastImageUrl=d.image_url;
+    preview.innerHTML='<img class="preview-result" src="'+escapeHtml(d.image_url)+'" alt="Composed image">';
+    actions.style.display='flex';
+    if(d.debug_log){debug.textContent=d.debug_log;debug.style.display='block'}
+    showToast('图片生成成功','success');
+  })
+  .catch(function(err){
+    preview.innerHTML='<div class="preview-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><div style="color:var(--color-danger);font-weight:600">生成失败</div><small>'+escapeHtml(err.message||'未知错误')+'</small></div>';
+    showToast('图片生成失败','error');
+  })
+  .finally(function(){btn.disabled=false;btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> 生成图片'});
+}
+
+function downloadComposed(){
+  if(!compState.lastImageUrl)return;
+  var a=document.createElement('a');a.href=compState.lastImageUrl;a.download='rhc-marketing-'+Date.now()+'.jpg';a.target='_blank';document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast('图片下载已开始','success');
+}
+
+(function init(){var ai=document.getElementById('api-url-input');if(ai){ai.value=state.apiBase;ai.addEventListener('keydown',function(e){if(e.key==='Enter')connectAPI()})}initComposer();checkHealth()})();
+
+// ============ CUTOUT FEATURE ============
+(function(){
+  var fileInput=document.getElementById('cp2-cutout-file');
+  var leftArea=document.getElementById('cp2-cutout-left');
+  if(leftArea){
+    leftArea.addEventListener('click',function(){
+      if(!cp2State.cutout.loading) fileInput.click();
+    });
+    leftArea.addEventListener('keydown',function(e){
+      if((e.key==='Enter'||e.key===' ')&&!cp2State.cutout.loading){e.preventDefault();fileInput.click();}
+    });
+  }
+  if(fileInput){
+    fileInput.addEventListener('change',function(){cp2OnCutoutUpload(this);});
+  }
+})();
+
+function cp2SetBtn(id,enabled){var b=document.getElementById(id);if(b)b.disabled=!enabled;}
+
+function cp2OnCutoutUpload(input){
+  var file=input.files&&input.files[0];if(!file)return;
+  if(file.size>12*1024*1024){showToast('图片不能超过12MB','error');input.value='';return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    cp2State.cutout.origUrl=e.target.result;
+    cp2State.cutout.origFile=file;
+    cp2State.cutout.resultUrl=null;
+    var img=document.getElementById('cp2-cutout-orig-img');
+    img.src=e.target.result;img.style.display='block';
+    document.getElementById('cp2-cutout-placeholder').style.display='none';
+    cp2SetBtn('cp2-cutout-start',true);
+    cp2SetBtn('cp2-cutout-cancel',true);
+    document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+    var rimg=document.getElementById('cp2-cutout-result-img');rimg.style.display='none';rimg.src='';
+    cp2SetBtn('cp2-cutout-dl',false);
+    document.getElementById('cp2-cutout-spinner').style.display='none';
+    showToast('图片已上传，点击开始抠图','success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function cp2DoCutout(){
+  if(!cp2State.cutout.origFile){showToast('请先上传图片','error');return}
+  cp2State.cutout.loading=true;
+  cp2SetBtn('cp2-cutout-start',false);
+  cp2SetBtn('cp2-cutout-cancel',false);
+  var btn=document.getElementById('cp2-cutout-start');
+  btn.innerHTML='<span class="loading-spinner" style="width:14px;height:14px;border-width:2px;vertical-align:-2px"></span> 抠图中...';
+  document.getElementById('cp2-cutout-spinner').style.display='block';
+  document.getElementById('cp2-cutout-result-placeholder').style.display='none';
+  var fd=new FormData();
+  fd.append('file',cp2State.cutout.origFile);
+  fetch(apiUrl('/api/cutout'),{method:'POST',body:fd,signal:AbortSignal.timeout(180000)})
+    .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.detail||'抠图失败')});return r.json()})
+    .then(function(d){
+      if(d.url){
+        cp2State.cutout.resultUrl=d.url;
+        var img=document.getElementById('cp2-cutout-result-img');
+        img.onload=function(){
+          document.getElementById('cp2-cutout-spinner').style.display='none';
+          img.style.display='block';
+          cp2SetBtn('cp2-cutout-dl',true);
+          cp2SetBtn('cp2-cutout-cancel',true);
+        };
+        img.onerror=function(){
+          document.getElementById('cp2-cutout-spinner').style.display='none';
+          document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+          cp2SetBtn('cp2-cutout-cancel',true);
+          showToast('结果图片加载失败','error');
+        };
+        img.src=d.url;
+        showToast('抠图完成','success');
+      }else{throw new Error('未返回结果')}
+    })
+    .catch(function(err){
+      document.getElementById('cp2-cutout-spinner').style.display='none';
+      document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+      cp2SetBtn('cp2-cutout-cancel',true);
+      cp2SetBtn('cp2-cutout-start',true);
+      var msg=err.message||'';
+      if(msg.indexOf('Failed to fetch')>=0||msg.indexOf('NetworkError')>=0||msg.indexOf('network')>=0){
+        msg='服务器处理超时或暂时不可用，请重试，或换一张较小的图片';
+      }
+      showToast('抠图失败: '+msg,'error');
+    })
+    .finally(function(){
+      cp2State.cutout.loading=false;
+      btn.disabled=false;
+      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图';
+    });
+}
+
+function cp2DownloadCutout(){
+  if(!cp2State.cutout.resultUrl)return;
+  var a=document.createElement('a');
+  a.href=cp2State.cutout.resultUrl;
+  a.download='RHC_cutout_'+Date.now()+'.png';
+  a.target='_blank';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast('已开始下载','success');
+}
+
+function cp2ResetCutout(){
+  cp2State.cutout={origUrl:null,origFile:null,resultUrl:null,loading:false};
+  var fileInput=document.getElementById('cp2-cutout-file');
+  if(fileInput)fileInput.value='';
+  var img=document.getElementById('cp2-cutout-orig-img');img.src='';img.style.display='none';
+  document.getElementById('cp2-cutout-placeholder').style.display='flex';
+  cp2SetBtn('cp2-cutout-start',false);
+  cp2SetBtn('cp2-cutout-cancel',false);
+  cp2SetBtn('cp2-cutout-dl',false);
+  var btn=document.getElementById('cp2-cutout-start');
+  btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 开始抠图';
+  var rimg=document.getElementById('cp2-cutout-result-img');rimg.src='';rimg.style.display='none';
+  document.getElementById('cp2-cutout-result-placeholder').style.display='flex';
+  document.getElementById('cp2-cutout-spinner').style.display='none';
+}
+
+// ============ BROCHURE DOWNLOAD (canvas) ============
+function cp2ProxyUrl(url){
+  if(!url)return '';
+  if(url.startsWith('data:')||url.startsWith('blob:'))return url;
+  return apiUrl('/api/proxy-image?url=')+encodeURIComponent(url);
+}
+
+function cp2LoadImage(src){
+  return new Promise(function(resolve,reject){
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){resolve(img)};
+    img.onerror=function(){reject(new Error('图片加载失败'))};
+    img.src=src;
+  });
+}
+
+function cp2Download(){
+  var pg=cp2ActivePage();if(!pg)return;
+  var dims=CP2_PAPER[pg.paperSize]||CP2_PAPER.A4;
+  var scale=2;
+  var W=dims[0],H=dims[1];
+  var canvas=document.createElement('canvas');
+  canvas.width=W*scale;canvas.height=H*scale;
+  var ctx=canvas.getContext('2d');
+  ctx.scale(scale,scale);
+  showToast('正在生成图片...','info');
+
+  var bgPromise;
+  if(pg.bgType==='image'&&pg.bgImageUrl){
+    bgPromise=cp2LoadImage(cp2ProxyUrl(pg.bgImageUrl)).then(function(img){
+      ctx.drawImage(img,0,0,W,H);
+    }).catch(function(){
+      ctx.fillStyle=pg.bgValue||'#fff';ctx.fillRect(0,0,W,H);
+    });
+  }else{
+    ctx.fillStyle=pg.bgValue||'#fff';ctx.fillRect(0,0,W,H);
+    bgPromise=Promise.resolve();
+  }
+
+  bgPromise.then(function(){
+    var promises=[];
+    pg.products.forEach(function(l){
+      if(!l.img)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.img)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    pg.animals.forEach(function(l){
+      if(!l.imgUrl)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.imgUrl)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    pg.logos.forEach(function(l){
+      if(!l.url)return;
+      promises.push(cp2LoadImage(cp2ProxyUrl(l.url)).then(function(img){
+        var w=W*l.w/100,h=img.height*w/img.width;
+        ctx.drawImage(img,W*l.x/100,H*l.y/100,w,h);
+      }).catch(function(e){console.warn(e)}));
+    });
+    return Promise.all(promises);
+  }).then(function(){
+    pg.texts.forEach(function(l){
+      if(!l.text)return;
+      var x=W*l.x/100,y=H*l.y/100,maxW=W*l.w/100,fs=l.fontSize;
+      ctx.font=(l.italic?'italic ':'')+(l.bold?'bold ':'')+fs+'px '+l.fontFamily;
+      ctx.fillStyle=l.color;ctx.textBaseline='top';
+      var lines=String(l.text).split('\n');var lineY=y;
+      lines.forEach(function(line){
+        var words=line.split(' ');var curLine='';
+        words.forEach(function(word){
+          var test=curLine?curLine+' '+word:word;
+          if(ctx.measureText(test).width>maxW&&curLine){
+            ctx.fillText(curLine,x,lineY);lineY+=fs*1.3;curLine=word;
+          }else{curLine=test}
+        });
+        if(curLine){ctx.fillText(curLine,x,lineY);lineY+=fs*1.3}
+      });
+    });
+    var pIdx=0;
+    for(var j=0;j<cp2State.pages.length;j++){if(cp2State.pages[j].id===pg.id){pIdx=j+1;break}}
+    pg.pageNums.forEach(function(pn){
+      ctx.font='12px sans-serif';ctx.fillStyle='#999';ctx.textAlign='center';
+      ctx.fillText('- '+pIdx+' -',W*pn.x/100,H*pn.y/100);ctx.textAlign='start';
+    });
+    canvas.toBlob(function(blob){
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url;a.download='RHC_brochure_'+(pg.paperSize||'A4').replace(/[^a-z0-9]/gi,'_')+'_'+Date.now()+'.png';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url)},1000);
+      showToast('图片已下载','success');
+    },'image/png');
+  }).catch(function(err){
+    showToast('生成失败: '+err.message,'error');
+  });
+}
+
+</script>
+
+<script>
+var cp2State={mode:null,pages:[],activePageId:0,nextId:1,cutout:{origUrl:null,origFile:null,resultUrl:null,loading:false}};
+var CP2_PAPER={'A4':[210,297],'A5':[148,210],'B5':[176,250],'Letter':[216,279],'1:1 (Instagram)':[1080,1080],'16:9':[1920,1080],'9:16':[1080,1920],'4:3':[1400,1050]};
+var CP2_LOGOS=[{name:'RHC 主Logo（透明底）',url:'https://iili.io/CZ0tVNn.png'},{name:'RHC 圆形头像',url:'https://iili.io/CtTySJ2.png'},{name:'RHC 主Logo（白底）',url:'https://iili.io/CZ19Hcx.jpg'}];
+var CP2_FONTS=['Microsoft YaHei','SimSun','KaiTi','Arial','Helvetica','Times New Roman','Georgia','Verdana'];
+var CP2_POSITION_KEYS=['top-left','top-center','top-right','middle-left','middle-center','middle-right','bottom-left','bottom-center','bottom-right'];
+var CP2_POSITION_LABELS={'top-left':'左上角','top-center':'中上','top-right':'右上角','middle-left':'左中','middle-center':'正中','middle-right':'右中','bottom-left':'左下角','bottom-center':'正下','bottom-right':'右下角'};
+var CP2_POSITION_MAP={'top-left':{x:2,y:2},'top-center':{x:45,y:2},'top-right':{x:90,y:2},'middle-left':{x:2,y:46},'middle-center':{x:45,y:46},'middle-right':{x:90,y:46},'bottom-left':{x:2,y:94},'bottom-center':{x:45,y:94},'bottom-right':{x:90,y:94}};
+
+// Drag/resize state
+var cp2Drag=null;
+
+function cp2Uid(){return cp2State.nextId++;}
+
+function cp2ActivePage(){
+  for(var i=0;i<cp2State.pages.length;i++){
+    if(cp2State.pages[i].id===cp2State.activePageId) return cp2State.pages[i];
+  }
+  return null;
+}
+
+function cp2Start(mode){
+  cp2State.mode=mode;
+  document.getElementById('cp2-mode-select').style.display='none';
+  if(mode==='brochure'){
+    document.getElementById('cp2-brochure').style.display='block';
+    if(cp2State.pages.length===0) cp2AddPage();
+    cp2RenderAll();
+    cp2EnsureProductsLoaded();
+  }else{
+    document.getElementById('cp2-cutout').style.display='block';
+  }
+}
+
+function cp2EnsureProductsLoaded(){
+  // If products not loaded yet, try loading them; retry up to 5 times
+  if(typeof state!=='undefined'&&state.products&&state.products.length){
+    cp2UpdateProductSelects(cp2ActivePage());
+    return;
+  }
+  var tries=0;
+  var iv=setInterval(function(){
+    tries++;
+    if(typeof state!=='undefined'&&state.products&&state.products.length){
+      clearInterval(iv);
+      cp2UpdateProductSelects(cp2ActivePage());
+    }else if(tries>=10){
+      clearInterval(iv);
+      // Try triggering load if function exists
+      if(typeof loadProducts==='function'){
+        try{loadProducts();}catch(e){}
+        // Retry a few more times after triggering load
+        var t2=0;
+        var iv2=setInterval(function(){
+          t2++;
+          if(typeof state!=='undefined'&&state.products&&state.products.length){
+            clearInterval(iv2);
+            cp2UpdateProductSelects(cp2ActivePage());
+          }else if(t2>=10){clearInterval(iv2);}
+        },1000);
+      }
+    }
+  },500);
+}
+
+function cp2Exit(){
+  cp2State.mode=null;
+  cp2State.pages=[];
+  cp2State.activePageId=0;
+  document.getElementById('cp2-mode-select').style.display='block';
+  document.getElementById('cp2-brochure').style.display='none';
+  document.getElementById('cp2-cutout').style.display='none';
+  cp2ResetCutout();
+}
+
+function cp2AddPage(){
+  var pg={id:cp2Uid(),paperSize:'A4',bgType:'color',bgValue:'#ffffff',bgImageUrl:'',products:[],animals:[],texts:[],logos:[],pageNums:[]};
+  cp2State.pages.push(pg);
+  cp2State.activePageId=pg.id;
+  cp2RenderAll();
+}
+
+function cp2DeletePage(id){
+  if(cp2State.pages.length<=1){if(typeof showToast==='function')showToast('至少保留一页','warning');return;}
+  cp2State.pages=cp2State.pages.filter(function(p){return p.id!==id;});
+  if(cp2State.activePageId===id) cp2State.activePageId=cp2State.pages[0].id;
+  cp2RenderAll();
+}
+
+function cp2SwitchPage(id){
+  cp2State.activePageId=id;
+  cp2RenderAll();
+}
+
+function cp2ClearPage(){
+  if(!confirm('确定要清空当前页所有图层吗？')) return;
+  var pg=cp2ActivePage();
+  if(!pg) return;
+  pg.products=[];pg.animals=[];pg.texts=[];pg.logos=[];pg.pageNums=[];
+  cp2RenderAll();
+  if(typeof showToast==='function') showToast('已清空当前页','success');
+}
+
+function cp2RenderAll(){
+  cp2RenderPageTabs();
+  cp2RenderConfig();
+  cp2RenderPreview();
+}
+
+function cp2RenderPageTabs(){
+  var pg=cp2ActivePage();
+  if(!pg) return;
+  var html='<span style="font-size:11px;font-weight:700;color:var(--color-text-secondary);margin-right:4px">页码</span>';
+  for(var i=0;i<cp2State.pages.length;i++){
+    var p=cp2State.pages[i];
+    html+='<span class="cp2-page-tab'+(p.id===cp2State.activePageId?' active':'')+'" onclick="cp2SwitchPage('+p.id+')">'+(i+1)+'</span>';
+  }
+  html+='<span class="cp2-add-page-btn" onclick="cp2AddPage()">+ 添加页</span>';
+  var bar=document.getElementById('cp2-pages-bar');
+  if(bar) bar.innerHTML=html;
+}
+
+function cp2RenderConfig(){
+  var pg=cp2ActivePage();
+  if(!pg) return;
+  var h='';
+  h+='<div class="cp2-pages-bar" id="cp2-pages-bar"></div>';
+
+  // Paper size
+  h+='<div class="cp2-section"><div class="cp2-section-head"><span class="cp2-section-label">纸张大小</span></div>';
+  h+='<div class="cp2-field"><select onchange="cp2ActivePage().paperSize=this.value;cp2RenderPreview()">';
+  var keys=Object.keys(CP2_PAPER);
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i];
+    h+='<option value="'+k+'"'+(k===pg.paperSize?' selected':'')+'>'+k+' ('+CP2_PAPER[k][0]+'x'+CP2_PAPER[k][1]+'px)</option>';
+  }
+  h+='</select></div></div>';
+
+  // Background
+  h+='<div class="cp2-section"><div class="cp2-section-head"><span class="cp2-section-label">背景图</span></div><div class="cp2-field">';
+  h+='<div class="cp2-btn-row">';
+  h+='<button class="cp2-tb'+(pg.bgType==='color'?' active':'')+'" onclick="cp2SetBgType(\'color\')">纯白</button>';
+  h+='<button class="cp2-tb'+(pg.bgType==='image'?' active':'')+'" onclick="cp2SetBgType(\'image\')">AI生成</button>';
+  h+='</div>';
+  if(pg.bgType==='color'){
+    h+='<div class="cp2-color-row"><input type="color" class="cp2-color-input" value="'+pg.bgValue+'" onchange="cp2ActivePage().bgValue=this.value;cp2RenderPreview()"><span class="cp2-hint">点击色块选择背景颜色</span></div>';
+  }else{
+    h+='<div class="cp2-field" style="margin-bottom:8px"><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:4px">AI 背景描述</label><input type="text" value="'+(pg.aiPrompt||'')+'" placeholder="例如：现代宠物诊所内部，白色 cabinets，柔和灯光" onchange="cp2ActivePage().aiPrompt=this.value" style="width:100%;padding:7px 10px;font-size:12px;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg)"></div>';
+    h+='<div class="cp2-field" style="margin-bottom:8px"><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:4px">风格</label><select onchange="cp2ActivePage().aiStyle=this.value" style="width:100%;padding:7px 10px;font-size:12px;border:1px solid var(--color-border);border-radius:6px"><option value="professional"'+(pg.aiStyle==='professional'?' selected':'')+'>专业 Professional</option><option value="modern"'+(pg.aiStyle==='modern'?' selected':'')+'>现代 Modern</option><option value="clean"'+(pg.aiStyle==='clean'?' selected':'')+'>简洁 Clean</option></select></div>';
+    h+='<button class="cp2-gen-btn" onclick="cp2GenerateBg()" id="cp2-bg-gen-btn">'+(pg.bgImageUrl?'重新生成AI背景':'AI 生成背景')+'</button>';
+    if(pg.bgImageUrl) h+='<div class="cp2-success-text">已生成，预览中可见</div>';
+  }
+  h+='</div></div>';
+
+  // Products
+  h+='<div class="cp2-section"><div class="cp2-section-head"><span class="cp2-section-label">产品图层</span><span class="cp2-add-btn" onclick="cp2AddProduct()">+ 添加</span></div>';
+  h+='<div class="cp2-hint" style="margin-bottom:6px">提示：在预览纸上拖动图层移动，拖右下角调整大小</div>';
+  for(var i=0;i<pg.products.length;i++) h+=cp2ProductLayerHTML(pg.products[i],i);
+  h+='</div>';
+
+  // Animals
+  h+='<div class="cp2-section"><div class="cp2-section-head"><span class="cp2-section-label">动物图层</span><span class="cp2-add-btn" onclick="cp2AddAnimal()">+ 添加</span></div>';
+  for(var i=0;i<pg.animals.length;i++) h+=cp2AnimalLayerHTML(pg.animals[i],i);
+  h+='</div>';
+
+  // Text
+  h+='<div class="cp2-section"><div class="cp2-section-head"><span class="cp2-section-label">文字卡片</span><span class="cp2-add-btn" onclick="cp2AddText()">+ 添加</span></div>';
+  for(var i=0;i<pg.texts.length;i++) h+=cp2TextLayerHTML(pg.texts[i],i);
+  h+='</div>';
+
+  // Logos
+  h+='<div class="cp2-section"><div class="cp2-section-head"><span class="cp2-section-label">公司Logo</span><span class="cp2-add-btn" onclick="cp2AddLogo()">+ 添加</span></div>';
+  for(var i=0;i<pg.logos.length;i++) h+=cp2LogoLayerHTML(pg.logos[i],i);
+  h+='</div>';
+
+  // Page numbers
+  h+='<div class="cp2-section"><div class="cp2-section-head"><span class="cp2-section-label">页码</span>';
+  if(pg.pageNums.length<2) h+='<span class="cp2-add-btn" onclick="cp2AddPageNum()">+ 添加</span>';
+  h+='</div>';
+  for(var i=0;i<pg.pageNums.length;i++) h+=cp2PageNumLayerHTML(pg.pageNums[i],i);
+  h+='</div>';
+
+  document.getElementById('cp2-config-area').innerHTML=h;
+  cp2RenderPageTabs();
+  cp2UpdateProductSelects(pg);
+}
+
+function cp2ProductLayerHTML(l,i){
+  var h='<div class="cp2-layer-card"><div class="cp2-layer-head"><span class="cp2-layer-name">产品'+(i+1)+'</span><span class="cp2-layer-del" onclick="cp2DelLayer(\'products\','+i+')">&times;</span></div>';
+  h+='<div class="cp2-field"><select class="cp2-prod-sel" data-idx="'+i+'" onchange="cp2ActivePage().products['+i+'].model=this.value;cp2ActivePage().products['+i+'].img=cp2GetProductImg(this.value);cp2RenderPreview()"><option value="">选择产品...</option></select></div>';
+  h+=cp2PosSelectHTML('cp2ActivePage().products['+i+']',l.pos);
+  h+=cp2XYZInputs('products',i,l);
+  h+='</div>';
+  return h;
+}
+
+function cp2AnimalLayerHTML(l,i){
+  var h='<div class="cp2-layer-card"><div class="cp2-layer-head"><span class="cp2-layer-name">动物'+(i+1)+'</span><span class="cp2-layer-del" onclick="cp2DelLayer(\'animals\','+i+')">&times;</span></div>';
+  h+='<div class="cp2-field"><label>描述你要的动物</label><input type="text" value="'+(l.prompt||'').replace(/"/g,'&quot;')+'" placeholder="例如：金毛寻回犬，坐姿，正面" onchange="cp2ActivePage().animals['+i+'].prompt=this.value"></div>';
+  h+='<button class="cp2-gen-btn" onclick="cp2GenerateAnimal('+i+')">'+(l.imgUrl?'重新生成透明底动物图':'生成透明底动物图')+'</button>';
+  h+='<div class="cp2-animal-status" id="cp2-animal-st-'+i+'">'+(l.status||'')+'</div>';
+  h+=cp2PosSelectHTML('cp2ActivePage().animals['+i+']',l.pos);
+  h+=cp2XYZInputs('animals',i,l);
+  h+='</div>';
+  return h;
+}
+
+function cp2TextLayerHTML(l,i){
+  var h='<div class="cp2-layer-card"><div class="cp2-layer-head"><span class="cp2-layer-name">文字卡片'+(i+1)+'</span><span class="cp2-layer-del" onclick="cp2DelLayer(\'texts\','+i+')">&times;</span></div>';
+  h+='<div class="cp2-text-tools">';
+  h+='<button class="cp2-tb'+(l.bold?' active':'')+'" onclick="cp2ToggleTextProp('+i+',\'bold\')"><b>B</b></button>';
+  h+='<button class="cp2-tb'+(l.italic?' active':'')+'" onclick="cp2ToggleTextProp('+i+',\'italic\')"><i>I</i></button>';
+  h+='<input type="color" class="cp2-color-input-sm" value="'+l.color+'" onchange="cp2ActivePage().texts['+i+'].color=this.value;cp2RenderPreview()">';
+  h+='<select class="cp2-font-sel" onchange="cp2ActivePage().texts['+i+'].fontFamily=this.value;cp2RenderPreview()">';
+  for(var j=0;j<CP2_FONTS.length;j++){
+    var f=CP2_FONTS[j];
+    h+='<option value="'+f+'" style="font-family:'+f+'"'+(f===l.fontFamily?' selected':'')+'>'+f+'</option>';
+  }
+  h+='</select>';
+  h+='<input type="number" class="cp2-fs-input" min="8" max="72" value="'+l.fontSize+'" onchange="cp2ActivePage().texts['+i+'].fontSize=+this.value;cp2RenderPreview()">';
+  h+='</div>';
+  h+='<textarea rows="3" placeholder="输入文字..." oninput="cp2ActivePage().texts['+i+'].text=this.value;cp2RenderPreview()">'+(l.text||'')+'</textarea>';
+  h+=cp2PosSelectHTML('cp2ActivePage().texts['+i+']',l.pos);
+  h+=cp2XYZInputs('texts',i,l);
+  h+='</div>';
+  return h;
+}
+
+function cp2LogoLayerHTML(l,i){
+  var h='<div class="cp2-layer-card"><div class="cp2-layer-head"><span class="cp2-layer-name">Logo'+(i+1)+'</span><span class="cp2-layer-del" onclick="cp2DelLayer(\'logos\','+i+')">&times;</span></div>';
+  h+='<div class="cp2-field"><select onchange="var li=+this.value;var lo=CP2_LOGOS[li];cp2ActivePage().logos['+i+'].url=lo?lo.url:\'\';cp2ActivePage().logos['+i+'].name=lo?lo.name:\'\';cp2RenderPreview()"><option value="">选择Logo...</option>';
+  for(var j=0;j<CP2_LOGOS.length;j++){
+    h+='<option value="'+j+'"'+(l.url===CP2_LOGOS[j].url?' selected':'')+'>'+CP2_LOGOS[j].name+'</option>';
+  }
+  h+='</select></div>';
+  h+=cp2PosSelectHTML('cp2ActivePage().logos['+i+']',l.pos);
+  h+='<div class="cp2-field"><label>大小%</label><input type="number" min="5" max="40" value="'+l.w+'" onchange="cp2ActivePage().logos['+i+'].w=+this.value;cp2RenderPreview()"></div>';
+  h+='</div>';
+  return h;
+}
+
+function cp2PageNumLayerHTML(l,i){
+  var h='<div class="cp2-layer-card"><div class="cp2-layer-head"><span class="cp2-layer-name">页码'+(i+1)+'</span><span class="cp2-layer-del" onclick="cp2DelLayer(\'pageNums\','+i+')">&times;</span></div>';
+  h+=cp2PosSelectHTML('cp2ActivePage().pageNums['+i+']',l.pos);
+  h+='</div>';
+  return h;
+}
+
+function cp2PosSelectHTML(target,current){
+  var h='<div class="cp2-pos-row"><label>位置</label><select onchange="cp2SetPosQuick('+target+',this.value)"><option value="">自定义</option>';
+  for(var i=0;i<CP2_POSITION_KEYS.length;i++){
+    var k=CP2_POSITION_KEYS[i];
+    h+='<option value="'+k+'"'+(k===current?' selected':'')+'>'+CP2_POSITION_LABELS[k]+'</option>';
+  }
+  h+='</select></div>';
+  return h;
+}
+
+function cp2SetPosQuick(layer,pos){
+  layer.pos=pos;
+  if(CP2_POSITION_MAP[pos]){layer.x=CP2_POSITION_MAP[pos].x;layer.y=CP2_POSITION_MAP[pos].y;}
+  // Lightweight: update X/Y inputs if they exist, then refresh preview only
+  var card=document.querySelector('.cp2-layer-card select:focus');
+  if(card){
+    var parent=card.closest('.cp2-layer-card');
+    if(parent){
+      var inputs=parent.querySelectorAll('.cp2-xyz-field input');
+      if(inputs.length>=2){
+        inputs[0].value=layer.x;
+        inputs[1].value=layer.y;
+      }
+    }
+  }
+  cp2RenderPreview();
+}
+
+function cp2XYZInputs(type,i,l){
+  var h='<div class="cp2-xyz-row">';
+  h+='<div class="cp2-xyz-field"><label>X%</label><input type="number" min="0" max="100" value="'+l.x+'" onchange="cp2ActivePage().'+type+'['+i+'].x=+this.value;cp2RenderPreview()"></div>';
+  h+='<div class="cp2-xyz-field"><label>Y%</label><input type="number" min="0" max="100" value="'+l.y+'" onchange="cp2ActivePage().'+type+'['+i+'].y=+this.value;cp2RenderPreview()"></div>';
+  h+='<div class="cp2-xyz-field"><label>大小%</label><input type="number" min="5" max="100" value="'+l.w+'" onchange="cp2ActivePage().'+type+'['+i+'].w=+this.value;cp2RenderPreview()"></div>';
+  h+='</div>';
+  return h;
+}
+
+function cp2SetPos(layer,pos){
+  layer.pos=pos;
+  if(CP2_POSITION_MAP[pos]){layer.x=CP2_POSITION_MAP[pos].x;layer.y=CP2_POSITION_MAP[pos].y;}
+}
+
+function cp2SetBgType(t){
+  var pg=cp2ActivePage();
+  pg.bgType=t;
+  if(t==='color'&&!pg.bgValue) pg.bgValue='#ffffff';
+  cp2RenderConfig();
+  cp2RenderPreview();
+}
+
+function cp2AddProduct(){
+  var pg=cp2ActivePage();
+  pg.products.push({id:cp2Uid(),model:'',img:'',x:5,y:30,w:35,pos:''});
+  cp2RenderAll();
+  cp2EnsureProductsLoaded();
+}
+
+function cp2AddAnimal(){
+  var pg=cp2ActivePage();
+  pg.animals.push({id:cp2Uid(),prompt:'',imgUrl:'',status:'',x:50,y:40,w:25,pos:''});
+  cp2RenderAll();
+}
+
+function cp2AddText(){
+  var pg=cp2ActivePage();
+  pg.texts.push({id:cp2Uid(),text:'',bold:false,italic:false,color:'#1D1D1F',fontSize:18,fontFamily:'Microsoft YaHei',x:5,y:70,w:90,pos:''});
+  cp2RenderAll();
+}
+
+function cp2AddLogo(){
+  var pg=cp2ActivePage();
+  pg.logos.push({id:cp2Uid(),url:CP2_LOGOS[0].url,name:CP2_LOGOS[0].name,x:85,y:3,w:12,pos:'top-right'});
+  cp2RenderAll();
+}
+
+function cp2AddPageNum(){
+  var pg=cp2ActivePage();
+  if(pg.pageNums.length>=2){if(typeof showToast==='function')showToast('最多添加2个页码','warning');return;}
+  pg.pageNums.push({id:cp2Uid(),x:45,y:94,pos:'bottom-center'});
+  cp2RenderAll();
+}
+
+function cp2DelLayer(type,i){
+  var pg=cp2ActivePage();
+  pg[type].splice(i,1);
+  cp2RenderAll();
+}
+
+function cp2ToggleTextProp(i,prop){
+  var pg=cp2ActivePage();
+  pg.texts[i][prop]=!pg.texts[i][prop];
+  cp2RenderConfig();
+  cp2RenderPreview();
+}
+
+function cp2GetProductImg(model){
+  if(typeof state==='undefined'||!state.products) return '';
+  for(var i=0;i<state.products.length;i++){
+    if(typeof getProductModel==='function'&&getProductModel(state.products[i])===model){
+      return typeof getProductImageUrl==='function'?getProductImageUrl(state.products[i]):'';
+    }
+  }
+  return '';
+}
+
+function cp2UpdateProductSelects(pg){
+  var sels=document.querySelectorAll('.cp2-prod-sel');
+  if(!sels.length) return;
+  if(typeof state==='undefined'||!state.products||!state.products.length) return;
+  for(var s=0;s<sels.length;s++){
+    var sel=sels[s];
+    var idx=+sel.getAttribute('data-idx');
+    var cur=pg.products[idx]?pg.products[idx].model:'';
+    var opts='<option value="">选择产品...</option>';
+    for(var i=0;i<state.products.length;i++){
+      var m=typeof getProductModel==='function'?getProductModel(state.products[i]):'';
+      var esc=m.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      opts+='<option value="'+esc+'"'+(m===cur?' selected':'')+'>'+esc+'</option>';
+    }
+    sel.innerHTML=opts;
+  }
+}
+
+// ============ DRAG & RESIZE ============
+function cp2BindInteractions(el,type,idx){
+  // Drag: mousedown on element body
+  el.addEventListener('mousedown',function(e){
+    if(e.button!==0) return;
+    // Don't start drag if clicking on resize handle
+    if(e.target.classList && e.target.classList.contains('cp2-resize-handle')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var paper=document.getElementById('cp2-paper');
+    var rect=paper.getBoundingClientRect();
+    cp2Drag={
+      action:'move',
+      type:type,
+      idx:idx,
+      startX:e.clientX,
+      startY:e.clientY,
+      origLayerX:cp2ActivePage()[type][idx].x,
+      origLayerY:cp2ActivePage()[type][idx].y,
+      origW:cp2ActivePage()[type][idx].w,
+      paperRect:rect
+    };
+    paper.classList.add('cp2-dragging');
+    document.addEventListener('mousemove',cp2OnPointerMove);
+    document.addEventListener('mouseup',cp2OnPointerUp);
+  });
+
+  // Resize: mousedown on handle
+  var handle=el.querySelector('.cp2-resize-handle');
+  if(handle){
+    handle.addEventListener('mousedown',function(e){
+      if(e.button!==0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      var paper=document.getElementById('cp2-paper');
+      var rect=paper.getBoundingClientRect();
+      cp2Drag={
+        action:'resize',
+        type:type,
+        idx:idx,
+        startX:e.clientX,
+        startY:e.clientY,
+        origW:cp2ActivePage()[type][idx].w,
+        paperRect:rect
+      };
+      paper.classList.add('cp2-dragging');
+      document.addEventListener('mousemove',cp2OnPointerMove);
+      document.addEventListener('mouseup',cp2OnPointerUp);
+    });
+  }
+}
+
+function cp2OnPointerMove(e){
+  if(!cp2Drag) return;
+  var pg=cp2ActivePage();
+  if(!pg) return;
+  var layer=pg[cp2Drag.type][cp2Drag.idx];
+  if(!layer){cp2OnPointerUp();return;}
+  var rect=cp2Drag.paperRect;
+
+  if(cp2Drag.action==='move'){
+    var dx=((e.clientX-cp2Drag.startX)/rect.width)*100;
+    var dy=((e.clientY-cp2Drag.startY)/rect.height)*100;
+    var nx=Math.max(0,Math.min(98,cp2Drag.origLayerX+dx));
+    var ny=Math.max(0,Math.min(96,cp2Drag.origLayerY+dy));
+    layer.x=Math.round(nx*10)/10;
+    layer.y=Math.round(ny*10)/10;
+    layer.pos='';
+  }else if(cp2Drag.action==='resize'){
+    var dw=((e.clientX-cp2Drag.startX)/rect.width)*100;
+    var nw=Math.max(5,Math.min(95,cp2Drag.origW+dw));
+    layer.w=Math.round(nw*10)/10;
+  }
+  cp2RenderPreview();
+}
+
+function cp2OnPointerUp(){
+  var paper=document.getElementById('cp2-paper');
+  if(paper) paper.classList.remove('cp2-dragging');
+  if(cp2Drag){
+    cp2RenderConfig();
+  }
+  cp2Drag=null;
+  document.removeEventListener('mousemove',cp2OnPointerMove);
+  document.removeEventListener('mouseup',cp2OnPointerUp);
+}
+
+function cp2RenderPreview(){
+  var pg=cp2ActivePage();
+  if(!pg) return;
+  var paper=document.getElementById('cp2-paper');
+  if(!paper) return;
+  var dims=CP2_PAPER[pg.paperSize]||CP2_PAPER.A4;
+  var pw=dims[0],ph=dims[1];
+  var wrap=document.getElementById('cp2-preview-wrap');
+  var maxW=wrap.clientWidth-40;
+  var maxH=wrap.clientHeight-40;
+  var scale=Math.min(maxW/pw,maxH/ph,2);
+  if(scale<=0||!isFinite(scale)) scale=0.5;
+  var rw=Math.round(pw*scale);
+  var rh=Math.round(ph*scale);
+  paper.style.width=rw+'px';
+  paper.style.height=rh+'px';
+  if(pg.bgType==='image'&&pg.bgImageUrl){
+    paper.style.background='url('+pg.bgImageUrl+') center/cover no-repeat,#fff';
+  }else{
+    paper.style.background=pg.bgValue||'#fff';
+  }
+  var html='';
+
+  for(var i=0;i<pg.products.length;i++){
+    var l=pg.products[i];
+    if(!l.img) continue;
+    html+='<div class="cp2-layer-item cp2-draggable" data-type="products" data-idx="'+i+'" style="left:'+l.x+'%;top:'+l.y+'%;width:'+l.w+'%"><img src="'+l.img+'" alt=""><div class="cp2-resize-handle"></div></div>';
+  }
+
+  for(var i=0;i<pg.animals.length;i++){
+    var l=pg.animals[i];
+    if(!l.imgUrl) continue;
+    html+='<div class="cp2-layer-item cp2-draggable" data-type="animals" data-idx="'+i+'" style="left:'+l.x+'%;top:'+l.y+'%;width:'+l.w+'%"><img src="'+l.imgUrl+'" alt=""><div class="cp2-resize-handle"></div></div>';
+  }
+
+  for(var i=0;i<pg.texts.length;i++){
+    var l=pg.texts[i];
+    var st='left:'+l.x+'%;top:'+l.y+'%;width:'+l.w+'%;font-size:'+Math.round(l.fontSize*scale)+'px;color:'+l.color+';font-family:'+l.fontFamily+';';
+    if(l.bold) st+='font-weight:bold;';
+    if(l.italic) st+='font-style:italic;';
+    var txt=(l.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    html+='<div class="cp2-text-item cp2-draggable" data-type="texts" data-idx="'+i+'" style="'+st+'">'+txt+'<div class="cp2-resize-handle"></div></div>';
+  }
+
+  for(var i=0;i<pg.logos.length;i++){
+    var l=pg.logos[i];
+    if(!l.url) continue;
+    html+='<div class="cp2-logo-item cp2-draggable" data-type="logos" data-idx="'+i+'" style="left:'+l.x+'%;top:'+l.y+'%;width:'+l.w+'%"><img src="'+l.url+'" alt=""><div class="cp2-resize-handle"></div></div>';
+  }
+
+  var pIdx=0;
+  for(var j=0;j<cp2State.pages.length;j++){if(cp2State.pages[j].id===pg.id){pIdx=j+1;break;}}
+  for(var i=0;i<pg.pageNums.length;i++){
+    var pn=pg.pageNums[i];
+    html+='<div class="cp2-page-num" style="position:absolute;left:'+pn.x+'%;top:'+pn.y+'%">- '+pIdx+' -</div>';
+  }
+
+  paper.innerHTML=html;
+
+  // Bind interactions
+  var draggables=paper.querySelectorAll('.cp2-draggable');
+  for(var d=0;d<draggables.length;d++){
+    var el=draggables[d];
+    var type=el.getAttribute('data-type');
+    var idx=parseInt(el.getAttribute('data-idx'),10);
+    cp2BindInteractions(el,type,idx);
+  }
+}
+
+window.addEventListener('resize',function(){if(cp2State.mode==='brochure')cp2RenderPreview();});
+
+function cp2GenerateAnimal(i){
+  var pg=cp2ActivePage();
+  var a=pg.animals[i];
+  if(!a.prompt||!a.prompt.trim()){if(typeof showToast==='function')showToast('请先输入动物描述','warning');return;}
+  var st=document.getElementById('cp2-animal-st-'+i);
+  if(st){st.textContent='正在搜索并抠图...';st.style.color='var(--color-primary)';}
+  fetch(apiUrl('/api/compose'),{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({mode:'animal_cutout',prompt:a.prompt})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.image_url||d.url){
+      a.imgUrl=d.image_url||d.url;
+      a.status='已生成';
+      if(st){st.textContent='已生成';st.style.color='var(--color-success)';}
+      cp2RenderPreview();
+    }else{
+      a.status='生成失败：'+(d.detail||d.error||'未知错误');
+      if(st){st.textContent=a.status;st.style.color='var(--color-danger)';}
+    }
+  }).catch(function(err){
+    a.status='生成失败，请检查后端连接';
+    if(st){st.textContent=a.status;st.style.color='var(--color-danger)';}
+  });
+}
+
+function cp2GenerateBg(){
+  var pg=cp2ActivePage();
+  var btn=document.getElementById('cp2-bg-gen-btn');
+  var aiPrompt=pg.aiPrompt||'';
+  var aiStyle=pg.aiStyle||'professional';
+  if(btn){btn.disabled=true;btn.textContent='AI ' + '\u751F\u6210\u4E2D\uFF08\u7EA6' + '30' + '\u79D2\uFF09' + '...';}
+  fetch(apiUrl('/api/compose'),{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({mode:'background',ai_background:true,ai_prompt:aiPrompt,ai_style:aiStyle})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.image_url||d.url){
+      pg.bgImageUrl=d.image_url||d.url;
+      cp2RenderConfig();
+      cp2RenderPreview();
+      if(typeof showToast==='function') showToast('AI ' + '\u80CC\u666F\u56FE\u5DF2\u751F\u6210','success');
+    }else{
+      if(typeof showToast==='function') showToast('\u80CC\u666F\u56FE\u751F\u6210\u5931\u8D25\uFF1A' +(d.detail||''),'error');
+    }
+  }).catch(function(e){
+    if(typeof showToast==='function') showToast('\u80CC\u666F\u56FE\u751F\u6210\u5931\u8D25\uFF1A' +e.message,'error');
+  }).then(function(){
+    if(btn){btn.disabled=false;btn.textContent=pg.bgImageUrl?'重新生成AI背景':'AI 生成背景';}
+  });
+}
+// ============ BROCHURE DOWNLOAD (canvas) ============
+</script>
+</body>
+</html>
