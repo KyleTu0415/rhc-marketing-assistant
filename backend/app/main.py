@@ -90,20 +90,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-async def root():
-    return {
-        "message": "RHC Marketing Assistant API",
-        "version": "1.0.0",
-        "status": "online",
-        "timestamp": datetime.now().isoformat(),
-        "modules": {
-            "composer": True,
-            "feishu": feishu is not None,
-            "llm": generate_copy.__module__ if hasattr(generate_copy, "__module__") else "stub"
-        }
-    }
-
 @app.get("/health")
 async def health():
     return {"status": "ok"}
