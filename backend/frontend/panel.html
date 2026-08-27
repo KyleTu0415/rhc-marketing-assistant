@@ -81,8 +81,8 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 .logout-btn svg{width:14px;height:14px}
 
 /* ===== Main Content ===== */
-.main-container{max-width:1100px;margin:0 auto;padding:48px 32px 40px}
-.welcome-section{margin-bottom:40px}
+.main-container{max-width:1100px;margin:0 auto;padding:40px 32px 40px}
+.welcome-section{margin-bottom:28px}
 .welcome-greeting{font-size:28px;font-weight:700;color:var(--color-text);margin-bottom:8px}
 .welcome-greeting .wave{display:inline-block;animation:wave 2s ease-in-out infinite;transform-origin:70% 70%}
 @keyframes wave{0%,100%{transform:rotate(0)}10%{transform:rotate(14deg)}20%{transform:rotate(-8deg)}30%{transform:rotate(14deg)}40%{transform:rotate(-4deg)}50%{transform:rotate(10deg)}60%{transform:rotate(0)}}
@@ -97,9 +97,106 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   border-radius:2px;
 }
 
+/* ===== News Section ===== */
+.news-section{margin-bottom:40px}
+.news-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
+}
+.news-card{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+  display:flex;flex-direction:column;
+  height:280px;
+  overflow:hidden;
+}
+.news-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;
+  flex-shrink:0;
+}
+.news-card-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:16px;font-weight:700;color:var(--color-text);
+}
+.news-card-title::before{
+  content:'';width:3px;height:16px;background:var(--color-primary);
+  border-radius:2px;flex-shrink:0;
+}
+.news-card-more{
+  font-size:12px;color:var(--color-text-secondary);
+  display:flex;align-items:center;gap:4px;
+  transition:color var(--transition-fast);
+}
+.news-card-more:hover{color:var(--color-primary);text-decoration:none}
+.news-card-more svg{width:12px;height:12px}
+
+.news-list{
+  list-style:none;
+  overflow-y:auto;
+  padding:0 20px 16px;
+  flex:1;
+}
+.news-list::-webkit-scrollbar{width:4px}
+.news-list::-webkit-scrollbar-track{background:transparent}
+.news-list::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:2px}
+.news-list::-webkit-scrollbar-thumb:hover{background:var(--color-text-tertiary)}
+
+.news-item{
+  padding:12px 0;
+  border-bottom:1px solid var(--color-border-light);
+}
+.news-item:last-child{border-bottom:none;padding-bottom:0}
+.news-item:first-child{padding-top:0}
+
+.news-item-link{
+  display:block;
+  transition:all var(--transition-fast);
+}
+.news-item-link:hover{text-decoration:none}
+.news-item-link:hover .news-item-title{color:var(--color-primary)}
+
+.news-item-top{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;margin-bottom:4px;
+}
+.news-item-title{
+  font-size:13px;font-weight:500;color:var(--color-text);
+  line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;
+  overflow:hidden;
+  transition:color var(--transition-fast);
+}
+.news-item-date{
+  font-size:12px;color:var(--color-text-tertiary);
+  flex-shrink:0;white-space:nowrap;
+}
+.news-item-summary{
+  font-size:12px;color:var(--color-text-secondary);
+  line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* News item with tag */
+.news-item-title-wrap{
+  display:flex;align-items:center;gap:8px;flex:1;min-width:0;
+}
+.news-tag{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:4px;
+  font-size:11px;font-weight:600;
+  flex-shrink:0;line-height:1.4;
+}
+.news-tag-new{background:#E8F5E9;color:#2E7D32}
+.news-tag-upgrade{background:#E3F2FD;color:#1565C0}
+.news-tag-beta{background:#FFF3E0;color:#E65100}
+.news-tag-news{background:#F3F4F6;color:#6B7280}
+
 /* ===== Assistant Cards Grid ===== */
 .assistant-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
   margin-bottom:48px;
 }
 .assistant-card{
@@ -181,18 +278,19 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 
 /* ===== Responsive ===== */
 @media(max-width:960px){
-  .assistant-grid{grid-template-columns:repeat(2,1fr)}
+  .news-grid{grid-template-columns:1fr}
+  .assistant-grid{grid-template-columns:1fr}
   .main-container{padding:32px 20px}
 }
 @media(max-width:600px){
   .topnav{padding:0 16px;height:56px}
   .main-container{padding:24px 16px}
   .welcome-greeting{font-size:22px}
-  .assistant-grid{grid-template-columns:1fr}
   .topnav-brand .brand-sub{display:none}
   .user-info{display:none}
   .logout-btn span{display:none}
   .logout-btn{padding:7px 10px}
+  .news-card{height:auto;max-height:320px}
 }
 
 /* Focus */
@@ -239,22 +337,174 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
     <p class="welcome-subtitle">欢迎回到 Real Healthcare 智能工作平台，请选择您要进入的工作台</p>
   </section>
 
+  <!-- News Section -->
+  <section class="news-section">
+    <h2 class="section-title">新闻动态</h2>
+    <div class="news-grid">
+      <!-- 行业动态 -->
+      <div class="news-card">
+        <div class="news-card-header">
+          <div class="news-card-title">行业动态</div>
+          <a href="#" class="news-card-more" target="_blank" rel="noopener">
+            更多
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+        <ul class="news-list">
+          <li class="news-item">
+            <a class="news-item-link" href="https://ceo.ca/@GlobeNewswire/ai-is-reshaping-veterinary-medicine-investment-surges" target="_blank" rel="noopener">
+              <div class="news-item-top">
+                <div class="news-item-title">AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增</div>
+                <span class="news-item-date">2026-08-19</span>
+              </div>
+              <p class="news-item-summary">Digitail融资2300万美元、Lupa Pets融资2000万美元，AI X光判读30秒内完成</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="https://www.globenewswire.com/news-release/2026/08/25/3350843/0/en/global-veterinary-medical-devices-market-to-reach-9-1-billion-by-2030.html" target="_blank" rel="noopener">
+              <div class="news-item-top">
+                <div class="news-item-title">全球兽医医疗器械市场预计2030年达91亿美元</div>
+                <span class="news-item-date">2026-08-25</span>
+              </div>
+              <p class="news-item-summary">CAGR 6.1%，北美占55.9%，AI诊断和POC检测驱动行业增长</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="https://animalhealthnews.com/2026/08/12/idexx-launches-dual-species-point-of-care-cardiac-biomarker-test/" target="_blank" rel="noopener">
+              <div class="news-item-top">
+                <div class="news-item-title">IDEXX推出犬猫双物种心脏生物标志物检测</div>
+                <span class="news-item-date">2026-08-12</span>
+              </div>
+              <p class="news-item-summary">首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="https://www.petdhw.com/show-52837.html" target="_blank" rel="noopener">
+              <div class="news-item-top">
+                <div class="news-item-title">睿视医疗与晓闻科技合作推进宠物CT智能化升级</div>
+                <span class="news-item-date">2026-08-06</span>
+              </div>
+              <p class="news-item-summary">融合AI影像辅助诊断模型，提升宠物CT临床诊疗能力</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="http://m.toutiao.com/group/7669029600882360875/" target="_blank" rel="noopener">
+              <div class="news-item-top">
+                <div class="news-item-title">中宠兽与日本尼普洛（NIPRO）达成全面战略合作</div>
+                <span class="news-item-date">2026-08-01</span>
+              </div>
+              <p class="news-item-summary">品牌授权、进口器械渠道运营、宠物医药联合研发、高端耗材国产化五大方向</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="https://news.zoetis.com/press-releases/press-release-details/2026/Zoetis-Receives-Approval-for-Portela-relfovetmab-injection-in-Great-Britain-2026-QKVxj1nBee/default.aspx" target="_blank" rel="noopener">
+              <div class="news-item-top">
+                <div class="news-item-title">Zoetis Portela猫骨关节炎止痛药在英国获批</div>
+                <span class="news-item-date">2026-07-30</span>
+              </div>
+              <p class="news-item-summary">首个长效抗NGF单克隆抗体，一次注射缓解猫OA疼痛长达3个月</p>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 公司新闻 -->
+      <div class="news-card">
+        <div class="news-card-header">
+          <div class="news-card-title">公司新闻</div>
+          <a href="#" class="news-card-more" target="_blank" rel="noopener">
+            更多
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+        <ul class="news-list">
+          <li class="news-item">
+            <a class="news-item-link" href="#">
+              <div class="news-item-top">
+                <div class="news-item-title-wrap">
+                  <span class="news-tag news-tag-new">new</span>
+                  <div class="news-item-title">智能工作平台V1.2上线：经营仪表盘模块发布</div>
+                </div>
+                <span class="news-item-date">2026-08-25</span>
+              </div>
+              <p class="news-item-summary">新增实时业绩看板、多维度数据分析和决策支持功能，管理层可一屏掌握全局经营状况。</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="#">
+              <div class="news-item-top">
+                <div class="news-item-title-wrap">
+                  <span class="news-tag news-tag-upgrade">upgrade</span>
+                  <div class="news-item-title">营销中心升级：AI社媒内容生成支持多平台一键发布</div>
+                </div>
+                <span class="news-item-date">2026-08-20</span>
+              </div>
+              <p class="news-item-summary">新增LinkedIn、Facebook、Instagram多平台适配，AI自动生成本地化文案和图片，发布效率提升3倍。</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="#">
+              <div class="news-item-top">
+                <div class="news-item-title-wrap">
+                  <span class="news-tag news-tag-beta">beta</span>
+                  <div class="news-item-title">销售智能助手开放内测：产品知识库+竞品对比</div>
+                </div>
+                <span class="news-item-date">2026-08-15</span>
+              </div>
+              <p class="news-item-summary">接入全产品线知识库，支持自然语言问答、竞品参数对比和场景化推荐，帮助销售团队快速响应客户。</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="#">
+              <div class="news-item-top">
+                <div class="news-item-title-wrap">
+                  <span class="news-tag news-tag-upgrade">upgrade</span>
+                  <div class="news-item-title">客户管理系统CRM完成架构升级</div>
+                </div>
+                <span class="news-item-date">2026-08-10</span>
+              </div>
+              <p class="news-item-summary">客户档案、商机漏斗、跟进提醒全面优化，支持自定义字段和自动化工作流，数据迁移无缝衔接。</p>
+            </a>
+          </li>
+          <li class="news-item">
+            <a class="news-item-link" href="#">
+              <div class="news-item-top">
+                <div class="news-item-title-wrap">
+                  <span class="news-tag news-tag-news">news</span>
+                  <div class="news-item-title">RHC智能工作平台正式对外发布</div>
+                </div>
+                <span class="news-item-date">2026-08-01</span>
+              </div>
+              <p class="news-item-summary">整合营销、销售、客户管理和数据分析四大模块，AI构建全球营销全链路，数据驱动业绩增长。</p>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <h2 class="section-title">选择工作台</h2>
 
   <div class="assistant-grid">
-    <!-- 营销中心 -->
-    <div class="assistant-card" onclick="enterMarketing()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterMarketing()">
+    <!-- 经营仪表盘 -->
+    <div class="assistant-card disabled" onclick="showToast('即将上线，敬请期待','warning')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showToast('即将上线，敬请期待','warning')">
       <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
       <div class="assistant-icon icon-red">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
         </svg>
       </div>
-      <h3 class="assistant-name">营销中心</h3>
-      <p class="assistant-desc">社媒营销、图片合成、素材管理</p>
-      <span class="assistant-status status-active">立即进入</span>
+      <h3 class="assistant-name">经营仪表盘</h3>
+      <p class="assistant-desc">数据看板、业绩分析、决策支持</p>
+      <span class="assistant-status status-coming">即将上线</span>
     </div>
 
     <!-- 销售智能助手 -->
@@ -272,7 +522,22 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
       <span class="assistant-status status-coming">即将上线</span>
     </div>
 
-    <!-- 客户管理 CRM -->
+    <!-- 营销中心 -->
+    <div class="assistant-card" onclick="enterMarketing()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterMarketing()">
+      <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+      <div class="assistant-icon icon-red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+      </div>
+      <h3 class="assistant-name">营销中心</h3>
+      <p class="assistant-desc">社媒内容生成、图片合成、素材管理</p>
+      <span class="assistant-status status-active">立即进入</span>
+    </div>
+
+    <!-- 客户管理系统 -->
     <div class="assistant-card disabled" onclick="showToast('规划中，敬请期待','warning')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showToast('规划中，敬请期待','warning')">
       <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -285,7 +550,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
           <path d="M16 3.13a4 4 0 010 7.75"/>
         </svg>
       </div>
-      <h3 class="assistant-name">客户管理 CRM</h3>
+      <h3 class="assistant-name">客户管理系统</h3>
       <p class="assistant-desc">客户档案、商机跟进、成交转化</p>
       <span class="assistant-status status-planning">规划中</span>
     </div>
