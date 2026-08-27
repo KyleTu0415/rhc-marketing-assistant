@@ -58,8 +58,9 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
 }
 .brand-logo{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
 .brand-logo .logo-mark{
-  width:52px;height:52px;border-radius:50%;background:#fff;
+  width:64px;height:64px;border-radius:16px;background:#fff;
   display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 .brand-logo .logo-text{
   font-size:20px;font-weight:700;letter-spacing:1px;
@@ -165,9 +166,25 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
   <div class="brand-panel">
     <div class="brand-logo">
       <div class="logo-mark">
-        <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-          <text x="4" y="23" font-family="Arial, sans-serif" font-weight="900" font-size="20" fill="#C8102E">RH</text>
-        </svg>
+        <svg width="48" height="48" viewBox="0 0 64 64" aria-hidden="true">
+            <!-- White circle background -->
+            <circle cx="32" cy="32" r="30" fill="#fff"/>
+            <!-- Red thin circle border -->
+            <circle cx="32" cy="32" r="28" fill="none" stroke="#C8102E" stroke-width="2"/>
+            <!-- Serif "RH" letters -->
+            <text x="32" y="36" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="24" fill="#C8102E" text-anchor="middle" letter-spacing="0">RH</text>
+            <!-- Medical cross (+) on top-right of H -->
+            <g transform="translate(43, 16)">
+              <rect x="0" y="-1.5" width="8" height="3" fill="#C8102E"/>
+              <rect x="-1.5" y="0" width="3" height="8" transform="translate(2.5, -2.5)" fill="#C8102E"/>
+              <line x1="2.5" y1="0" x2="2.5" y2="5" stroke="#C8102E" stroke-width="3" stroke-linecap="square"/>
+              <line x1="0" y1="2.5" x2="5" y2="2.5" stroke="#C8102E" stroke-width="3" stroke-linecap="square"/>
+            </g>
+            <!-- Smile arc from bottom of R, curving up-right with arrow -->
+            <path d="M 14 42 Q 28 54 48 40" fill="none" stroke="#C8102E" stroke-width="2" stroke-linecap="round"/>
+            <!-- Arrow head -->
+            <path d="M 48 40 L 44 36 M 48 40 L 44 44" stroke="#C8102E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
       </div>
       <div>
         <div class="logo-text">Real Healthcare</div>
@@ -176,8 +193,8 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
     </div>
 
     <div class="brand-content">
-      <h1>智能营销，<br><span class="highlight">助力业务增长</span></h1>
-      <p class="slogan">一站式智能工作平台，整合营销、销售、客户管理能力，让团队更高效，让增长更简单。</p>
+      <h1>智驱医疗，<br><span class="highlight">关怀无界</span></h1>
+      <p class="slogan">一站式智能工作平台，融合AI技术与医疗专业，让营销更精准、销售更高效、管理更智能。</p>
       <div class="brand-features">
         <div class="brand-feature">
           <div class="brand-feature-icon">
@@ -204,6 +221,15 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
           <div class="brand-feature-text">
             <h3>客户管理</h3>
             <p>客户档案、商机跟进、成交转化</p>
+          </div>
+        </div>
+        <div class="brand-feature">
+          <div class="brand-feature-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg>
+          </div>
+          <div class="brand-feature-text">
+            <h3>管理视图</h3>
+            <p>数据看板、业绩分析、决策支持</p>
           </div>
         </div>
       </div>
