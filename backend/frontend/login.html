@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>登录 — Real Healthcare 智能工作平台</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@main/css/harmonyos_sans_sc.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@main/css/harmonyos_sans_sc.css" as="style" onload="this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@main/css/harmonyos_sans_sc.css"></noscript>
 <style>
 :root{
   --color-bg:#F7F8FA;
@@ -29,7 +29,7 @@
   --transition-normal:0.25s ease;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:var(--font-sans);font-size:14px;line-height:1.5;color:var(--color-text);background:var(--color-bg)}
+html,body{min-height:100vh;font-family:var(--font-sans);font-size:14px;line-height:1.5;color:var(--color-text);background:var(--color-bg);font-display:optional}
 a{color:var(--color-primary);text-decoration:none}
 a:hover{text-decoration:underline}
 button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;font-size:13px}
@@ -45,7 +45,7 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
   background:linear-gradient(135deg,var(--color-primary) 0%,var(--color-primary-dark) 100%);
   color:#fff;
   padding:56px 48px;
-  display:flex;flex-direction:column;justify-content:space-between;
+  display:flex;flex-direction:column;
   position:relative;overflow:hidden;
 }
 .brand-panel::before{
@@ -64,17 +64,17 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
   flex-shrink:0;
 }
 .brand-logo .logo-text{
-  font-size:18px;font-weight:700;letter-spacing:1px;
+  font-size:22px;font-weight:700;letter-spacing:1px;
 }
 .brand-logo .logo-sub{
-  font-size:11px;opacity:0.8;font-weight:400;margin-top:2px;letter-spacing:2px;
+  font-size:13px;opacity:0.8;font-weight:400;margin-top:2px;letter-spacing:2px;
 }
-.brand-content{position:relative;z-index:1;max-width:380px}
+.brand-content{position:relative;z-index:1;max-width:380px;margin-top:24px}
 .brand-content h1{font-size:34px;font-weight:700;line-height:1.25;margin-bottom:14px;letter-spacing:0.5px}
 .brand-content h1 .highlight{color:#FFD1D9}
 .brand-content .slogan{font-size:15px;line-height:1.8;opacity:0.92;margin-bottom:32px}
 .assistant-slogan{
-  font-size:20px;font-weight:500;letter-spacing:0.5px;
+  font-size:17px;font-weight:500;letter-spacing:0.5px;white-space:nowrap;
   color:rgba(255,255,255,0.78);
   margin-bottom:24px;padding-top:18px;
   position:relative;
@@ -93,7 +93,7 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
 }
 .brand-feature-text h3{font-size:14px;font-weight:600;margin-bottom:2px}
 .brand-feature-text p{font-size:12px;opacity:0.75;line-height:1.6}
-.brand-footer{position:relative;z-index:1;font-size:12px;opacity:0.6}
+.brand-footer{position:relative;z-index:1;font-size:12px;opacity:0.6;margin-top:auto}
 
 /* Right form panel */
 .form-panel{
