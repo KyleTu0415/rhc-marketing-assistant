@@ -108,7 +108,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow-sm);
   display:flex;flex-direction:column;
-  height:280px;
+  height:auto;
   overflow:hidden;
 }
 .news-card-header{
@@ -128,20 +128,15 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   font-size:12px;color:var(--color-text-secondary);
   display:flex;align-items:center;gap:4px;
   transition:color var(--transition-fast);
+  cursor:pointer;
 }
 .news-card-more:hover{color:var(--color-primary);text-decoration:none}
 .news-card-more svg{width:12px;height:12px}
 
 .news-list{
   list-style:none;
-  overflow-y:auto;
   padding:0 20px 16px;
-  flex:1;
 }
-.news-list::-webkit-scrollbar{width:4px}
-.news-list::-webkit-scrollbar-track{background:transparent}
-.news-list::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:2px}
-.news-list::-webkit-scrollbar-thumb:hover{background:var(--color-text-tertiary)}
 
 .news-item{
   padding:12px 0;
@@ -194,20 +189,77 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 .news-tag-beta{background:#FFF3E0;color:#E65100}
 .news-tag-news{background:#F3F4F6;color:#6B7280}
 
+/* ===== Modal ===== */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.5);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;
+  opacity:0;visibility:hidden;
+  transition:opacity var(--transition-fast), visibility var(--transition-fast);
+}
+.modal-overlay.show{opacity:1;visibility:visible}
+.modal-card{
+  background:var(--color-surface);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  width:90%;max-width:600px;
+  max-height:80vh;
+  display:flex;flex-direction:column;
+  transform:translateY(20px);
+  transition:transform var(--transition-normal);
+}
+.modal-overlay.show .modal-card{transform:translateY(0)}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 24px;
+  border-bottom:1px solid var(--color-border-light);
+  flex-shrink:0;
+}
+.modal-title{
+  font-size:16px;font-weight:700;color:var(--color-text);
+  display:flex;align-items:center;gap:10px;
+}
+.modal-title::before{
+  content:'';width:3px;height:16px;background:var(--color-primary);
+  border-radius:2px;flex-shrink:0;
+}
+.modal-close{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--color-text-tertiary);
+  transition:all var(--transition-fast);
+}
+.modal-close:hover{background:var(--color-bg);color:var(--color-text)}
+.modal-close svg{width:18px;height:18px}
+.modal-body{
+  padding:8px 24px 20px;
+  overflow-y:auto;
+  flex:1;
+}
+.modal-body::-webkit-scrollbar{width:6px}
+.modal-body::-webkit-scrollbar-track{background:transparent}
+.modal-body::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:3px}
+.modal-body::-webkit-scrollbar-thumb:hover{background:var(--color-text-tertiary)}
+.modal-body .news-list{padding:0}
+.modal-body .news-item{padding:14px 0}
+
 /* ===== Assistant Cards Grid ===== */
 .assistant-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
   margin-bottom:48px;
 }
 .assistant-card{
   background:var(--color-surface);
   border:1px solid var(--color-border);
   border-radius:var(--radius-lg);
-  padding:28px 24px;
+  padding:18px;
   transition:all var(--transition-normal);
   cursor:pointer;
   position:relative;
   display:flex;flex-direction:column;
+  align-items:center;
+  text-align:center;
 }
 .assistant-card:hover:not(.disabled){
   box-shadow:var(--shadow-lg);
@@ -215,7 +267,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   border-color:var(--color-primary);
 }
 .assistant-card.disabled{
-  cursor:not-allowed;
+  cursor:default;
   opacity:0.6;
 }
 .assistant-card.disabled:hover{
@@ -225,30 +277,30 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 }
 
 .assistant-icon{
-  width:56px;height:56px;border-radius:var(--radius-md);
+  width:40px;height:40px;border-radius:var(--radius-md);
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:18px;
+  margin-bottom:12px;
 }
-.assistant-icon svg{width:28px;height:28px}
+.assistant-icon svg{width:20px;height:20px}
 .assistant-icon.icon-red{background:var(--color-primary-light);color:var(--color-primary)}
 .assistant-icon.icon-blue{background:#E8F0FE;color:#3B82F6}
 .assistant-icon.icon-gray{background:#F0F2F3;color:#6B7280}
 
-.assistant-name{font-size:17px;font-weight:700;color:var(--color-text);margin-bottom:6px}
-.assistant-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:20px;flex:1}
+.assistant-name{font-size:14px;font-weight:700;color:var(--color-text);margin-bottom:4px}
+.assistant-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:12px}
 
 .assistant-status{
-  display:inline-flex;align-items:center;align-self:flex-start;
-  padding:5px 12px;border-radius:20px;
-  font-size:12px;font-weight:600;
+  display:inline-flex;align-items:center;
+  padding:4px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;
 }
 .status-active{background:var(--color-primary-light);color:var(--color-primary)}
 .status-coming{background:#F0F2F3;color:#6B7280}
 .status-planning{background:#F0F2F3;color:#9CA3AF}
 
 .assistant-card .card-arrow{
-  position:absolute;top:24px;right:24px;
-  width:20px;height:20px;color:var(--color-text-tertiary);
+  position:absolute;top:14px;right:14px;
+  width:16px;height:16px;color:var(--color-text-tertiary);
   transition:all var(--transition-fast);
 }
 .assistant-card:hover:not(.disabled) .card-arrow{
@@ -279,7 +331,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 /* ===== Responsive ===== */
 @media(max-width:960px){
   .news-grid{grid-template-columns:1fr}
-  .assistant-grid{grid-template-columns:1fr}
+  .assistant-grid{grid-template-columns:repeat(2,1fr);gap:16px}
   .main-container{padding:32px 20px}
 }
 @media(max-width:600px){
@@ -290,7 +342,9 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   .user-info{display:none}
   .logout-btn span{display:none}
   .logout-btn{padding:7px 10px}
-  .news-card{height:auto;max-height:320px}
+  .assistant-grid{grid-template-columns:1fr;gap:14px}
+  .modal-header{padding:16px 20px}
+  .modal-body{padding:4px 20px 16px}
 }
 
 /* Focus */
@@ -345,12 +399,12 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
       <div class="news-card">
         <div class="news-card-header">
           <div class="news-card-title">行业动态</div>
-          <a href="#" class="news-card-more" target="_blank" rel="noopener">
+          <span class="news-card-more" onclick="openModal('industry')">
             更多
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
-          </a>
+          </span>
         </div>
         <ul class="news-list">
           <li class="news-item">
@@ -380,33 +434,6 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
               <p class="news-item-summary">首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市</p>
             </a>
           </li>
-          <li class="news-item">
-            <a class="news-item-link" href="https://www.petdhw.com/show-52837.html" target="_blank" rel="noopener">
-              <div class="news-item-top">
-                <div class="news-item-title">睿视医疗与晓闻科技合作推进宠物CT智能化升级</div>
-                <span class="news-item-date">2026-08-06</span>
-              </div>
-              <p class="news-item-summary">融合AI影像辅助诊断模型，提升宠物CT临床诊疗能力</p>
-            </a>
-          </li>
-          <li class="news-item">
-            <a class="news-item-link" href="http://m.toutiao.com/group/7669029600882360875/" target="_blank" rel="noopener">
-              <div class="news-item-top">
-                <div class="news-item-title">中宠兽与日本尼普洛（NIPRO）达成全面战略合作</div>
-                <span class="news-item-date">2026-08-01</span>
-              </div>
-              <p class="news-item-summary">品牌授权、进口器械渠道运营、宠物医药联合研发、高端耗材国产化五大方向</p>
-            </a>
-          </li>
-          <li class="news-item">
-            <a class="news-item-link" href="https://news.zoetis.com/press-releases/press-release-details/2026/Zoetis-Receives-Approval-for-Portela-relfovetmab-injection-in-Great-Britain-2026-QKVxj1nBee/default.aspx" target="_blank" rel="noopener">
-              <div class="news-item-top">
-                <div class="news-item-title">Zoetis Portela猫骨关节炎止痛药在英国获批</div>
-                <span class="news-item-date">2026-07-30</span>
-              </div>
-              <p class="news-item-summary">首个长效抗NGF单克隆抗体，一次注射缓解猫OA疼痛长达3个月</p>
-            </a>
-          </li>
         </ul>
       </div>
 
@@ -414,12 +441,12 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
       <div class="news-card">
         <div class="news-card-header">
           <div class="news-card-title">公司新闻</div>
-          <a href="#" class="news-card-more" target="_blank" rel="noopener">
+          <span class="news-card-more" onclick="openModal('company')">
             更多
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
-          </a>
+          </span>
         </div>
         <ul class="news-list">
           <li class="news-item">
@@ -458,30 +485,6 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
               <p class="news-item-summary">接入全产品线知识库，支持自然语言问答、竞品参数对比和场景化推荐，帮助销售团队快速响应客户。</p>
             </a>
           </li>
-          <li class="news-item">
-            <a class="news-item-link" href="#">
-              <div class="news-item-top">
-                <div class="news-item-title-wrap">
-                  <span class="news-tag news-tag-upgrade">upgrade</span>
-                  <div class="news-item-title">客户管理系统CRM完成架构升级</div>
-                </div>
-                <span class="news-item-date">2026-08-10</span>
-              </div>
-              <p class="news-item-summary">客户档案、商机漏斗、跟进提醒全面优化，支持自定义字段和自动化工作流，数据迁移无缝衔接。</p>
-            </a>
-          </li>
-          <li class="news-item">
-            <a class="news-item-link" href="#">
-              <div class="news-item-top">
-                <div class="news-item-title-wrap">
-                  <span class="news-tag news-tag-news">news</span>
-                  <div class="news-item-title">RHC智能工作平台正式对外发布</div>
-                </div>
-                <span class="news-item-date">2026-08-01</span>
-              </div>
-              <p class="news-item-summary">整合营销、销售、客户管理和数据分析四大模块，AI构建全球营销全链路，数据驱动业绩增长。</p>
-            </a>
-          </li>
         </ul>
       </div>
     </div>
@@ -491,7 +494,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 
   <div class="assistant-grid">
     <!-- 经营仪表盘 -->
-    <div class="assistant-card disabled" onclick="showToast('即将上线，敬请期待','warning')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showToast('即将上线，敬请期待','warning')">
+    <div class="assistant-card disabled" role="button" tabindex="0">
       <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
@@ -508,7 +511,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
     </div>
 
     <!-- 销售智能助手 -->
-    <div class="assistant-card disabled" onclick="showToast('即将上线，敬请期待','warning')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showToast('即将上线，敬请期待','warning')">
+    <div class="assistant-card disabled" role="button" tabindex="0">
       <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
@@ -538,7 +541,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
     </div>
 
     <!-- 客户管理系统 -->
-    <div class="assistant-card disabled" onclick="showToast('规划中，敬请期待','warning')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showToast('规划中，敬请期待','warning')">
+    <div class="assistant-card disabled" role="button" tabindex="0">
       <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
@@ -560,6 +563,158 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
     © 2026 Real Healthcare. All rights reserved.
   </footer>
 </main>
+
+<!-- 行业动态 Modal -->
+<div class="modal-overlay" id="modal-industry" onclick="handleOverlayClick(event, 'industry')">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">行业动态</div>
+      <button class="modal-close" onclick="closeModal('industry')" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <ul class="news-list">
+        <li class="news-item">
+          <a class="news-item-link" href="https://ceo.ca/@GlobeNewswire/ai-is-reshaping-veterinary-medicine-investment-surges" target="_blank" rel="noopener">
+            <div class="news-item-top">
+              <div class="news-item-title">AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增</div>
+              <span class="news-item-date">2026-08-19</span>
+            </div>
+            <p class="news-item-summary">Digitail融资2300万美元、Lupa Pets融资2000万美元，AI X光判读30秒内完成</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="https://www.globenewswire.com/news-release/2026/08/25/3350843/0/en/global-veterinary-medical-devices-market-to-reach-9-1-billion-by-2030.html" target="_blank" rel="noopener">
+            <div class="news-item-top">
+              <div class="news-item-title">全球兽医医疗器械市场预计2030年达91亿美元</div>
+              <span class="news-item-date">2026-08-25</span>
+            </div>
+            <p class="news-item-summary">CAGR 6.1%，北美占55.9%，AI诊断和POC检测驱动行业增长</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="https://animalhealthnews.com/2026/08/12/idexx-launches-dual-species-point-of-care-cardiac-biomarker-test/" target="_blank" rel="noopener">
+            <div class="news-item-top">
+              <div class="news-item-title">IDEXX推出犬猫双物种心脏生物标志物检测</div>
+              <span class="news-item-date">2026-08-12</span>
+            </div>
+            <p class="news-item-summary">首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="https://www.petdhw.com/show-52837.html" target="_blank" rel="noopener">
+            <div class="news-item-top">
+              <div class="news-item-title">睿视医疗与晓闻科技合作推进宠物CT智能化升级</div>
+              <span class="news-item-date">2026-08-06</span>
+            </div>
+            <p class="news-item-summary">融合AI影像辅助诊断模型，提升宠物CT临床诊疗能力</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="http://m.toutiao.com/group/7669029600882360875/" target="_blank" rel="noopener">
+            <div class="news-item-top">
+              <div class="news-item-title">中宠兽与日本尼普洛（NIPRO）达成全面战略合作</div>
+              <span class="news-item-date">2026-08-01</span>
+            </div>
+            <p class="news-item-summary">品牌授权、进口器械渠道运营、宠物医药联合研发、高端耗材国产化五大方向</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="https://news.zoetis.com/press-releases/press-release-details/2026/Zoetis-Receives-Approval-for-Portela-relfovetmab-injection-in-Great-Britain-2026-QKVxj1nBee/default.aspx" target="_blank" rel="noopener">
+            <div class="news-item-top">
+              <div class="news-item-title">Zoetis Portela猫骨关节炎止痛药在英国获批</div>
+              <span class="news-item-date">2026-07-30</span>
+            </div>
+            <p class="news-item-summary">首个长效抗NGF单克隆抗体，一次注射缓解猫OA疼痛长达3个月</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- 公司新闻 Modal -->
+<div class="modal-overlay" id="modal-company" onclick="handleOverlayClick(event, 'company')">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">公司新闻</div>
+      <button class="modal-close" onclick="closeModal('company')" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <ul class="news-list">
+        <li class="news-item">
+          <a class="news-item-link" href="#">
+            <div class="news-item-top">
+              <div class="news-item-title-wrap">
+                <span class="news-tag news-tag-new">new</span>
+                <div class="news-item-title">智能工作平台V1.2上线：经营仪表盘模块发布</div>
+              </div>
+              <span class="news-item-date">2026-08-25</span>
+            </div>
+            <p class="news-item-summary">新增实时业绩看板、多维度数据分析和决策支持功能，管理层可一屏掌握全局经营状况。</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="#">
+            <div class="news-item-top">
+              <div class="news-item-title-wrap">
+                <span class="news-tag news-tag-upgrade">upgrade</span>
+                <div class="news-item-title">营销中心升级：AI社媒内容生成支持多平台一键发布</div>
+              </div>
+              <span class="news-item-date">2026-08-20</span>
+            </div>
+            <p class="news-item-summary">新增LinkedIn、Facebook、Instagram多平台适配，AI自动生成本地化文案和图片，发布效率提升3倍。</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="#">
+            <div class="news-item-top">
+              <div class="news-item-title-wrap">
+                <span class="news-tag news-tag-beta">beta</span>
+                <div class="news-item-title">销售智能助手开放内测：产品知识库+竞品对比</div>
+              </div>
+              <span class="news-item-date">2026-08-15</span>
+            </div>
+            <p class="news-item-summary">接入全产品线知识库，支持自然语言问答、竞品参数对比和场景化推荐，帮助销售团队快速响应客户。</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="#">
+            <div class="news-item-top">
+              <div class="news-item-title-wrap">
+                <span class="news-tag news-tag-upgrade">upgrade</span>
+                <div class="news-item-title">客户管理系统CRM完成架构升级</div>
+              </div>
+              <span class="news-item-date">2026-08-10</span>
+            </div>
+            <p class="news-item-summary">客户档案、商机漏斗、跟进提醒全面优化，支持自定义字段和自动化工作流，数据迁移无缝衔接。</p>
+          </a>
+        </li>
+        <li class="news-item">
+          <a class="news-item-link" href="#">
+            <div class="news-item-top">
+              <div class="news-item-title-wrap">
+                <span class="news-tag news-tag-news">news</span>
+                <div class="news-item-title">RHC智能工作平台正式对外发布</div>
+              </div>
+              <span class="news-item-date">2026-08-01</span>
+            </div>
+            <p class="news-item-summary">整合营销、销售、客户管理和数据分析四大模块，AI构建全球营销全链路，数据驱动业绩增长。</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -585,6 +740,39 @@ function handleLogout() {
     window.location.href = 'login.html';
   }
 }
+
+/* ===== Modal Functions ===== */
+function openModal(type) {
+  var modal = document.getElementById('modal-' + type);
+  if (modal) {
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeModal(type) {
+  var modal = document.getElementById('modal-' + type);
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+}
+
+function handleOverlayClick(event, type) {
+  if (event.target.classList.contains('modal-overlay')) {
+    closeModal(type);
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var modals = document.querySelectorAll('.modal-overlay.show');
+    modals.forEach(function(m) {
+      m.classList.remove('show');
+    });
+    document.body.style.overflow = '';
+  }
+});
 </script>
 </body>
 </html>
