@@ -72,6 +72,17 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
 .brand-content h1{font-size:40px;font-weight:700;line-height:1.25;margin-bottom:16px;letter-spacing:0.5px}
 .brand-content h1 .highlight{color:#FFD1D9}
 .brand-content .slogan{font-size:17px;line-height:1.8;opacity:0.92;margin-bottom:40px}
+.assistant-slogan{
+  font-size:24px;font-weight:500;letter-spacing:0.5px;
+  color:rgba(255,255,255,0.78);
+  margin-bottom:28px;padding-top:20px;
+  position:relative;
+}
+.assistant-slogan::before{
+  content:'';position:absolute;top:0;left:0;
+  width:40px;height:2px;
+  background:rgba(255,255,255,0.4);border-radius:1px;
+}
 .brand-features{display:flex;flex-direction:column;gap:18px}
 .brand-feature{display:flex;align-items:flex-start;gap:14px}
 .brand-feature-icon{
@@ -148,6 +159,7 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
   .brand-content{max-width:100%}
   .brand-content h1{font-size:28px}
   .brand-content .slogan{font-size:15px;margin-bottom:24px}
+  .brand-content .assistant-slogan{font-size:18px;padding-top:16px;margin-bottom:20px}
   .brand-features{flex-direction:row;flex-wrap:wrap;gap:12px}
   .brand-feature{flex:1 1 45%}
   .brand-footer{display:none}
@@ -193,8 +205,9 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
     </div>
 
     <div class="brand-content">
-      <h1>智驱医疗，<br><span class="highlight">关怀无界</span></h1>
+      <h1>智能动物医疗，<br><span class="highlight">关爱生命健康</span></h1>
       <p class="slogan">一站式智能工作平台，融合AI技术与医疗专业，让营销更精准、销售更高效、管理更智能。</p>
+      <p class="assistant-slogan">AI驱动，连接全球，助力业绩增长</p>
       <div class="brand-features">
         <div class="brand-feature">
           <div class="brand-feature-icon">
