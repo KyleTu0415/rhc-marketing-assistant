@@ -591,6 +591,16 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 .cp2-cutout-hint span{font-size:12px;color:var(--color-text-tertiary)}
 
 </style>
+
+<script>
+  // 根地址直接访问时跳转登录页，从工作台跳转不拦截
+  (function(){
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('from') !== 'panel') {
+      window.location.replace('login.html');
+    }
+  })();
+</script>
 </head>
 <body>
 <div class="app-layout">
