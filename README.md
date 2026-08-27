@@ -1,4 +1,4 @@
-# RHC Medical 外贸营销助手
+# RHC Medical 外贸营销中心
 
 宠物医疗器械外贸营销内容生成平台。
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RHC 安瑞康 — 营销助手</title>
+<title>RHC 安瑞康 — 营销中心</title>
 <style>
 :root{
   --color-bg:#F7F8FA;
@@ -575,9 +575,9 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 <nav class="sidebar" aria-label="Main navigation">
 <div class="sidebar-logo"><img src="https://iili.io/CZ0tVNn.png" alt="RHC Medical"></div>
 <div class="sidebar-nav">
-<div class="nav-section">营销助手-工作台</div>
+<div class="nav-section">营销中心-工作台</div>
 <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>仪表盘</span></div>
-<div class="nav-item" data-page="media" onclick="switchPage('media',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><span>营销中心</span></div>
+<div class="nav-item" data-page="media" onclick="switchPage('media',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><span>素材资源库</span></div>
 <div class="nav-item" data-page="posts" onclick="switchPage('posts',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>社媒营销</span></div>
 <div class="nav-item" data-page="composer" onclick="switchPage('composer',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片合成</span></div>
 <div class="nav-item" data-page="history" onclick="switchPage('history',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>内容历史</span></div>
@@ -743,7 +743,7 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 </div>
 </section>
 <section class="page" id="page-media">
-<div class="page-header"><h2>营销中心</h2><p>产品、品牌资源与最佳实践集中管理</p></div>
+<div class="page-header"><h2>素材资源库</h2><p>产品、品牌资源与最佳实践集中管理</p></div>
 <div id="media-main">
 <div class="media-tabs" id="media-tabs">
 <div class="media-tab active" onclick="switchMediaTab('products',this)">产品库</div>
@@ -989,7 +989,7 @@ function renderAnimals(animals){
   if(typeof updateMiniCanvas==='function'){try{updateMiniCanvas()}catch(e){console.warn('miniCanvas update failed:',e)}}
 }
 
-var pageTitles={dashboard:'仪表盘',posts:'社媒推文生成',composer:'图片合成工作室',media:'营销中心',history:'内容历史',notifications:'通知',settings:'设置'};
+var pageTitles={dashboard:'仪表盘',posts:'社媒推文生成',composer:'图片合成工作室',media:'素材资源库',history:'内容历史',notifications:'通知',settings:'设置'};
 function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');if(pageId==='notifications'){var nb=document.getElementById('sidebar-notif-badge');if(nb)nb.style.display='none'}if(pageId==='media'&&typeof backToProductGrid==='function'){try{backToProductGrid()}catch(e){}}document.getElementById('topbar-title')&&(document.getElementById('topbar-title').textContent=pageTitles[pageId]||pageId)}
 
 function switchMediaTab(tab,el){document.querySelectorAll('#media-tabs .media-tab').forEach(function(t){t.classList.remove('active')});el.classList.add('active');var pt=document.getElementById('media-products-tab'),bd=document.getElementById('media-brand'),cs=document.getElementById('media-cases');pt.style.display='none';bd.style.display='none';cs.style.display='none';if(tab==='products'){pt.style.display=''}else if(tab==='brand'){bd.style.display=''}else if(tab==='cases'){cs.style.display=''}}
