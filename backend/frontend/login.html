@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 — Real Healthcare 智能工作平台</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@main/css/harmonyos_sans_sc.css">
+<style>
+:root{
+  --color-bg:#F7F8FA;
+  --color-surface:#FFFFFF;
+  --color-primary:#C8102E;
+  --color-primary-dark:#A50D26;
+  --color-primary-light:#FDE8EB;
+  --color-primary-xlight:#FFF1F3;
+  --color-text:#1A1A1A;
+  --color-text-secondary:#6B7280;
+  --color-text-tertiary:#9CA3AF;
+  --color-border:#E5E7EB;
+  --color-border-light:#F3F4F6;
+  --font-sans:"HarmonyOS Sans SC","HarmonyOS Sans","Noto Sans SC",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.10);
+  --transition-fast:0.15s ease;
+  --transition-normal:0.25s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font-sans);font-size:14px;line-height:1.5;color:var(--color-text);background:var(--color-bg)}
+a{color:var(--color-primary);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;font-size:13px}
+input{font-family:var(--font-sans);font-size:14px;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--color-text);background:var(--color-surface);outline:none;transition:border-color var(--transition-fast)}
+input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,46,0.12)}
+
+/* ===== Layout ===== */
+.login-wrapper{display:flex;min-height:100vh}
+
+/* Left brand panel */
+.brand-panel{
+  flex:0 0 52%;
+  background:linear-gradient(135deg,var(--color-primary) 0%,var(--color-primary-dark) 100%);
+  color:#fff;
+  padding:60px 64px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.brand-panel::before{
+  content:'';position:absolute;top:-200px;right:-200px;width:500px;height:500px;
+  background:rgba(255,255,255,0.06);border-radius:50%;
+}
+.brand-panel::after{
+  content:'';position:absolute;bottom:-150px;left:-100px;width:400px;height:400px;
+  background:rgba(255,255,255,0.04);border-radius:50%;
+}
+.brand-logo{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.brand-logo .logo-mark{
+  width:52px;height:52px;border-radius:50%;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.brand-logo .logo-text{
+  font-size:20px;font-weight:700;letter-spacing:1px;
+}
+.brand-logo .logo-sub{
+  font-size:12px;opacity:0.8;font-weight:400;margin-top:2px;letter-spacing:3px;
+}
+.brand-content{position:relative;z-index:1;max-width:440px}
+.brand-content h1{font-size:40px;font-weight:700;line-height:1.25;margin-bottom:16px;letter-spacing:0.5px}
+.brand-content h1 .highlight{color:#FFD1D9}
+.brand-content .slogan{font-size:17px;line-height:1.8;opacity:0.92;margin-bottom:40px}
+.brand-features{display:flex;flex-direction:column;gap:18px}
+.brand-feature{display:flex;align-items:flex-start;gap:14px}
+.brand-feature-icon{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,0.16);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.brand-feature-text h3{font-size:14px;font-weight:600;margin-bottom:2px}
+.brand-feature-text p{font-size:12px;opacity:0.75;line-height:1.6}
+.brand-footer{position:relative;z-index:1;font-size:12px;opacity:0.6}
+
+/* Right form panel */
+.form-panel{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:40px;background:var(--color-bg);
+}
+.login-card{
+  width:100%;max-width:400px;
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);
+  padding:40px 36px;
+  box-shadow:var(--shadow-sm);
+}
+.login-card .card-title{font-size:24px;font-weight:700;color:var(--color-text);margin-bottom:6px}
+.login-card .card-subtitle{font-size:13px;color:var(--color-text-secondary);margin-bottom:32px}
+
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--color-text-secondary);margin-bottom:8px}
+.input-with-icon{position:relative}
+.input-with-icon input{width:100%;padding-left:42px}
+.input-with-icon .input-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;color:var(--color-text-tertiary);
+}
+.input-with-icon input:focus + .input-icon{color:var(--color-primary)}
+
+.form-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;font-size:13px}
+.checkbox-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--color-text-secondary);user-select:none}
+.checkbox-wrap input{width:16px;height:16px;cursor:pointer;accent-color:var(--color-primary)}
+.forgot-link{color:var(--color-primary);font-size:13px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;
+  font-weight:600;transition:all var(--transition-fast);width:100%;
+}
+.btn-primary{background:var(--color-primary);color:#fff}
+.btn-primary:hover{background:var(--color-primary-dark);box-shadow:0 4px 12px rgba(200,16,46,0.25)}
+.btn-primary:active{transform:translateY(1px)}
+
+.demo-tip{
+  margin-top:20px;padding:12px 14px;background:var(--color-primary-xlight);
+  border:1px solid var(--color-primary-light);border-radius:var(--radius-sm);
+  font-size:12px;color:var(--color-primary-dark);text-align:center;
+}
+.demo-tip svg{width:14px;height:14px;vertical-align:-2px;margin-right:6px}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--color-text);color:#fff;padding:12px 24px;border-radius:var(--radius-md);
+  font-size:13px;font-weight:500;z-index:2000;opacity:0;
+  transition:all .3s ease;box-shadow:var(--shadow-lg);pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-success{background:#16A37B}
+.toast-error{background:#E5484D}
+
+/* Responsive */
+@media(max-width:960px){
+  .login-wrapper{flex-direction:column}
+  .brand-panel{flex:none;padding:40px 32px;min-height:auto}
+  .brand-content{max-width:100%}
+  .brand-content h1{font-size:28px}
+  .brand-content .slogan{font-size:15px;margin-bottom:24px}
+  .brand-features{flex-direction:row;flex-wrap:wrap;gap:12px}
+  .brand-feature{flex:1 1 45%}
+  .brand-footer{display:none}
+  .form-panel{padding:32px 20px}
+  .login-card{padding:32px 24px}
+}
+@media(max-width:480px){
+  .brand-features{flex-direction:column}
+  .brand-feature{flex:none}
+}
+</style>
+</head>
+<body>
+<div class="login-wrapper">
+  <!-- Left brand panel -->
+  <div class="brand-panel">
+    <div class="brand-logo">
+      <div class="logo-mark">
+        <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+          <text x="4" y="23" font-family="Arial, sans-serif" font-weight="900" font-size="20" fill="#C8102E">RH</text>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">Real Healthcare</div>
+        <div class="logo-sub">智能工作平台</div>
+      </div>
+    </div>
+
+    <div class="brand-content">
+      <h1>智能营销，<br><span class="highlight">助力业务增长</span></h1>
+      <p class="slogan">一站式智能工作平台，整合营销、销售、客户管理能力，让团队更高效，让增长更简单。</p>
+      <div class="brand-features">
+        <div class="brand-feature">
+          <div class="brand-feature-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          </div>
+          <div class="brand-feature-text">
+            <h3>智能营销</h3>
+            <p>社媒内容生成、图片合成、素材管理</p>
+          </div>
+        </div>
+        <div class="brand-feature">
+          <div class="brand-feature-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </div>
+          <div class="brand-feature-text">
+            <h3>销售助手</h3>
+            <p>产品知识问答、竞品对比、场景推荐</p>
+          </div>
+        </div>
+        <div class="brand-feature">
+          <div class="brand-feature-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="brand-feature-text">
+            <h3>客户管理</h3>
+            <p>客户档案、商机跟进、成交转化</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-footer">
+      © 2026 Real Healthcare. All rights reserved.
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="form-panel">
+    <div class="login-card">
+      <h2 class="card-title">欢迎登录</h2>
+      <p class="card-subtitle">请输入您的账号信息以继续</p>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="username">用户名</label>
+          <div class="input-with-icon">
+            <input type="text" id="username" name="username" placeholder="请输入用户名" value="Ella" autocomplete="username">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">密码</label>
+          <div class="input-with-icon">
+            <input type="password" id="password" name="password" placeholder="请输入密码" value="demo123" autocomplete="current-password">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="remember" checked>
+            <span>记住我</span>
+          </label>
+          <a href="#" class="forgot-link" onclick="showToast('请联系管理员重置密码','error');return false;">忘记密码？</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="loginBtn">
+          登录
+        </button>
+
+        <div class="demo-tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          演示环境，任意账号密码即可登录
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var toastTimer = null;
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' toast-' + type : '');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() {
+    t.className = 'toast' + (type ? ' toast-' + type : '');
+  }, 3000);
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  var username = document.getElementById('username').value.trim();
+  var password = document.getElementById('password').value.trim();
+  var btn = document.getElementById('loginBtn');
+
+  if (!username || !password) {
+    showToast('请输入用户名和密码', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '登录中...';
+  showToast('登录成功，正在跳转...', 'success');
+
+  setTimeout(function() {
+    window.location.href = 'panel.html';
+  }, 600);
+}
+
+// Enter key support
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('username').focus();
+});
+</script>
+</body>
+</html>
