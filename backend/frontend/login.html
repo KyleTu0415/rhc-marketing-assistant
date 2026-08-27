@@ -293,6 +293,7 @@ function handleLogin(e) {
   btn.textContent = '登录中...';
   showToast('登录成功，正在跳转...', 'success');
 
+    localStorage.setItem('rhc_logged_in', '1');
   setTimeout(function() {
     window.location.href = 'panel.html';
   }, 600);

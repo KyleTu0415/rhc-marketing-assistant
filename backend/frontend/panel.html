@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
+<script>
+(function(){
+  if (!localStorage.getItem('rhc_logged_in')) {
+    location.href = 'login.html';
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>工作台 — Real Healthcare 智能工作平台</title>
@@ -309,6 +316,7 @@ function enterMarketing() {
 
 function handleLogout() {
   if (confirm('确定要退出登录吗？')) {
+    localStorage.removeItem('rhc_logged_in');
     window.location.href = 'login.html';
   }
 }
