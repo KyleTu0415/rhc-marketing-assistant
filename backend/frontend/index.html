@@ -154,7 +154,19 @@ img{max-width:100%;height:auto;display:block}
 }
 .btn-connect:hover{background:var(--color-primary-dark)}
 
-.sidebar-footer{padding:12px 16px;border-top:1px solid var(--color-border-light)}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--color-border-light);display:flex;flex-direction:column;gap:10px}
+.sidebar-back-home-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 16px;border-radius:6px;
+  color:#C8102E;font-size:14px;font-weight:600;
+  border:1px solid #C8102E;background:#fff;
+  text-decoration:none;
+  transition:all 0.2s ease;
+}
+.sidebar-back-home-btn:hover{
+  background:#C8102E;color:#fff;
+}
+.sidebar-back-home-btn svg{width:16px;height:16px;flex-shrink:0}
 .sidebar-user{display:flex;align-items:center;gap:8px}
 .sidebar-user .avatar{
   width:30px;height:30px;border-radius:50%;background:var(--color-primary);
@@ -619,17 +631,14 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 <div class="sidebar-dev-panel">
 <div class="dev-panel-row"><span class="api-status-dot" id="api-status-dot" title="API未连接"></span><input type="text" class="api-url-input" id="api-url-input" placeholder="localhost:8000" aria-label="API 地址"><button class="btn-connect" id="btn-connect" onclick="connectAPI()">连接</button></div>
 </div>
-<div class="sidebar-footer"><div class="sidebar-user"><div class="avatar">E</div><div class="user-info"><div class="user-name">Ella</div><div class="user-role">市场部</div></div></div></div>
+<div class="sidebar-footer">
+  <a href="panel.html" class="sidebar-back-home-btn" title="返回工作台">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>返回首页</span>
+  </a>
+  <div class="sidebar-user"><div class="avatar">E</div><div class="user-info"><div class="user-name">Ella</div><div class="user-role">市场部</div></div></div></div>
 </nav>
 <div class="main-area">
-<header class="topbar">
-  <button class="topbar-back-btn" onclick="goToPanel()" title="返回工作台">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    <span>工作台</span>
-  </button>
-  <div class="topbar-title" id="topbar-title">仪表盘</div>
-  <div class="topbar-actions"></div>
-</header>
 <main class="content-area">
 <section class="page active" id="page-dashboard">
 <div class="page-header"><h2>仪表盘</h2><p>查看 RHC 安瑞康营销数据概览与最近动态</p></div>
