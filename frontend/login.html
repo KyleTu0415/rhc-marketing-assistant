@@ -333,7 +333,7 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
   flex-direction:column;
   justify-content:center;
   align-items:center;
-  padding:40px 20px 120px;
+  padding:40px 20px 140px;
   background:#FFFFFF;
   position:relative;
   overflow:hidden;
@@ -342,9 +342,11 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
 
 /* ===== Brand Watermark ===== */
 /* form-panel positioning handled above */
-.login-card,
-.stats-bar{
+.login-card{
   position:relative;
+  z-index:1;
+}
+.stats-bar{
   z-index:1;
 }
 /* Toast */
