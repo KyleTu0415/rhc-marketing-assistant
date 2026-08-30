@@ -82,6 +82,17 @@ except ImportError:
 
 app = FastAPI(title="RHC Marketing Assistant", version="1.0.0")
 
+@app.middleware("http")
+async def no_cache_middleware(request, call_next):
+    # 框架快速迭代期：HTML页面与数据快照禁用浏览器缓存，避免用户看到旧版
+    resp = await call_next(request)
+    path = request.url.path
+    if path.endswith(".html") or path == "/" or path.endswith("snapshot.json"):
+        resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        resp.headers["Pragma"] = "no-cache"
+        resp.headers["Expires"] = "0"
+    return resp
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
