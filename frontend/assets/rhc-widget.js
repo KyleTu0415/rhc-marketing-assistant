@@ -1,5 +1,5 @@
 /* ============================================================
- * RHC 产品知识问答 · 全局悬浮组件
+ * RHC 知识问答 · 全局悬浮组件
  * 自包含（内联样式、class/id 均加 rhc-widget- 前缀），
  * 不依赖任何页面现有 CSS 变量或脚本；DOMContentLoaded 后自挂载。
  * ============================================================ */
@@ -13,7 +13,7 @@
     '#rhc-widget-fab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;background:#C8102E;border:none;cursor:pointer;z-index:2147483600;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(200,16,46,.35);transition:transform .15s ease,background .15s ease}' +
     '#rhc-widget-fab:hover{background:#A50D26;transform:scale(1.06)}' +
     '#rhc-widget-fab svg{width:26px;height:26px;color:#fff;display:block}' +
-    '#rhc-widget-panel{position:fixed;right:20px;bottom:88px;width:380px;height:520px;max-height:70vh;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18);z-index:2147483601;display:none;flex-direction:column;overflow:hidden}' +
+    '#rhc-widget-panel{position:fixed;right:20px;bottom:88px;width:420px;height:580px;max-height:75vh;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18);z-index:2147483601;display:none;flex-direction:column;overflow:hidden}' +
     '#rhc-widget-panel.rhc-widget-open{display:flex}' +
     '.rhc-widget-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #F3F4F6;background:#FFFFFF;flex-shrink:0}' +
     '.rhc-widget-title{display:flex;flex-direction:column;gap:2px;min-width:0}' +
@@ -34,7 +34,7 @@
     '.rhc-widget-typing i:nth-child(2){animation-delay:.2s}' +
     '.rhc-widget-typing i:nth-child(3){animation-delay:.4s}' +
     '@keyframes rhc-widget-blink{0%,80%,100%{opacity:.3}40%{opacity:1}}' +
-    '.rhc-widget-quick{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px 0;background:#F7F8FA;flex-shrink:0}' +
+    '.rhc-widget-quick{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px 12px;background:#F7F8FA;flex-shrink:0;border-top:1px solid #ECEEF0}' +
     '.rhc-widget-chip{padding:5px 12px;border:1px solid #E5E7EB;border-radius:16px;font-size:12px;color:#6B7280;background:#FFFFFF;cursor:pointer;transition:all .15s ease;font-family:inherit;line-height:1.4}' +
     '.rhc-widget-chip:hover{border-color:#C8102E;color:#C8102E}' +
     '.rhc-widget-input-bar{display:flex;gap:8px;padding:12px 14px;border-top:1px solid #F3F4F6;background:#FFFFFF;flex-shrink:0}' +
@@ -97,12 +97,12 @@
     }).join('');
 
     root.innerHTML =
-      '<button type="button" id="rhc-widget-fab" aria-label="打开产品知识问答" title="产品知识问答">' +
+      '<button type="button" id="rhc-widget-fab" aria-label="打开知识问答" title="知识问答">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
       '</button>' +
-      '<div id="rhc-widget-panel" role="dialog" aria-label="产品知识问答">' +
+      '<div id="rhc-widget-panel" role="dialog" aria-label="知识问答">' +
         '<div class="rhc-widget-header">' +
-          '<div class="rhc-widget-title"><span class="rhc-widget-title-main">产品知识问答</span><span class="rhc-widget-title-sub">RHC产品资料库</span></div>' +
+          '<div class="rhc-widget-title"><span class="rhc-widget-title-main">知识问答</span><span class="rhc-widget-title-sub">基于RHC产品资料库</span></div>' +
           '<button type="button" id="rhc-widget-close" aria-label="关闭">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
           '</button>' +
@@ -139,7 +139,7 @@
       }
     };
 
-    addMsg('bot', '您好，我是 RHC 产品知识助手。您可以向我咨询 V5 Plus、X35VET、M800、SA Series 等在售产品的参数、适用场景与配置信息。点击常见问题，或直接输入问题开始。');
+    addMsg('bot', '您好，我是 RHC 知识问答助手。您可以向我咨询 V5 Plus、X35VET、M800、SA Series 等在售产品的参数、适用场景与配置信息。点击常见问题，或直接输入问题开始。');
 
     function addMsg(role, text) {
       var row = document.createElement('div');
