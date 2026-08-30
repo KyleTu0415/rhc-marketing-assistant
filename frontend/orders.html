@@ -50,6 +50,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .sidebar-user .user-name{font-size:13px;font-weight:600}
 .sidebar-user .user-role{font-size:11px;color:var(--color-text-tertiary)}
 .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.page{display:none;animation:fadeIn 0.3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .page-header h2{font-size:18px;font-weight:700;color:var(--color-text);margin:0 0 4px}
 .page-header p{margin:0;font-size:14px;color:var(--color-text-secondary)}
@@ -68,11 +71,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .btn-outline{border:1px solid var(--color-border);color:var(--color-text-secondary);background:var(--color-surface)}
 .btn-outline:hover{border-color:var(--color-primary);color:var(--color-primary)}
 .btn-sm{padding:6px 12px;font-size:12px}
-
-/* view switch */
-.view-switch{display:inline-flex;border:1px solid var(--color-border);border-radius:20px;overflow:hidden;background:var(--color-surface)}
-.view-switch button{padding:6px 18px;font-size:12px;font-weight:600;color:var(--color-text-secondary);transition:all var(--transition-fast)}
-.view-switch button.active{background:var(--color-primary);color:#fff}
 
 .notice-bar{display:flex;gap:10px;align-items:flex-start;background:#FFF8EC;border:1px solid #F5DFB0;color:#8A6116;border-radius:var(--radius-md);padding:12px 16px;font-size:12.5px;line-height:1.6;margin-bottom:16px}
 .notice-bar svg{width:16px;height:16px;flex-shrink:0;margin-top:2px}
@@ -171,24 +169,30 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   <div class="sidebar-logo"><img src="https://iili.io/CZ0tVNn.png" alt="RHC Medical"></div>
   <div class="sidebar-nav">
     <div class="nav-section">订单履约</div>
-    <a class="nav-item" href="#order-area"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>订单列表</span></a>
-    <a class="nav-item" href="#view-switch"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><span>履约节点</span></a>
-    <a class="nav-item nav-item-back-home" href="panel.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></a>
+    <div class="nav-item active" data-page="kanban" onclick="switchPage('kanban',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><span>履约看板</span></div>
+    <div class="nav-item" data-page="list" onclick="switchPage('list',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>订单列表</span></div>
+    <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
 </nav>
 <div class="main-area">
     <main class="content-area">
+    <section class="page active" id="page-kanban">
     <div class="page-header">
-      <div><h2>订单履约</h2><p>订单跟踪、履约节点与单据管理</p></div>
-      <div class="page-header-actions">
-        <div class="view-switch" id="view-switch"><button id="vs-kanban" class="active" onclick="switchView('kanban')">看板</button><button id="vs-list" onclick="switchView('list')">列表</button></div>
-      </div>
+      <div><h2>履约看板</h2><p>按履约节点跟踪订单进度</p></div>
     </div>
     <div class="notice-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <div>完整履约操作（配置确认 / 单据上传 / 提货 / 报关）请使用全流程演示系统；本中心提供管理视角的订单状态总览。点击任意订单卡片或行可查看履约时间线。</div>
+      <div>完整履约操作（配置确认 / 单据上传 / 提货 / 报关）请使用全流程演示系统；本中心提供管理视角的订单状态总览。点击任意订单卡片可查看履约时间线。</div>
     </div>
-    <div id="order-area"><div class="loading-row"><span class="loading-spinner"></span> 正在加载订单数据…</div></div>
+    <div id="kanban-area"><div class="loading-row"><span class="loading-spinner"></span> 正在加载订单数据…</div></div>
+    </section>
+
+    <section class="page" id="page-list">
+    <div class="page-header">
+      <div><h2>订单列表</h2><p>全部订单明细与单据管理</p></div>
+    </div>
+    <div id="list-area"><div class="loading-row"><span class="loading-spinner"></span> 正在加载订单数据…</div></div>
+    </section>
   </main>
 </div>
 </div>
@@ -203,8 +207,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 <div class="toast" id="toast"></div>
 
 <script>
+function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');var ca=document.querySelector('.content-area');if(ca)ca.scrollTop=0}
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
 var ORDER_STATUSES=['已成交','单据制作中','待配置校验','已发仓库待配货','可提货','已提货','报关中·已进仓','已发运','已完成'];
-var snapshotData=null,currentView='kanban';
+var snapshotData=null;
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3200)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -219,14 +225,10 @@ function statusTag(s){
 }
 
 function render(){
+  if(!snapshotData)return;
   var orders=snapshotData.orders||[];
-  if(currentView==='kanban')renderKanban(orders);else renderList(orders);
-}
-function switchView(v){
-  currentView=v;
-  document.getElementById('vs-kanban').classList.toggle('active',v==='kanban');
-  document.getElementById('vs-list').classList.toggle('active',v==='list');
-  if(snapshotData)render();
+  renderKanban(orders);
+  renderList(orders);
 }
 
 function renderKanban(orders){
@@ -244,11 +246,12 @@ function renderKanban(orders){
       }).join(''):'<div class="kcol-empty">暂无订单</div>')+
       '</div></div>';
   }).join('')+'</div>';
-  document.getElementById('order-area').innerHTML=html;
+  var ka=document.getElementById('kanban-area');if(ka)ka.innerHTML=html;
 }
 
 function renderList(orders){
-  document.getElementById('order-area').innerHTML=
+  var la=document.getElementById('list-area');if(!la)return;
+  la.innerHTML=
     '<div class="card"><table class="data-table"><thead><tr>'+
       '<th>订单号</th><th>客户</th><th>国家/地区</th><th>订单金额（原币）</th><th>当前状态</th><th>下单日期</th><th>负责销售</th>'+
     '</tr></thead><tbody>'+
@@ -299,7 +302,9 @@ fetch('data/snapshot.json',{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
   .then(function(d){snapshotData=d;render()})
   .catch(function(){
-    document.getElementById('order-area').innerHTML='<div class="card"><div class="state-message"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div style="font-weight:600;color:var(--color-text)">数据加载失败</div><div>无法读取 data/snapshot.json，请通过本地 HTTP 服务访问本页面。</div><button class="btn btn-outline btn-sm" onclick="location.reload()">重新加载</button></div></div>';
+    var failHtml='<div class="card"><div class="state-message"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div style="font-weight:600;color:var(--color-text)">数据加载失败</div><div>无法读取 data/snapshot.json，请通过本地 HTTP 服务访问本页面。</div><button class="btn btn-outline btn-sm" onclick="location.reload()">重新加载</button></div></div>';
+    var ka=document.getElementById('kanban-area');if(ka)ka.innerHTML=failHtml;
+    var la=document.getElementById('list-area');if(la)la.innerHTML=failHtml;
   });
 </script>
 <script src="assets/rhc-widget.js?v=20260831b"></script>

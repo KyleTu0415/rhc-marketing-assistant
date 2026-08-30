@@ -139,46 +139,6 @@ img{max-width:100%;height:auto;display:block}
   font-size:9px;padding:1px 6px;border-radius:10px;font-weight:600;
 }
 
-/* Sidebar dev panel */
-.sidebar-dev-panel{padding:8px 12px;border-top:1px solid var(--color-border-light)}
-.dev-panel-row{display:flex;align-items:center;gap:6px}
-.api-status-dot{width:7px;height:7px;border-radius:50%;background:var(--color-text-tertiary);flex-shrink:0}
-.api-status-dot.connected{background:var(--color-success);box-shadow:0 0 4px rgba(22,163,123,.5)}
-.api-url-input{
-  flex:1;min-width:0;padding:4px 6px;font-size:10px;
-  border:1px solid var(--color-border);border-radius:var(--radius-sm);
-  background:var(--color-bg);color:var(--color-text);outline:none;
-}
-.api-url-input:focus{border-color:var(--color-primary)}
-.btn-connect{
-  padding:4px 8px;font-size:10px;font-weight:600;
-  background:var(--color-primary);color:#fff;border-radius:var(--radius-sm);white-space:nowrap;
-}
-.btn-connect:hover{background:var(--color-primary-dark)}
-
-.sidebar-footer{padding:12px 16px;border-top:1px solid var(--color-border-light);display:flex;flex-direction:column;gap:10px}
-.sidebar-back-home-btn{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:6px 12px;border-radius:6px;
-  color:#C8102E;font-size:12px;font-weight:600;
-  border:1px solid #C8102E;background:#fff;
-  text-decoration:none;
-  transition:all 0.2s ease;
-}
-.sidebar-back-home-btn:hover{
-  background:#C8102E;color:#fff;
-}
-.sidebar-back-home-btn svg{width:14px;height:14px;flex-shrink:0}
-.sidebar-user{display:flex;align-items:center;gap:8px}
-.sidebar-user .avatar{
-  width:30px;height:30px;border-radius:50%;background:var(--color-primary);
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:12px;font-weight:700;flex-shrink:0;
-}
-.sidebar-user .user-info{flex:1;min-width:0}
-.sidebar-user .user-name{font-size:13px;color:var(--color-text);font-weight:600}
-.sidebar-user .user-role{font-size:11px;color:var(--color-text-tertiary)}
-
 /* Main area */
 .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 
@@ -460,7 +420,7 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 @media(max-width:860px){
   .sidebar{width:56px;min-width:56px}
   .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-item .badge,
-  .sidebar .sidebar-user .user-info,.sidebar .nav-section{display:none}
+  .sidebar .nav-section{display:none}
   .sidebar-logo{padding:16px 8px;text-align:center}
   .sidebar-logo img{height:28px;margin:0 auto}
   .sidebar-nav .nav-item{padding:12px 0;justify-content:center;border-left:none;border-bottom:2px solid transparent}
@@ -629,13 +589,8 @@ input.filter-select{width:auto;max-width:200px;padding:9px 12px;border:1px solid
 <div class="nav-item" data-page="history" onclick="switchPage('history',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>内容历史</span></div>
 <div class="nav-item" data-page="notifications" onclick="switchPage('notifications',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>通知</span><span class="badge" id="sidebar-notif-badge">3</span></div>
 <div class="nav-item" data-page="settings" onclick="switchPage('settings',this)" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>设置</span></div>
-<div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回首页</span></div>
+<div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="icon-svg nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
 </div>
-<div class="sidebar-dev-panel">
-<div class="dev-panel-row"><span class="api-status-dot" id="api-status-dot" title="API未连接"></span><input type="text" class="api-url-input" id="api-url-input" placeholder="localhost:8000" aria-label="API 地址"><button class="btn-connect" id="btn-connect" onclick="connectAPI()">连接</button></div>
-</div>
-<div class="sidebar-footer">
-  <div class="sidebar-user"><div class="avatar">E</div><div class="user-info"><div class="user-name">Ella</div><div class="user-role">市场部</div></div></div></div>
 </nav>
 <div class="main-area">
 <main class="content-area">
@@ -895,9 +850,9 @@ var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3000)}
 
 function apiUrl(p){return state.apiBase.replace(/\/+$/,'')+p}
-function setAPIStatus(c){state.apiConnected=c;var d=document.getElementById('api-status-dot');if(c){d.classList.add('connected');d.title='API 已连接'}else{d.classList.remove('connected');d.title='API 未连接'}}
+function setAPIStatus(c){state.apiConnected=c;var d=document.getElementById('api-status-dot');if(!d)return;if(c){d.classList.add('connected');d.title='API 已连接'}else{d.classList.remove('connected');d.title='API 未连接'}}
 
-function connectAPI(){var v=document.getElementById('api-url-input').value.trim();if(!v){showToast('请输入 API 地址','error');return}state.apiBase=v;localStorage.setItem('rhc_api_base',v);setAPIStatus(false);showToast('正在连接 '+v+'...');checkHealth()}
+function connectAPI(){var inp=document.getElementById('api-url-input');if(!inp)return;var v=inp.value.trim();if(!v){showToast('请输入 API 地址','error');return}state.apiBase=v;localStorage.setItem('rhc_api_base',v);setAPIStatus(false);showToast('正在连接 '+v+'...');checkHealth()}
 
 function checkHealth(){fetch(apiUrl('/api/health'),{method:'GET',signal:AbortSignal.timeout(5000)}).then(function(r){if(!r.ok)throw new Error('fail');return r.json()}).then(function(){setAPIStatus(true);showToast('API 连接成功','success');loadProducts();loadAnimals()}).catch(function(){setAPIStatus(false);showToast('无法连接 API，使用本地数据','error');loadFallbackProducts()})}
 

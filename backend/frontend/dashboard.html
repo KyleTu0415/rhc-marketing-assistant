@@ -51,6 +51,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .sidebar-user .user-name{font-size:13px;font-weight:600}
 .sidebar-user .user-role{font-size:11px;color:var(--color-text-tertiary)}
 .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.page{display:none;animation:fadeIn 0.3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .page-header h2{font-size:18px;font-weight:700;color:var(--color-text);margin:0 0 4px}
 .page-header p{margin:0;font-size:14px;color:var(--color-text-secondary)}
@@ -105,6 +108,26 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .toast-error{background:var(--color-danger)}
 .state-message{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 20px;gap:10px;color:var(--color-text-secondary);font-size:13px;grid-column:1/-1}
 .data-source-note{margin-top:24px;font-size:12px;color:var(--color-text-tertiary);text-align:center}
+.insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.insight-point{padding:12px 0;border-bottom:1px solid var(--color-border-light)}
+.insight-point:last-child{border-bottom:none}
+.insight-point .ip-tag{display:inline-block;font-size:11px;font-weight:700;color:var(--color-primary);background:var(--color-primary-light);border-radius:var(--radius-sm);padding:2px 8px;margin-bottom:6px}
+.insight-point .ip-title{font-size:13px;font-weight:700;line-height:1.6}
+.insight-point .ip-impact{font-size:12.5px;color:var(--color-text-secondary);line-height:1.7;margin-top:6px}
+.insight-point .ip-impact strong{color:var(--color-primary-dark)}
+.itl{list-style:none;position:relative;margin-left:6px}
+.itl li{position:relative;padding:0 0 20px 26px}
+.itl li:last-child{padding-bottom:0}
+.itl li::before{content:'';position:absolute;left:8px;top:16px;bottom:-2px;width:2px;background:var(--color-border)}
+.itl li:last-child::before{display:none}
+.itl-dot{position:absolute;left:1px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--color-primary);border:3px solid var(--color-primary-light);z-index:1}
+.itl-date{font-size:11px;color:var(--color-text-tertiary);font-variant-numeric:tabular-nums}
+.itl-title{font-size:13px;font-weight:600;line-height:1.5;margin:2px 0}
+.itl-tag{font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;margin-left:6px}
+.itl-tag.tag-warn{background:#FFF4E0;color:#B27A1B}
+.itl-tag.tag-opp{background:#E6F9F1;color:#0D7B57}
+.itl-note{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+@media(max-width:860px){.insight-grid{grid-template-columns:1fr}}
 .loading-row{display:flex;align-items:center;gap:10px;color:var(--color-text-secondary);font-size:13px;padding:40px 0;justify-content:center}
 .loading-spinner{width:20px;height:20px;border:2.5px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -130,16 +153,18 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   <div class="sidebar-logo"><img src="https://iili.io/CZ0tVNn.png" alt="RHC Medical"></div>
   <div class="sidebar-nav">
     <div class="nav-section">经营仪表盘</div>
-    <a class="nav-item" href="#metric-grid"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>经营概览</span></a>
-    <a class="nav-item" href="#chart-orders"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>订单状态分布</span></a>
-    <a class="nav-item" href="#chart-customers"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>客户地区分布</span></a>
-    <a class="nav-item nav-item-back-home" href="panel.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></a>
+    <div class="nav-item active" data-page="overview" onclick="switchPage('overview',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>经营概览</span></div>
+    <div class="nav-item" data-page="orders-chart" onclick="switchPage('orders-chart',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>订单状态分布</span></div>
+    <div class="nav-item" data-page="customers-chart" onclick="switchPage('customers-chart',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>客户地区分布</span></div>
+    <div class="nav-item" data-page="insight" onclick="switchPage('insight',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span>市场洞察</span></div>
+    <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
 </nav>
 <div class="main-area">
     <main class="content-area">
+    <section class="page active" id="page-overview">
     <div class="page-header">
-      <div><h2>经营仪表盘</h2><p>经营指标总览、订单状态与客户地区分布</p></div>
+      <div><h2>经营概览</h2><p>经营指标总览</p></div>
       <div class="page-header-actions"><span class="tag tag-gray" id="snapshot-time">快照加载中</span></div>
     </div>
     <div class="metric-grid" id="metric-grid">
@@ -149,16 +174,57 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       <div class="metric-card"><div class="metric-icon" style="background:#E8F0FE"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A56C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="metric-value" id="m-transit">—</div><div class="metric-label">在途货值（原币口径）</div><div class="metric-note" id="m-transit-note">进行中订单金额，按币种分列</div></div>
     </div>
 
-    <div id="charts-area">
-      <div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div>
-    </div>
-
     <p class="data-source-note">数据来源：飞书多维表格，框架阶段定时快照；正式版实时同步</p>
+    </section>
+
+    <section class="page" id="page-orders-chart">
+    <div class="page-header">
+      <div><h2>订单状态分布</h2><p>各履约状态订单数量分布</p></div>
+    </div>
+    <div class="card" id="chart-orders"><div class="card-body"><div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div></div></div>
+    </section>
+
+    <section class="page" id="page-customers-chart">
+    <div class="page-header">
+      <div><h2>客户地区分布</h2><p>客户所在地区分布</p></div>
+    </div>
+    <div class="card" id="chart-customers"><div class="card-body"><div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div></div></div>
+    </section>
+
+    <section class="page" id="page-insight">
+    <div class="page-header">
+      <div><h2>市场洞察</h2><p>行业趋势、竞品动态与业务影响判断</p></div>
+    </div>
+    <div class="insight-grid">
+      <div class="card">
+        <div class="card-header"><h3>市场情报周报 · 决策摘要</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span>　第 12 期 · 2026-08-31</span></div>
+        <div class="card-body">
+          <div class="insight-point"><span class="ip-tag">行业趋势</span><div class="ip-title">兽医影像数字化与 AI 辅助诊断加速，北美设备进入 7 年替换窗口</div><div class="ip-impact"><strong>对业务的影响：</strong>北美客户未来 1-2 年询盘将以更新换代为主，建议提前准备 V5 Plus 等工作站的替换方案与以旧换新话术，优先覆盖 2019 年前后采购的老客户。</div></div>
+          <div class="insight-point"><span class="ip-tag">监管动态</span><div class="ip-title">FDA 注册要求趋严，欧盟 CE MDR 抬高临床评价门槛</div><div class="ip-impact"><strong>对业务的影响：</strong>合规已成为欧洲订单的前置条件，认证周期需纳入交付排期；建议市场侧提前备齐 MDR 技术文档清单，销售对欧报价时预留认证时间。</div></div>
+          <div class="insight-point"><span class="ip-tag">展会风向</span><div class="ip-title">VMX / WVC 2026 麻醉与监护一体化成为主流展示方向</div><div class="ip-impact"><strong>对业务的影响：</strong>单品机的展示竞争力下降，展会与画册物料应突出工作站集成方案，销售沟通从「卖麻醉机」转向「卖一体化麻醉监护方案」。</div></div>
+          <div class="insight-point"><span class="ip-tag">区域市场</span><div class="ip-title">中东、东南亚兽医诊所扩容，基础设备批量需求上升</div><div class="ip-impact"><strong>对业务的影响：</strong>新兴市场走量机会明确，适合以 X35VET、SA Series 等成熟机型打包「新院配置清单」，渠道拓展应重点扶持当地代理的售后能力。</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>竞品动态时间线</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span></span></div>
+        <div class="card-body">
+          <ul class="itl">
+            <li><span class="itl-dot"></span><div class="itl-date">2026-08</div><div class="itl-title">迈瑞动物医疗发布一体化麻醉监护工作站<span class="itl-tag tag-warn">竞争加剧</span></div><div class="itl-note">北美展会主推集成方案，与我方 V5 Plus 定位正面重叠，需强化差异化卖点。</div></li>
+            <li><span class="itl-dot"></span><div class="itl-date">2026-07</div><div class="itl-title">DRE Veterinary 北美渠道季度促销<span class="itl-tag tag-warn">价格压力</span></div><div class="itl-note">主力机型折扣争夺中小诊所，报价场景需准备总体拥有成本对比材料。</div></li>
+            <li><span class="itl-dot"></span><div class="itl-date">2026-06</div><div class="itl-title">瑞沃德（RWD）加码东南亚代理网络<span class="itl-tag tag-opp">机会</span></div><div class="itl-note">其大动物与工作站产品线薄弱，正是 M800 等机型切入当地连锁医院的空档。</div></li>
+            <li><span class="itl-dot"></span><div class="itl-date">2026-03</div><div class="itl-title">全球兽医医疗器械市场维持 6% 以上增速<span class="itl-tag tag-opp">大盘向好</span></div><div class="itl-note">AI 诊断与 POCT 驱动扩容，麻醉通气类基础设备需求同步抬升。</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    </section>
   </main>
 </div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
+function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');var ca=document.querySelector('.content-area');if(ca)ca.scrollTop=0}
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
 var ORDER_STATUSES=['已成交','单据制作中','待配置校验','已发仓库待配货','可提货','已提货','报关中·已进仓','已发运','已完成'];
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3000)}
@@ -166,13 +232,14 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 function parseMoney(s){var m=String(s||'').match(/^([^\d]*)([\d,\.]+)/);if(!m)return{cur:String(s||'').trim(),val:0};return{cur:m[1].trim(),val:parseFloat(m[2].replace(/,/g,''))||0}}
 function fmtMoney(cur,val){return cur+val.toLocaleString('en-US',{maximumFractionDigits:0})}
 
-function barChartHtml(rows,fillClass){
+function barChartHtml(rows,fillClass,rowFillFn){
   var max=0;rows.forEach(function(r){if(r.count>max)max=r.count});
   return '<div class="bar-chart">'+rows.map(function(r){
     var pct=max>0?Math.round(r.count/max*100):0;
+    var fc=(rowFillFn?rowFillFn(r):'')||fillClass||'';
     return '<div class="bar-row" title="'+esc(r.label)+'：'+r.count+'">'+
       '<div class="bar-label">'+esc(r.label)+'</div>'+
-      '<div class="bar-track"><div class="bar-fill '+(fillClass||'')+'" style="width:'+pct+'%"></div></div>'+
+      '<div class="bar-track"><div class="bar-fill '+fc+'" style="width:'+pct+'%"></div></div>'+
       '<div class="bar-val">'+r.count+'</div></div>';
   }).join('')+'</div>';
 }
@@ -212,33 +279,31 @@ function render(data){
   customers.forEach(function(c){var k=c['国家/地区']||'未填写';cmap[k]=(cmap[k]||0)+1});
   var countryRows=Object.keys(cmap).map(function(k){return{label:k,count:cmap[k]}}).sort(function(a,b){return b.count-a.count});
 
-  document.getElementById('charts-area').innerHTML=
-    '<div class="dashboard-grid">'+
-      '<div class="card" id="chart-orders"><div class="card-header"><h3>订单状态分布</h3><span class="card-sub">共 '+orders.length+' 单 · 9 个履约节点</span></div><div class="card-body">'+
-        barChartHtml(statusRows,'')+
-        '<div class="chart-legend-note">红色为进行中节点，绿色为已完成节点</div>'+
-      '</div></div>'+
-      '<div class="card" id="chart-customers"><div class="card-header"><h3>客户国家 / 地区分布</h3><span class="card-sub">共 '+customers.length+' 家客户</span></div><div class="card-body">'+
-        barChartHtml(countryRows,'fill-blue')+
-        '<div class="chart-legend-note">按客户档案所属国家/地区统计</div>'+
-      '</div></div>'+
-    '</div>';
-  // 已完成节点条改绿
-  var fills=document.querySelectorAll('#charts-area .bar-row');
-  fills.forEach(function(row){if(row.getAttribute('title')&&row.getAttribute('title').indexOf('已完成：')===0){var f=row.querySelector('.bar-fill');if(f)f.classList.add('fill-green')}});
+  var co=document.getElementById('chart-orders');
+  if(co){
+    co.innerHTML='<div class="card-header"><h3>订单状态分布</h3><span class="card-sub">共 '+orders.length+' 单 · 9 个履约节点</span></div><div class="card-body">'+
+      barChartHtml(statusRows,'',function(r){return r.label==='已完成'?'fill-green':''})+
+      '<div class="chart-legend-note">红色为进行中节点，绿色为已完成节点</div>';
+  }
+  var cc=document.getElementById('chart-customers');
+  if(cc){
+    cc.innerHTML='<div class="card-header"><h3>客户国家 / 地区分布</h3><span class="card-sub">共 '+customers.length+' 家客户</span></div><div class="card-body">'+
+      barChartHtml(countryRows,'fill-blue')+
+      '<div class="chart-legend-note">按客户档案所属国家/地区统计</div>';
+  }
 }
 
 function renderError(err){
   document.getElementById('snapshot-time').textContent='快照不可用';
   ['m-customers','m-ongoing','m-done','m-transit'].forEach(function(id){document.getElementById(id).textContent='—'});
   document.getElementById('m-customers-note').textContent='数据加载失败';
-  document.getElementById('charts-area').innerHTML=
-    '<div class="card"><div class="card-body"><div class="state-message">'+
+  var errHtml='<div class="state-message">'+
     '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'+
     '<div style="font-weight:600;color:var(--color-text)">数据加载失败</div>'+
     '<div>无法读取 data/snapshot.json。请通过本地 HTTP 服务访问本页面（例如在 frontend 目录运行 <code>python3 -m http.server</code> 后访问），不要直接双击打开 HTML 文件。</div>'+
     '<button class="btn btn-outline btn-sm" onclick="location.reload()">重新加载</button>'+
-    '</div></div></div>';
+    '</div>';
+  ['chart-orders','chart-customers'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=errHtml});
 }
 
 fetch('data/snapshot.json',{cache:'no-store'})

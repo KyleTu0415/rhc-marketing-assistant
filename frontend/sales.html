@@ -50,6 +50,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .sidebar-user .user-name{font-size:13px;font-weight:600}
 .sidebar-user .user-role{font-size:11px;color:var(--color-text-tertiary)}
 .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.page{display:none;animation:fadeIn 0.3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .page-header h2{font-size:18px;font-weight:700;color:var(--color-text);margin:0 0 4px}
 .page-header p{margin:0;font-size:14px;color:var(--color-text-secondary)}
@@ -106,6 +109,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .mail-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
 .mail-footnote{margin-top:14px;font-size:11px;color:var(--color-text-tertiary);background:var(--color-bg);border-radius:var(--radius-sm);padding:10px 14px;line-height:1.7}
 
+/* ===== 市场情报 ===== */
+.intel-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.intel-point{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--color-border-light);font-size:13px;line-height:1.7}
+.intel-point:last-child{border-bottom:none}
+.intel-point .ip-tag{flex-shrink:0;font-size:11px;font-weight:700;color:var(--color-primary);background:var(--color-primary-light);border-radius:var(--radius-sm);padding:2px 8px;height:fit-content;margin-top:2px}
+.intel-item{border:1px solid var(--color-border-light);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px}
+.intel-item:last-child{margin-bottom:0}
+.intel-item .ii-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.intel-item .ii-desc{font-size:12.5px;color:var(--color-text-secondary);line-height:1.7}
+.intel-item .ii-hint{font-size:12px;color:var(--color-primary-dark);background:var(--color-primary-xlight);border-radius:var(--radius-sm);padding:8px 10px;margin-top:8px;line-height:1.6}
+.intel-item .ii-hint strong{color:var(--color-primary)}
+@media(max-width:860px){.intel-grid{grid-template-columns:1fr}}
+
 /* ===== PI 工作台 ===== */
 .quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
 
@@ -147,19 +163,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   <div class="sidebar-logo"><img src="https://iili.io/CZ0tVNn.png" alt="RHC Medical"></div>
   <div class="sidebar-nav">
     <div class="nav-section">销售智能助手</div>
-    <a class="nav-item" href="#mail-card"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>邮件助手</span></a>
-    <a class="nav-item" href="#pi-card"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><span>PI工作台</span></a>
-    <a class="nav-item nav-item-back-home" href="panel.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></a>
+    <div class="nav-item active" data-page="mail" onclick="switchPage('mail',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>邮件助手</span></div>
+    <div class="nav-item" data-page="pi" onclick="switchPage('pi',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><span>PI工作台</span></div>
+    <div class="nav-item" data-page="intel" onclick="switchPage('intel',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>市场情报</span></div>
+    <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
 </nav>
 <div class="main-area">
     <main class="content-area">
+    <section class="page active" id="page-mail">
     <div class="page-header">
-      <div><h2>销售智能助手</h2><p>邮件撰写、知识问答、报价与形式发票</p></div>
+      <div><h2>邮件助手</h2><p>按场景生成专业英文商务邮件，可一键复制</p></div>
     </div>
-
     <div class="card" id="mail-card">
-      <div class="card-header"><h3>邮件助手</h3><span class="card-sub">按场景生成专业英文商务邮件，可一键复制</span></div>
       <div class="card-body">
         <div class="mail-tabs" id="mail-tabs">
           <button type="button" class="mail-tab active" data-type="inquiry" onclick="switchMailTab('inquiry')">询盘回复</button>
@@ -202,8 +218,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       </div>
     </div>
 
+    </section>
+
+    <section class="page" id="page-pi">
+    <div class="page-header">
+      <div><h2>PI工作台</h2><p>报价与形式发票</p></div>
+    </div>
     <div class="card" id="pi-card">
-      <div class="card-header"><h3>PI工作台</h3><span class="card-sub">报价与形式发票</span></div>
       <div class="card-body">
         <div class="quote-grid">
           <div>
@@ -227,12 +248,71 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
         </div>
       </div>
     </div>
+    </section>
 
+    <section class="page" id="page-intel">
+    <div class="page-header">
+      <div><h2>市场情报</h2><p>行业动态、竞品动向与客户谈资，每周一更新</p></div>
+    </div>
+    <div class="intel-grid">
+      <div class="card">
+        <div class="card-header"><h3>市场情报周报</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span>　第 12 期 · 2026-08-31</span></div>
+        <div class="card-body">
+          <div class="intel-point"><span class="ip-tag">行业趋势</span><div>兽医影像设备向数字化、AI 辅助诊断方向加速演进；北美兽医诊所设备平均更新周期约 7 年，2019 年采购潮的设备正集中进入替换窗口，询盘将以「整机更新 + 数字化升级」为主。</div></div>
+          <div class="intel-point"><span class="ip-tag">监管动态</span><div>美国 FDA 对兽医电气设备的注册与上市前合规要求持续收紧；欧盟 CE MDR 法规下麻醉与监护类设备的临床评价要求提高，出口欧洲需更早准备技术文档与认证周期。</div></div>
+          <div class="intel-point"><span class="ip-tag">展会风向</span><div>VMX、WVC 2026 展会上，麻醉机与监护模块一体化、工作站集成化成为主流展示方向，单一功能设备的关注度明显下降。</div></div>
+          <div class="intel-point"><span class="ip-tag">区域市场</span><div>中东与东南亚兽医诊所数量保持较快增长，当地连锁医院扩店带来麻醉机、注射泵等基础设备的批量采购需求，对性价比与售后响应敏感。</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><h3>竞品动态</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span></span></div>
+          <div class="card-body">
+            <div class="intel-item">
+              <div class="ii-title">迈瑞动物医疗（Mindray Animal）</div>
+              <div class="ii-desc">推出新款一体化麻醉监护工作站，主打麻醉机与多参数监护深度集成，在北美展会重点推广。</div>
+              <div class="ii-hint"><strong>销售切入点：</strong>客户关注一体化方案时，可强调我方 V5 Plus 工作站 12.1 寸翻转触摸屏与监护扩展能力，并以 ISO 13485 体系与本地化售后响应作差异。</div>
+              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
+            </div>
+            <div class="intel-item">
+              <div class="ii-title">DRE Veterinary</div>
+              <div class="ii-desc">在北美渠道开展季度促销，主力麻醉机型以价格折扣争夺中小诊所客户。</div>
+              <div class="ii-hint"><strong>销售切入点：</strong>客户关注价格时，可强调我方 X35VET 麻醉机与监护模块的集成方案在同配置下的总体拥有成本优势，以及电动电控涡轮无需驱动气带来的使用成本节约。</div>
+              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
+            </div>
+            <div class="intel-item">
+              <div class="ii-title">瑞沃德（RWD）</div>
+              <div class="ii-desc">加速东南亚市场扩张，通过本地代理网络推广实验室与临床麻醉设备。</div>
+              <div class="ii-hint"><strong>销售切入点：</strong>面对东南亚客户时，可主动提供 M800 大动物工作站等差异化机型与 CE 认证清单，用齐全产品线覆盖其代理尚未深耕的大动物场景。</div>
+              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>客户谈资</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span></span></div>
+          <div class="card-body">
+            <div class="intel-item">
+              <div class="ii-title">北美设备替换窗口</div>
+              <div class="ii-desc">美国兽医诊所平均设备更新周期约 7 年，2026 年正值 2019 年采购潮的替换窗口，可作为开发信与跟进邮件的寒暄切入。</div>
+              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
+            </div>
+            <div class="intel-item">
+              <div class="ii-title">新兴市场诊所增长</div>
+              <div class="ii-desc">中东、东南亚连锁兽医诊所扩张提速，新院开业普遍需要麻醉机、注射泵的整套配置，适合在开发信中以「新院配置清单」话题切入。</div>
+              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </section>
   </main>
 </div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
+function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');var ca=document.querySelector('.content-area');if(ca)ca.scrollTop=0}
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
 /* ===== 产品清单（内置兜底，均为 RHC 真实在售产品；接口可用时以 /api/products 返回为准） ===== */
 var PRODUCTS=[
   {model:'V5 Plus',name:'V5 Plus 兽用麻醉工作站',desc:'旗舰工作站，12.1寸可翻转触摸屏，200g-160kg小动物，CE/ISO 13485',specs:'12.1寸可翻转触摸屏；潮气量2-1600ml；适用200g-160kg小动物；CE/ISO 13485认证'},

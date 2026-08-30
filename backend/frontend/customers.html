@@ -50,6 +50,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .sidebar-user .user-name{font-size:13px;font-weight:600}
 .sidebar-user .user-role{font-size:11px;color:var(--color-text-tertiary)}
 .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.page{display:none;animation:fadeIn 0.3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .page-header h2{font-size:18px;font-weight:700;color:var(--color-text);margin:0 0 4px}
 .page-header p{margin:0;font-size:14px;color:var(--color-text-secondary)}
@@ -90,6 +93,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .data-table tbody tr:hover{background:var(--color-primary-xlight)}
 .cell-main{font-weight:600}
 .cell-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+
+/* follow board */
+.follow-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:start}
+.follow-col{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.follow-col-head{padding:12px 16px;border-bottom:1px solid var(--color-border-light);display:flex;align-items:center;gap:8px}
+.follow-col-head .fc-name{font-size:13px;font-weight:700}
+.follow-col-head .fc-count{margin-left:auto;font-size:11px;font-weight:700;background:var(--color-bg);border:1px solid var(--color-border);border-radius:10px;padding:1px 8px;color:var(--color-text-secondary)}
+.follow-col-body{padding:10px;display:flex;flex-direction:column;gap:8px}
+.follow-card{border:1px solid var(--color-border-light);border-radius:var(--radius-sm);padding:10px 12px;cursor:pointer;transition:all var(--transition-fast)}
+.follow-card:hover{border-color:var(--color-primary);background:var(--color-primary-xlight)}
+.follow-card .f-name{font-size:13px;font-weight:600;line-height:1.4}
+.follow-card .f-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:4px;line-height:1.6}
+.follow-card.f-warn{border-color:var(--color-warning);background:#FFF8EC}
+.follow-card.f-warn .f-name{color:#B27A1B}
+.follow-warn-tag{display:inline-block;font-size:10px;font-weight:700;color:#B27A1B;background:#FFF4E0;border-radius:10px;padding:1px 8px;margin-top:6px}
+.follow-empty{font-size:12px;color:var(--color-text-tertiary);text-align:center;padding:16px 6px}
 
 /* modal / drawer */
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
@@ -143,15 +162,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   <div class="sidebar-logo"><img src="https://iili.io/CZ0tVNn.png" alt="RHC Medical"></div>
   <div class="sidebar-nav">
     <div class="nav-section">客户管理</div>
-    <a class="nav-item" href="#table-area"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>客户档案</span></a>
-    <a class="nav-item" href="#status-filter"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>跟进状态</span></a>
-    <a class="nav-item nav-item-back-home" href="panel.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></a>
+    <div class="nav-item active" data-page="list" onclick="switchPage('list',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>客户档案</span></div>
+    <div class="nav-item" data-page="follow" onclick="switchPage('follow',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>跟进状态</span></div>
+    <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
 </nav>
 <div class="main-area">
     <main class="content-area">
+    <section class="page active" id="page-list">
     <div class="page-header">
-      <div><h2>客户管理</h2><p>客户档案、跟进状态、关联订单</p></div>
+      <div><h2>客户档案</h2><p>全部客户信息、跟进状态与关联订单</p></div>
       <div class="page-header-actions"><button class="btn btn-primary btn-sm" onclick="openAddModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 新增客户</button></div>
     </div>
     <div class="filter-bar">
@@ -165,6 +185,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <div class="card">
       <div id="table-area"><div class="loading-row"><span class="loading-spinner"></span> 正在加载客户数据…</div></div>
     </div>
+    </section>
+
+    <section class="page" id="page-follow">
+    <div class="page-header">
+      <div><h2>跟进状态</h2><p>按跟进状态分组查看客户与今日待办</p></div>
+    </div>
+    <div id="follow-area"><div class="loading-row"><span class="loading-spinner"></span> 正在加载客户数据…</div></div>
+    </section>
   </main>
 </div>
 </div>
@@ -196,6 +224,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 <div class="toast" id="toast"></div>
 
 <script>
+function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');var ca=document.querySelector('.content-area');if(ca)ca.scrollTop=0}
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
 var snapshotData=null;
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3200)}
@@ -244,8 +274,45 @@ function renderTable(){
   window._filteredList=list;
 }
 
+function followDateOf(c){
+  var raw=String(c['最近跟进']||'').trim();
+  var m=raw.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  return m?new Date(+m[1],+m[2]-1,+m[3]):null;
+}
+function renderFollow(){
+  var area=document.getElementById('follow-area');
+  if(!area)return;
+  if(!snapshotData){area.innerHTML='<div class="loading-row"><span class="loading-spinner"></span> 正在加载客户数据…</div>';return}
+  var all=getAllCustomers();
+  var order=['初步接触','需求沟通','报价中','已成交','复购中','沉睡'];
+  var groups={};
+  all.forEach(function(c){var st=c['跟进状态']||'未标记';(groups[st]=groups[st]||[]).push(c)});
+  var keys=order.filter(function(k){return groups[k]}).concat(Object.keys(groups).filter(function(k){return order.indexOf(k)<0}));
+  var today=new Date();today.setHours(0,0,0,0);
+  var html='<div class="follow-grid">'+keys.map(function(st){
+    var list=groups[st];
+    return '<div class="follow-col"><div class="follow-col-head">'+statusTag(st)+'<span class="fc-count">'+list.length+'</span></div><div class="follow-col-body">'+
+      list.map(function(c){
+        var idx=all.indexOf(c);
+        var d=followDateOf(c);
+        var stale=false,warnText='';
+        var raw=String(c['最近跟进']||'').trim();
+        var doneStage=(st==='已成交'||st==='复购中');
+        if(!doneStage){stale=true;warnText='待跟进'}
+        else if(!d||!raw){stale=true;warnText='跟进日期缺失'}
+        else{var diff=Math.round((today-d)/86400000);if(diff>=14){stale=true;warnText=diff+' 天未跟进'}}
+        return '<div class="follow-card'+(stale?' f-warn':'')+'" onclick="openDetail('+idx+')" title="点击查看客户档案">'+
+          '<div class="f-name">'+esc(c['客户名称'])+'</div>'+
+          '<div class="f-meta">'+esc(c['国家/地区']||'—')+'　最近跟进：'+esc(raw||'暂无记录')+'</div>'+
+          (stale?'<span class="follow-warn-tag">'+warnText+'</span>':'')+
+        '</div>';
+      }).join('')+
+    '</div></div>';
+  }).join('')+'</div>';
+  area.innerHTML=html;
+}
 function openDetail(idx){
-  var c=window._filteredList? window._filteredList[idx] :null;
+  var c=(window._filteredList&&window._filteredList[idx])||getAllCustomers()[idx]||null;
   if(!c)return;
   document.getElementById('detail-title').textContent=c['客户名称'];
   var relOrders=getAllOrders().filter(function(o){return o['客户名称']===c['客户名称']});
@@ -293,17 +360,19 @@ function saveCustomer(){
   extra.push(record);
   localStorage.setItem('rhc_customers_extra',JSON.stringify(extra));
   closeModal('add-modal');
-  renderTable();
+  renderTable();renderFollow();
   showToast('已暂存（框架阶段存本地；正式版写入飞书客户表）','success');
 }
 
 fetch('data/snapshot.json',{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
   .then(function(d){
-    snapshotData=d;renderTable();
+    snapshotData=d;renderTable();renderFollow();
   })
   .catch(function(){
-    document.getElementById('table-area').innerHTML='<div class="state-message"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div style="font-weight:600;color:var(--color-text)">数据加载失败</div><div>无法读取 data/snapshot.json，请通过本地 HTTP 服务访问本页面。</div><button class="btn btn-outline btn-sm" onclick="location.reload()">重新加载</button></div>';
+    var failHtml='<div class="state-message"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div style="font-weight:600;color:var(--color-text)">数据加载失败</div><div>无法读取 data/snapshot.json，请通过本地 HTTP 服务访问本页面。</div><button class="btn btn-outline btn-sm" onclick="location.reload()">重新加载</button></div>';
+    document.getElementById('table-area').innerHTML=failHtml;
+    var fa=document.getElementById('follow-area');if(fa)fa.innerHTML=failHtml;
   });
 </script>
 <script src="assets/rhc-widget.js?v=20260831b"></script>

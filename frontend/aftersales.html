@@ -50,13 +50,20 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .sidebar-user .user-name{font-size:13px;font-weight:600}
 .sidebar-user .user-role{font-size:11px;color:var(--color-text-tertiary)}
 .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.page{display:none;animation:fadeIn 0.3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .page-header h2{font-size:18px;font-weight:700;color:var(--color-text);margin:0 0 4px}
 .page-header p{margin:0;font-size:14px;color:var(--color-text-secondary)}
 .page-header-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .content-area{flex:1;overflow-y:auto;padding:20px 28px 28px;scroll-behavior:smooth}
 
-.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:20px}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--color-border-light);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-header h3{font-size:14px;font-weight:600}
+.card-header .card-sub{font-size:12px;color:var(--color-text-tertiary);font-weight:400}
+.card-body{padding:20px}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.2px;white-space:nowrap}
 .tag-success{background:#E6F9F1;color:#0D7B57}
 .tag-warning{background:#FFF4E0;color:#B27A1B}
@@ -78,6 +85,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .stat-mini{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:14px 18px}
 .stat-mini .sm-val{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
 .stat-mini .sm-label{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.dist-bars{display:flex;flex-direction:column;gap:10px}
+.dist-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.dist-label{width:84px;flex-shrink:0;color:var(--color-text-secondary);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dist-track{flex:1;background:var(--color-bg);border-radius:6px;height:16px;min-width:40px;overflow:hidden}
+.dist-fill{height:100%;border-radius:6px;background:var(--color-primary);width:0;transition:width .5s ease}
+.dist-fill.fill-blue{background:var(--color-info)}
+.dist-val{width:28px;flex-shrink:0;font-weight:600;font-variant-numeric:tabular-nums}
+@media(max-width:860px){.dist-grid{grid-template-columns:1fr}}
 
 .data-table{width:100%;border-collapse:collapse;font-size:13px}
 .data-table thead{background:var(--color-bg)}
@@ -123,16 +139,26 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   <div class="sidebar-logo"><img src="https://iili.io/CZ0tVNn.png" alt="RHC Medical"></div>
   <div class="sidebar-nav">
     <div class="nav-section">售后中心</div>
-    <a class="nav-item" href="#ticket-area"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg><span>工单列表</span></a>
-    <a class="nav-item" href="#ticket-stats"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>工单统计</span></a>
-    <a class="nav-item nav-item-back-home" href="panel.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></a>
+    <div class="nav-item active" data-page="tickets" onclick="switchPage('tickets',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg><span>工单列表</span></div>
+    <div class="nav-item" data-page="stats" onclick="switchPage('stats',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>工单统计</span></div>
+    <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
 </nav>
 <div class="main-area">
     <main class="content-area">
+    <section class="page active" id="page-tickets">
     <div class="page-header">
-      <div><h2>售后中心</h2><p>售后工单受理、处理进度与服务闭环</p></div>
+      <div><h2>工单列表</h2><p>售后工单受理、处理进度与服务闭环</p></div>
       <div class="page-header-actions"><button class="btn btn-primary btn-sm" onclick="openNewModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 新建工单</button></div>
+    </div>
+    <div class="card">
+      <div id="ticket-area"><div class="state-message"><span class="loading-spinner" style="width:20px;height:20px;border:2.5px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span><div>正在加载工单数据…</div></div></div>
+    </div>
+    </section>
+
+    <section class="page" id="page-stats">
+    <div class="page-header">
+      <div><h2>工单统计</h2><p>工单处理情况统计</p></div>
     </div>
     <div class="stat-strip" id="ticket-stats">
       <div class="stat-mini"><div class="sm-val" id="stat-total">—</div><div class="sm-label">工单总数</div></div>
@@ -140,9 +166,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       <div class="stat-mini"><div class="sm-val" id="stat-doing" style="color:var(--color-info)">—</div><div class="sm-label">处理中</div></div>
       <div class="stat-mini"><div class="sm-val" id="stat-done" style="color:var(--color-success)">—</div><div class="sm-label">已完成</div></div>
     </div>
-    <div class="card">
-      <div id="ticket-area"><div class="state-message"><span class="loading-spinner" style="width:20px;height:20px;border:2.5px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span><div>正在加载工单数据…</div></div></div>
+    <div class="dist-grid">
+      <div class="card"><div class="card-header"><h3>按工单状态</h3></div><div class="card-body"><div class="dist-bars" id="dist-status"></div></div></div>
+      <div class="card"><div class="card-header"><h3>按工单类型</h3></div><div class="card-body"><div class="dist-bars" id="dist-type"></div></div></div>
     </div>
+    </section>
   </main>
 </div>
 </div>
@@ -170,6 +198,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 <div class="toast" id="toast"></div>
 
 <script>
+function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');var ca=document.querySelector('.content-area');if(ca)ca.scrollTop=0}
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
 var TICKET_TYPES=['质量问题','物流破损','备件补发','使用咨询','其他'];
 var snapshotData=null;
 var toastTimer=null;
@@ -201,9 +231,30 @@ function renderStats(list){
   document.getElementById('stat-done').textContent=list.filter(function(t){return t['状态']==='已完成'}).length;
 }
 
+function distBarsHtml(rows,fillClass){
+  var max=0;rows.forEach(function(r){if(r.count>max)max=r.count});
+  if(max===0)return '<div style="font-size:12px;color:var(--color-text-tertiary);padding:8px 0">暂无工单数据</div>';
+  return rows.map(function(r){
+    var pct=max>0?Math.round(r.count/max*100):0;
+    return '<div class="dist-row" title="'+esc(r.label)+'：'+r.count+'"><div class="dist-label">'+esc(r.label)+'</div><div class="dist-track"><div class="dist-fill '+(fillClass||'')+'" style="width:'+pct+'%"></div></div><div class="dist-val">'+r.count+'</div></div>';
+  }).join('');
+}
+function renderDist(list){
+  var ds=document.getElementById('dist-status');
+  if(ds){
+    var sr=['待处理','处理中','已完成'].map(function(k){return{label:k,count:list.filter(function(t){return (t['状态']||'待处理')===k}).length}});
+    ds.innerHTML=distBarsHtml(sr,'');
+  }
+  var dt=document.getElementById('dist-type');
+  if(dt){
+    var tr=TICKET_TYPES.map(function(k){return{label:k,count:list.filter(function(t){return t['类型']===k}).length}});
+    dt.innerHTML=distBarsHtml(tr,'fill-blue');
+  }
+}
 function renderTable(){
   var list=getAllTickets();
   renderStats(list);
+  renderDist(list);
   if(list.length===0){
     document.getElementById('ticket-area').innerHTML=
       '<div class="state-message">'+
