@@ -82,30 +82,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .toast-success{background:var(--color-success)}
 .toast-error{background:var(--color-danger)}
 
-/* ===== Chat ===== */
-.chat-messages{background:var(--color-bg);border:1px solid var(--color-border-light);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:14px;height:380px;overflow-y:auto}
-.msg{display:flex;gap:10px;max-width:82%}
-.msg .msg-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
-.msg-bot .msg-avatar{background:var(--color-primary)}
-.msg-bot .msg-bubble{background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px var(--radius-md) var(--radius-md) var(--radius-md);padding:10px 14px;font-size:13px;line-height:1.65;white-space:pre-wrap}
-.msg-user{align-self:flex-end;flex-direction:row-reverse}
-.msg-user .msg-avatar{background:var(--color-text-secondary)}
-.msg-user .msg-bubble{background:var(--color-primary);color:#fff;border-radius:var(--radius-md) 4px var(--radius-md) var(--radius-md);padding:10px 14px;font-size:13px;line-height:1.65;white-space:pre-wrap}
-.msg-bubble .msg-source{display:block;margin-top:8px;font-size:11px;color:var(--color-text-tertiary)}
-.msg-user .msg-bubble .msg-source{color:rgba(255,255,255,.75)}
-.chat-quick{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.quick-chip{padding:6px 14px;border:1px solid var(--color-border);border-radius:20px;font-size:12px;color:var(--color-text-secondary);background:var(--color-surface);cursor:pointer;transition:all var(--transition-fast)}
-.quick-chip:hover{border-color:var(--color-primary);color:var(--color-primary)}
-.chat-input-bar{display:flex;gap:10px;margin-top:12px}
-.chat-input-bar input{flex:1;padding:10px 14px}
-.typing-dots{display:inline-flex;gap:4px;align-items:center}
-.typing-dots i{width:6px;height:6px;border-radius:50%;background:var(--color-text-tertiary);animation:blink 1.2s infinite}
-.typing-dots i:nth-child(2){animation-delay:.2s}
-.typing-dots i:nth-child(3){animation-delay:.4s}
-@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
-
-/* ===== Quote workbench ===== */
-.quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+/* ===== 邮件助手 ===== */
+.mail-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.mail-tab{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;color:var(--color-text-secondary);background:var(--color-surface);border:1px solid var(--color-border);cursor:pointer;transition:all var(--transition-fast)}
+.mail-tab:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.mail-tab.active{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
+.mail-rule{font-size:12px;color:var(--color-text-tertiary);background:var(--color-bg);border-radius:var(--radius-sm);padding:10px 14px;line-height:1.7;margin-bottom:16px}
+.mail-rule strong{color:var(--color-text-secondary);font-weight:600}
 .product-pick{border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
 .product-pick-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--color-border-light);transition:background var(--transition-fast)}
 .product-pick-row:last-child{border-bottom:none}
@@ -114,6 +97,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .product-pick-row .pp-name{flex:1;font-size:13px;font-weight:600}
 .product-pick-row .pp-desc{font-size:11px;color:var(--color-text-tertiary);font-weight:400;margin-top:2px}
 .product-pick-row input[type=number]{width:72px;padding:6px 8px;text-align:center}
+.mail-preview{border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;min-height:320px;max-height:480px;overflow-y:auto;padding:22px 24px}
+.mail-preview-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:280px;gap:10px;color:var(--color-text-tertiary)}
+.mail-subject{font-size:14px;font-weight:700;color:var(--color-text);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--color-border-light);white-space:pre-wrap}
+.mail-body{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:12.5px;line-height:1.8;color:var(--color-text);white-space:pre-wrap;word-break:break-word}
+.mail-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.mail-footnote{margin-top:14px;font-size:11px;color:var(--color-text-tertiary);background:var(--color-bg);border-radius:var(--radius-sm);padding:10px 14px;line-height:1.7}
+
+/* ===== PI 工作台 ===== */
+.quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
 
 /* ===== PI preview ===== */
 .pi-doc{border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;padding:28px;box-shadow:var(--shadow-sm)}
@@ -144,7 +136,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   .sidebar-nav .nav-item.active{border-bottom-color:var(--color-primary)}
   .content-area{padding:16px}
   .quote-grid{grid-template-columns:1fr}
-  .msg{max-width:95%}
 }
 </style>
 </head>
@@ -168,23 +159,51 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   <main class="content-area">
 
     <div class="card">
-      <div class="card-header"><h3>产品知识问答</h3><span class="card-sub">基于 RHC 产品清单的智能问答，可接入后端 AI 接口</span></div>
+      <div class="card-header"><h3>邮件助手</h3><span class="card-sub">按场景生成专业英文商务邮件，可一键复制</span></div>
       <div class="card-body">
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="chat-quick">
-          <button class="quick-chip" onclick="askQuick('VAM-200 和 VAM-300 有什么区别？')">VAM-200 和 VAM-300 有什么区别？</button>
-          <button class="quick-chip" onclick="askQuick('VM-12 监护仪有哪些参数？')">VM-12 监护仪有哪些参数？</button>
-          <button class="quick-chip" onclick="askQuick('输液泵可以多机联动吗？')">输液泵可以多机联动吗？</button>
+        <div class="mail-tabs" id="mail-tabs">
+          <button type="button" class="mail-tab active" data-type="inquiry" onclick="switchMailTab('inquiry')">询盘回复</button>
+          <button type="button" class="mail-tab" data-type="development" onclick="switchMailTab('development')">开发信</button>
+          <button type="button" class="mail-tab" data-type="followup" onclick="switchMailTab('followup')">跟进邮件</button>
+          <button type="button" class="mail-tab" data-type="quotation" onclick="switchMailTab('quotation')">报价发送</button>
         </div>
-        <div class="chat-input-bar">
-          <input type="text" id="chat-input" placeholder="输入产品问题，例如：VAM-200 适合哪些动物？" onkeydown="if(event.key==='Enter')sendQuestion()">
-          <button class="btn btn-primary" id="chat-send-btn" onclick="sendQuestion()">发送</button>
+        <div class="mail-rule" id="mail-rule"></div>
+        <div class="quote-grid">
+          <div>
+            <div class="form-group">
+              <label>客户</label>
+              <select id="mail-customer" onchange="onMailCustomerChange()"><option value="">— 选择客户（加载中…）—</option></select>
+              <input type="text" id="mail-customer-manual" placeholder="手动输入客户名称" style="margin-top:8px;display:none">
+            </div>
+            <div class="form-group">
+              <label>相关产品（可多选）</label>
+              <div class="product-pick" id="mail-product-pick"></div>
+            </div>
+            <div class="form-group">
+              <label>要点</label>
+              <textarea id="mail-keypoints" rows="4" placeholder="填写客户关注点、报价要点、特殊条款等关键信息"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="generateMail()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> 生成英文邮件</button>
+          </div>
+          <div>
+            <div class="mail-preview" id="mail-preview">
+              <div class="mail-preview-empty">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-secondary)">尚未生成邮件</div>
+                <div style="font-size:12px">选择邮件类型与客户，填写要点后点击「生成英文邮件」</div>
+              </div>
+            </div>
+            <div class="mail-actions">
+              <button class="btn btn-outline btn-sm" id="mail-copy-btn" onclick="copyMail()" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 一键复制</button>
+            </div>
+          </div>
         </div>
+        <div class="mail-footnote">框架演示：AI生成内容请核对后使用。正式版将接通企业邮箱（IMAP/SMTP），邮件可直接发送并自动归档至客户档案。</div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-header"><h3>报价工作台</h3><span class="card-sub">选择客户与产品，生成形式发票（PI）预览</span></div>
+      <div class="card-header"><h3>PI工作台</h3><span class="card-sub">报价与形式发票</span></div>
       <div class="card-body">
         <div class="quote-grid">
           <div>
@@ -214,81 +233,246 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 </div>
 <div class="toast" id="toast"></div>
 <script>
-/* ===== 产品清单（内置，问答与报价共用） ===== */
+/* ===== 产品清单（内置兜底，均为 RHC 真实在售产品；接口可用时以 /api/products 返回为准） ===== */
 var PRODUCTS=[
-  {model:'VAM-200',name:'VAM-200 兽医麻醉机',desc:'小动物麻醉，适合猫、狗',specs:'标准配置含麻醉呼吸回路、挥发罐、流量计',keywords:['VAM-200','vam200','200','小动物','猫','狗','犬','宠物','麻醉机','挥发罐','流量计','呼吸回路'],
-   answer:'VAM-200 兽医麻醉机面向小动物临床，适用于猫、狗等宠物的吸入麻醉。标准配置包含麻醉呼吸回路、麻醉挥发罐和流量计，操作简洁，适合宠物医院常规手术使用。'},
-  {model:'VAM-300',name:'VAM-300 大型动物麻醉机',desc:'马、牛等大型动物，大流量通气',specs:'大流量通气设计',keywords:['VAM-300','vam300','300','大型动物','大动物','马','牛','大流量','马场','牧场'],
-   answer:'VAM-300 大型动物麻醉机专为马、牛等大型动物设计，支持大流量通气，满足大型动物手术中的麻醉通气需求，适用于马场、大型动物诊疗中心及牧场兽医站。'},
-  {model:'VM-12',name:'VM-12 多参数监护仪',desc:'心电/血氧/血压/呼吸/体温/呼末二氧化碳 六参数',specs:'心电、血氧、血压、呼吸、体温、呼末二氧化碳',keywords:['VM-12','vm12','12','监护','监护仪','心电','血氧','血压','呼吸','体温','二氧化碳','etco2','spo2','参数','六参数'],
-   answer:'VM-12 多参数监护仪提供六项核心参数监护：心电（ECG）、血氧（SpO₂）、血压（NIBP）、呼吸（RESP）、体温（TEMP）和呼末二氧化碳（EtCO₂），可配套麻醉机用于术中及术后监护。'},
-  {model:'VW-8',name:'VW-8 输液泵',desc:'高精度输注，可多机联动',specs:'高精度输注，支持多机联动',keywords:['VW-8','vw8','8','输液泵','输注','注射','输液','联动','多机','精度','高精度'],
-   answer:'VW-8 输液泵提供高精度输注控制，支持多机联动，便于在病区或手术中统一管理多台设备的输液任务，适用于兽医医院的住院与术中补液场景。'}
+  {model:'V5 Plus',name:'V5 Plus 兽用麻醉工作站',desc:'旗舰工作站，12.1寸可翻转触摸屏，200g-160kg小动物，CE/ISO 13485',specs:'12.1寸可翻转触摸屏；潮气量2-1600ml；适用200g-160kg小动物；CE/ISO 13485认证'},
+  {model:'X35VET',name:'X35VET 兽用麻醉机',desc:'主力机型，10.2寸屏，5-150kg，电动电控涡轮驱动无需驱动气',specs:'10.2寸屏幕；潮气量10-1600ml；适用5-150kg动物；电动电控涡轮驱动，无需驱动气'},
+  {model:'M800',name:'M800 大动物麻醉工作站',desc:'大型动物专用，15.6寸屏，潮气量50ml-19L，覆盖5kg-1800kg，CE/ISO 13485',specs:'15.6寸屏幕；潮气量50ml-19L；覆盖5kg-1800kg大动物；CE/ISO 13485认证'},
+  {model:'SA Series',name:'SA Series 注射泵',desc:'DERS药库功能，CE认证，精准输注',specs:'DERS药库（剂量错误减量）功能；CE认证；高精度输注'}
 ];
 
 var snapshotData=null;
+var mailType='inquiry';
+var mailProducts=PRODUCTS.slice();
+var currentMailText='';
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3200)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
-/* ===== 聊天 ===== */
-function addMsg(role,html,sourceTag){
-  var box=document.getElementById('chat-messages');
-  var row=document.createElement('div');
-  row.className='msg '+(role==='user'?'msg-user':'msg-bot');
-  row.innerHTML='<div class="msg-avatar">'+(role==='user'?'我':'AI')+'</div><div class="msg-bubble">'+html+(sourceTag?'<span class="msg-source">'+esc(sourceTag)+'</span>':'')+'</div>';
-  box.appendChild(row);box.scrollTop=box.scrollHeight;
-}
-function localAnswer(q){
-  var ql=q.toLowerCase();
-  var hits=PRODUCTS.filter(function(p){return p.keywords.some(function(k){return ql.indexOf(k.toLowerCase())>=0})});
-  if(hits.length===0){
-    return {text:'您好，我目前掌握的产品信息覆盖以下四款产品：\n· VAM-200 兽医麻醉机（小动物/猫狗）\n· VAM-300 大型动物麻醉机（马/牛等大动物）\n· VM-12 多参数监护仪（六参数）\n· VW-8 输液泵（高精度、多机联动）\n请直接输入产品型号或应用场景（如「猫」「马」「监护参数」），我会给出对应说明。更复杂的商务与报价问题请联系销售同事。',source:'本地产品清单兜底（未匹配到具体型号）'};
-  }
-  return {text:hits.map(function(p){return '【'+p.name+'】\n'+p.answer+'\n标准配置/特点：'+p.specs}).join('\n\n'),source:'本地产品清单'};
-}
-function askQuestion(q){
-  addMsg('user',esc(q));
-  var box=document.getElementById('chat-messages');
-  var typing=document.createElement('div');typing.className='msg msg-bot';typing.id='typing-row';
-  typing.innerHTML='<div class="msg-avatar">AI</div><div class="msg-bubble"><span class="typing-dots"><i></i><i></i><i></i></span></div>';
-  box.appendChild(typing);box.scrollTop=box.scrollHeight;
+/* ===== 邮件助手 ===== */
+var MAIL_TYPES={
+  inquiry:{label:'询盘回复',rule:'24小时内回复；客户每个问题逐条答全；主动附上规格、认证与图片；结尾明确下一步行动；专业简洁，不过度推销',
+    prompt:'这是一封外贸B2B医疗设备的询盘回复邮件。请在24小时回复时效的语境下，逐条回应客户问题，主动附上规格、认证与图片说明，结尾明确下一步行动；专业简洁，不过度推销。'},
+  development:{label:'开发信',rule:'全文约120词；价值前置，不用冗长自我介绍；针对客户业务定制、避免群发感；只给一个明确行动号召；首封不带附件',
+    prompt:'这是一封外贸B2B医疗设备的开发信（首封冷邮件）。全文约120词；价值前置，不用冗长自我介绍；针对客户业务定制、避免群发感；只给一个明确行动号召；首封不带附件。'},
+  followup:{label:'跟进邮件',rule:'按报价后3天/7天/14天节奏；每次跟进带来新价值（新案例、新认证、库存或促销信息）；不催促施压；顺带回应客户此前未答问题',
+    prompt:'这是一封报价后的跟进邮件。按报价后3天/7天/14天的跟进节奏；每次跟进带来新价值（新案例、新认证、库存或促销信息）；不催促施压；顺带回应客户此前未答复的问题。'},
+  quotation:{label:'报价发送',rule:'注明PI编号、总金额与报价有效期；重申贸易条款（FOB/CIF等）与付款方式；明确下一步（回签PI/支付定金）；说明PI附件内容',
+    prompt:'这是一封随附形式发票（PI）的报价发送邮件。注明PI编号、总金额与报价有效期；重申贸易条款（FOB/CIF等）与付款方式；明确下一步（回签PI/支付定金）；说明PI附件内容。'}
+};
 
-  function done(text,source){
-    var tr=document.getElementById('typing-row');if(tr)tr.remove();
-    addMsg('bot',esc(text),source);
+var MAIL_TEMPLATES={
+  inquiry:'Subject: Re: Your Inquiry about RHC Veterinary Equipment\n' +
+    '\n' +
+    'Dear {customer_name},\n' +
+    '\n' +
+    'Thank you for your inquiry, and for your interest in RHC Medical. We are pleased to provide the information you requested, tailored to the market in {country}.\n' +
+    '\n' +
+    'Regarding the products you mentioned, please find below a summary of the relevant models:\n' +
+    '{products}\n' +
+    '\n' +
+    'All RHC anesthesia and infusion systems carry CE certification, and our anesthesia workstations are manufactured under ISO 13485 quality management. Detailed specification sheets and product images are attached for your review.\n' +
+    '\n' +
+    'For your specific points:\n' +
+    '{key_points}\n' +
+    '\n' +
+    'As a next step, we would be glad to prepare a formal quotation with FOB/CIF terms based on your target quantity, and to arrange a short online demonstration at a time convenient for you.\n' +
+    '\n' +
+    'We look forward to your reply.\n' +
+    '\n' +
+    'Best regards,\n' +
+    'Sales Team, RHC Medical',
+
+  development:'Subject: Reliable Veterinary Anesthesia & Infusion Equipment for {customer_name}\n' +
+    '\n' +
+    'Dear {customer_name},\n' +
+    '\n' +
+    'RHC Medical manufactures CE-certified veterinary anesthesia workstations and infusion pumps trusted by distributors and veterinary hospitals across {country} and worldwide. Our flagship V5 Plus workstation covers patients from 200g to 160kg with a 12.1-inch flip touchscreen, while the M800 handles large animals up to 1800kg.\n' +
+    '\n' +
+    'Given {customer_name}\'s focus in the veterinary market, we believe the following line-up is particularly relevant to your customers:\n' +
+    '{products}\n' +
+    '\n' +
+    '{key_points}\n' +
+    '\n' +
+    'May we send you our full catalog and distributor pricing this week?\n' +
+    '\n' +
+    'Best regards,\n' +
+    'Sales Team, RHC Medical',
+
+  followup:'Subject: Following Up on Our Quotation — New Updates from RHC Medical\n' +
+    '\n' +
+    'Dear {customer_name},\n' +
+    '\n' +
+    'I hope you are doing well. Following our recent quotation for {country}, I wanted to share a few updates that may be useful for your evaluation:\n' +
+    '\n' +
+    '· We have just completed a new installation reference for a veterinary group similar in profile to yours, and we would be happy to share the case details.\n' +
+    '· Our latest CE and ISO 13485 certificates for the quoted models are available for your compliance review.\n' +
+    '· Current stock allows priority shipment for the following models:\n' +
+    '{products}\n' +
+    '\n' +
+    'In addition, to address the points you raised earlier:\n' +
+    '{key_points}\n' +
+    '\n' +
+    'There is no urgency on your side — please let us know if any specifications or terms need further clarification, and we will adjust the offer accordingly.\n' +
+    '\n' +
+    'Best regards,\n' +
+    'Sales Team, RHC Medical',
+
+  quotation:'Subject: Proforma Invoice {pi_no} — RHC Quotation for {customer_name}\n' +
+    '\n' +
+    'Dear {customer_name},\n' +
+    '\n' +
+    'Thank you for your interest in RHC Medical. Please find attached our Proforma Invoice {pi_no} covering the following products for your market in {country}:\n' +
+    '{products}\n' +
+    '\n' +
+    'The PI states the total amount and is valid for 15 days. Trade terms and payment details are summarized below:\n' +
+    '· Trade terms: CIF/FOB as specified in the attached PI\n' +
+    '· Payment: 30% deposit by T/T, balance before shipment\n' +
+    '· Lead time: within 15 working days after receipt of deposit\n' +
+    '\n' +
+    'Key points included in this offer:\n' +
+    '{key_points}\n' +
+    '\n' +
+    'The attached PI contains full product specifications, quantities, unit prices, total amount, packing information and our bank details. To proceed, please countersign and return the PI, or arrange the 30% deposit, and we will immediately confirm production and shipping schedule.\n' +
+    '\n' +
+    'Best regards,\n' +
+    'Sales Team, RHC Medical'
+};
+
+function piNo(){
+  var t=new Date();
+  return 'PI-FRAME-'+String(t.getFullYear()).slice(2)+String(t.getMonth()+1).padStart(2,'0')+'-'+String(Math.floor(Math.random()*900)+100);
+}
+function switchMailTab(type){
+  mailType=type;
+  var tabs=document.querySelectorAll('#mail-tabs .mail-tab');
+  for(var i=0;i<tabs.length;i++){tabs[i].className='mail-tab'+(tabs[i].getAttribute('data-type')===type?' active':'')}
+  document.getElementById('mail-rule').innerHTML='<strong>写作规范：</strong>'+esc(MAIL_TYPES[type].rule);
+}
+function onMailCustomerChange(){
+  var sel=document.getElementById('mail-customer');
+  var manual=document.getElementById('mail-customer-manual');
+  manual.style.display=(sel.value==='__manual__')?'block':'none';
+}
+function renderMailProducts(list){
+  mailProducts=list;
+  document.getElementById('mail-product-pick').innerHTML=list.map(function(p,i){
+    var nm=p.name||(p.product_model+' '+(p.product_name||''));
+    var model=p.model||p.product_model||'';
+    var desc=p.desc||p.main_selling_point||p.category||'';
+    return '<label class="product-pick-row"><input type="checkbox" id="mp-'+i+'" data-model="'+esc(model)+'"><span class="pp-name">'+esc(nm)+(desc?'<span class="pp-desc">'+esc(desc)+'</span>':'')+'</span></label>';
+  }).join('');
+}
+function getMailCustomer(){
+  var sel=document.getElementById('mail-customer');
+  if(sel.value==='__manual__'){
+    var m=document.getElementById('mail-customer-manual');
+    return {name:(m.value||'').trim(),country:'',manual:true};
   }
-  // 1) 优先 POST /api/chat
-  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})})
+  var name=sel.value;
+  if(!name)return {name:'',country:''};
+  var c=(snapshotData.customers||[]).filter(function(x){return x['客户名称']===name})[0]||{};
+  return {name:name,country:c['国家/地区']||''};
+}
+function getSelectedMailProducts(){
+  var out=[];
+  mailProducts.forEach(function(p,i){
+    var cb=document.getElementById('mp-'+i);
+    if(cb&&cb.checked){
+      var nm=p.name||(p.product_model+' '+(p.product_name||''));
+      var model=p.model||p.product_model||'';
+      out.push({name:nm,model:model,desc:p.desc||p.main_selling_point||''});
+    }
+  });
+  return out;
+}
+function buildFallbackMail(ctx){
+  var tpl=MAIL_TEMPLATES[mailType];
+  var prodLines=ctx.products.length
+    ? ctx.products.map(function(p){return '· '+p.name+(p.desc?' — '+p.desc:'')}).join('\n')
+    : '· (No product selected — please add the relevant RHC models.)';
+  var kp=ctx.keyPoints?ctx.keyPoints.split('\n').map(function(s){return '· '+s}).join('\n') : '· (Please confirm your specific requirements so we can tailor the offer.)';
+  return tpl
+    .replace(/\{customer_name\}/g,ctx.customerName)
+    .replace(/\{country\}/g,ctx.country||'your region')
+    .replace(/\{products\}/g,prodLines)
+    .replace(/\{key_points\}/g,kp)
+    .replace(/\{pi_no\}/g,piNo());
+}
+function renderMail(text,source){
+  currentMailText=text;
+  var lines=String(text).split(/\r?\n/);
+  var subject='';
+  var bodyStart=0;
+  if(lines[0]&&/^subject\s*:/i.test(lines[0])){
+    subject=lines[0].replace(/^subject\s*:\s*/i,'');
+    bodyStart=1;
+    while(bodyStart<lines.length&&lines[bodyStart].trim()==='')bodyStart++;
+  }
+  var body=lines.slice(bodyStart).join('\n');
+  var html='';
+  if(subject)html+='<div class="mail-subject">Subject: '+esc(subject)+'</div>';
+  html+='<div class="mail-body">'+esc(body)+'</div>';
+  document.getElementById('mail-preview').innerHTML=html;
+  var copyBtn=document.getElementById('mail-copy-btn');
+  copyBtn.style.display='inline-flex';
+  if(source)showToast(source,'success');
+}
+function generateMail(){
+  var ctx0=getMailCustomer();
+  if(!ctx0.name){showToast('请先选择或输入客户','error');return}
+  var prods=getSelectedMailProducts();
+  var keyPoints=document.getElementById('mail-keypoints').value.trim();
+  var ctx={customerName:ctx0.name,country:ctx0.country,products:prods,keyPoints:keyPoints};
+  var prodText=prods.length?prods.map(function(p){return p.name}).join('、'):'未指定产品';
+  var prompt='你是 RHC Medical（兽用医疗设备制造商）的外贸销售。'+MAIL_TYPES[mailType].prompt+'\n'+
+    '邮件类型：'+MAIL_TYPES[mailType].label+'\n'+
+    '客户名称：'+ctx.customerName+'\n'+
+    '客户国家/地区：'+(ctx.country||'未知')+'\n'+
+    '相关产品：'+prodText+'\n'+
+    '关键要点：'+(keyPoints||'（客户未补充要点，请按通用专业表述处理）')+'\n'+
+    '写作规范（必须遵守）：'+MAIL_TYPES[mailType].rule+'\n'+
+    '请输出一封专业英文商务邮件：第一行为 "Subject: 邮件主题"，空一行后为正文；落款统一使用 "Sales Team, RHC Medical"，不要写具体人名；不要输出任何中文或解释说明。';
+
+  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:prompt})})
     .then(function(r){if(!r.ok)throw new Error('chat '+r.status);return r.json()})
     .then(function(d){
       var text=d.reply||d.message||d.response||d.answer||d.text||(d.data&&(d.data.reply||d.data.message))||'';
-      if(!text)throw new Error('empty chat reply');
-      done(String(text),'后端智能问答接口 /api/chat');
+      if(!text||!/^subject\s*:/im.test(String(text).trim()))throw new Error('invalid mail reply');
+      renderMail(String(text).trim(),'英文邮件已生成（AI接口）');
     })
     .catch(function(){
-      // 2) 兜底 POST /api/copy
-      fetch('/api/copy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_model:'',target_language:'en',platform:'',extra_keywords:q})})
-        .then(function(r){if(!r.ok)throw new Error('copy '+r.status);return r.json()})
-        .then(function(d){
-          var text=d.copy||d.content||d.text||d.message||(d.data&&(d.data.copy||d.data.content))||'';
-          if(!text)throw new Error('empty copy reply');
-          done(String(text),'后端文案接口 /api/copy');
-        })
-        .catch(function(){
-          // 3) 本地兜底
-          setTimeout(function(){var a=localAnswer(q);done(a.text,a.source)},300);
-        });
+      setTimeout(function(){renderMail(buildFallbackMail(ctx),'英文邮件已生成（本地模板兜底）')},200);
     });
 }
-function sendQuestion(){
-  var inp=document.getElementById('chat-input');
-  var q=inp.value.trim();if(!q)return;
-  inp.value='';askQuestion(q);
+function copyMail(){
+  if(!currentMailText){showToast('暂无邮件可复制','error');return}
+  function ok(){showToast('邮件已复制到剪贴板','success')}
+  function fail(){showToast('复制失败，请手动选择文本复制','error')}
+  try{
+    if(navigator&&navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(currentMailText).then(ok).catch(function(){
+        fallbackCopy(currentMailText)?ok():fail();
+      });
+    }else{
+      fallbackCopy(currentMailText)?ok():fail();
+    }
+  }catch(e){fallbackCopy(currentMailText)?ok():fail()}
 }
-function askQuick(q){document.getElementById('chat-input').value=q;sendQuestion()}
+function fallbackCopy(text){
+  try{
+    var ta=document.createElement('textarea');
+    ta.value=text;
+    ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);
+    ta.select();
+    var done=document.execCommand('copy');
+    document.body.removeChild(ta);
+    return !!done;
+  }catch(e){return false}
+}
 
-/* ===== 报价工作台 ===== */
+/* ===== PI 工作台 ===== */
 function renderProductPick(){
   document.getElementById('product-pick').innerHTML=PRODUCTS.map(function(p,i){
     return '<label class="product-pick-row"><input type="checkbox" id="pp-'+i+'" data-model="'+esc(p.model)+'"><span class="pp-name">'+esc(p.name)+'<span class="pp-desc">'+esc(p.desc)+'</span></span><input type="number" min="1" max="999" value="1" id="pq-'+i+'"></label>';
@@ -309,13 +493,13 @@ function generatePI(){
   var cust=(snapshotData.customers||[]).filter(function(c){return c['客户名称']===custName})[0]||{};
   var today=new Date();
   var dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-  var piNo='PI-FRAME-'+String(today.getFullYear()).slice(2)+String(today.getMonth()+1).padStart(2,'0')+'-'+String(Math.floor(Math.random()*900)+100);
+  var piNoStr='PI-FRAME-'+String(today.getFullYear()).slice(2)+String(today.getMonth()+1).padStart(2,'0')+'-'+String(Math.floor(Math.random()*900)+100);
   var rows=lines.map(function(l){
     return '<tr><td>'+esc(l.product.name)+'<div style="color:var(--color-text-tertiary);font-size:11px;margin-top:2px">'+esc(l.product.desc)+'</div></td><td class="pi-qty">'+l.qty+'</td><td class="pi-price">待销售填写</td><td class="pi-price">待销售填写</td></tr>';
   }).join('');
   document.getElementById('pi-area').innerHTML=
     '<div class="pi-doc">'+
-      '<div class="pi-head"><div class="pi-brand">RHC 安瑞康<small>RHC Medical · Veterinary Equipment</small></div><div class="pi-title">形式发票 PROFORMA INVOICE<small>'+esc(piNo)+'</small></div></div>'+
+      '<div class="pi-head"><div class="pi-brand">RHC 安瑞康<small>RHC Medical · Veterinary Equipment</small></div><div class="pi-title">形式发票 PROFORMA INVOICE<small>'+esc(piNoStr)+'</small></div></div>'+
       '<div class="pi-meta">'+
         '<div><span>客户：</span>'+esc(custName)+'</div>'+
         '<div><span>日期：</span>'+dateStr+'</div>'+
@@ -334,21 +518,35 @@ function generatePI(){
 }
 
 /* ===== 初始化 ===== */
-addMsg('bot','您好，我是 RHC 销售智能助手。您可以向我咨询 VAM-200、VAM-300、VM-12、VW-8 等产品的参数、适用场景与配置信息。点击下方常见问题，或直接输入问题开始。');
+switchMailTab('inquiry');
 renderProductPick();
+renderMailProducts(PRODUCTS);
+fetch('/api/products',{cache:'no-store'})
+  .then(function(r){if(!r.ok)throw new Error('products '+r.status);return r.json()})
+  .then(function(d){
+    var items=(d&&d.items)||(Array.isArray(d)?d:[])||[];
+    if(!items.length)throw new Error('empty products');
+    renderMailProducts(items.map(function(p){
+      return {model:p.product_model||'',name:((p.product_model||'')+' '+(p.product_name||'')).trim(),desc:p.main_selling_point||p.category||''};
+    }));
+  })
+  .catch(function(){renderMailProducts(PRODUCTS)});
 fetch('data/snapshot.json',{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
   .then(function(d){
     snapshotData=d;
-    var sel=document.getElementById('quote-customer');
-    sel.innerHTML='<option value="">— 选择客户 —</option>'+(d.customers||[]).map(function(c){
+    var opts='<option value="">— 选择客户 —</option>'+(d.customers||[]).map(function(c){
       return '<option value="'+esc(c['客户名称'])+'">'+esc(c['客户名称'])+'（'+esc(c['国家/地区']||'')+'）</option>';
-    }).join('');
+    }).join('')+'<option value="__manual__">手动输入客户</option>';
+    document.getElementById('quote-customer').innerHTML=opts;
+    document.getElementById('mail-customer').innerHTML=opts;
   })
   .catch(function(){
     document.getElementById('quote-customer').innerHTML='<option value="">客户数据加载失败</option>';
+    document.getElementById('mail-customer').innerHTML='<option value="">客户数据加载失败</option>';
     showToast('客户数据加载失败，请通过本地 HTTP 服务访问本页面','error');
   });
 </script>
+<script src="assets/rhc-widget.js?v=20260831a"></script>
 </body>
 </html>

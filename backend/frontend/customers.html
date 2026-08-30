@@ -192,7 +192,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       <div class="form-group"><label>跟进状态</label>
         <select id="nf-status"><option>初步接触</option><option>需求沟通</option><option>报价中</option><option>已成交</option><option>复购中</option><option>沉睡</option></select>
       </div>
-      <div class="form-group"><label>主营产品</label><input type="text" id="nf-products" placeholder="如：VAM-200兽医麻醉机、VM-12多参数监护仪"></div>
+      <div class="form-group"><label>主营产品</label><input type="text" id="nf-products" placeholder="如：X35VET兽用麻醉机、SA Series注射泵"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('add-modal')">取消</button><button class="btn btn-primary" onclick="saveCustomer()">保存客户</button></div>
   </div>
@@ -310,5 +310,6 @@ fetch('data/snapshot.json',{cache:'no-store'})
     document.getElementById('table-area').innerHTML='<div class="state-message"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div style="font-weight:600;color:var(--color-text)">数据加载失败</div><div>无法读取 data/snapshot.json，请通过本地 HTTP 服务访问本页面。</div><button class="btn btn-outline btn-sm" onclick="location.reload()">重新加载</button></div>';
   });
 </script>
+<script src="assets/rhc-widget.js?v=20260831a"></script>
 </body>
 </html>
