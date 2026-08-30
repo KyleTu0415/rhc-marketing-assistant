@@ -95,7 +95,9 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
 }
 .brand-feature-text h3{font-size:14px;font-weight:600;margin-bottom:2px}
 .brand-feature-text p{font-size:12px;opacity:0.75;line-height:1.6}
-.brand-footer{position:relative;z-index:1;font-size:12px;opacity:0.6;margin-top:auto}
+.brand-logo{flex-shrink:0}
+.brand-content{flex-shrink:0}
+.brand-footer{position:relative;z-index:1;font-size:12px;opacity:0.6;margin-top:auto;flex-shrink:0;padding-top:24px}
 
 /* Right form panel */
 .form-panel{
@@ -282,20 +284,16 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
 .stats-bar{
   width:100%;
   max-width:none;
-  margin:0;
+  margin:24px 0 0;
   display:flex;
   background:transparent;
   border:none;
   border-top:1px solid #E5E7EB;
   border-radius:0;
   box-shadow:none;
-  padding:24px 0 0;
-  position:absolute;
-  bottom:40px;
-  left:0;
-  right:0;
-  padding-left:40px;
-  padding-right:40px;
+  padding:24px 40px 28px;
+  position:relative;
+  flex-shrink:0;
 }
 .stats-item{
   flex:1;
@@ -331,12 +329,15 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
   flex:1;
   display:flex;
   flex-direction:column;
-  justify-content:center;
+  justify-content:flex-start;
   align-items:center;
-  padding:40px 20px 140px;
+  padding:40px 20px 0;
   background:#FFFFFF;
   position:relative;
-  overflow:hidden;
+  min-height:100vh;
+}
+.form-panel .login-card{
+  margin-top:auto; margin-bottom:auto; width:100%;
 }
 
 
@@ -361,6 +362,20 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
 .toast-error{background:#E5484D}
 
 /* Responsive */
+@media (max-height:820px) and (min-width:961px){
+  .brand-panel{padding:32px 36px}
+  .brand-logo .logo-mark{width:80px;height:60px}
+  .brand-logo .logo-text{font-size:19px}
+  .brand-content{margin-top:16px}
+  .brand-content h1{font-size:32px;margin-bottom:10px}
+  .brand-content .assistant-slogan{font-size:16px;margin:12px 0 14px;padding-top:10px}
+  .brand-features{gap:12px;margin-top:20px}
+  .brand-feature-icon{width:32px;height:32px}
+  .form-panel{padding:24px 20px 0}
+  .login-card .card-title{font-size:24px}
+  .login-card .card-subtitle{margin-bottom:18px}
+  .form-row{margin-bottom:18px}
+}
 @media(max-width:960px){
   .login-wrapper{flex-direction:column}
   .brand-panel{flex:none;padding:40px 32px;min-height:auto}
