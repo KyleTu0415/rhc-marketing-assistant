@@ -490,7 +490,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 
   <div class="assistant-grid">
     <!-- 经营仪表盘 -->
-    <div class="assistant-card disabled" role="button" tabindex="0">
+    <div class="assistant-card" onclick="enterModule('dashboard.html')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterModule('dashboard.html')">
       <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
@@ -502,12 +502,12 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
         </svg>
       </div>
       <h3 class="assistant-name">经营仪表盘</h3>
-      <p class="assistant-desc">数据看板、业绩分析、决策支持</p>
-      <span class="assistant-status status-coming">即将上线</span>
+      <p class="assistant-desc">经营指标总览、订单状态、市场分布</p>
+      <span class="assistant-status status-active">立即进入</span>
     </div>
 
     <!-- 销售智能助手 -->
-    <div class="assistant-card disabled" role="button" tabindex="0">
+    <div class="assistant-card" onclick="enterModule('sales.html')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterModule('sales.html')">
       <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
@@ -517,8 +517,8 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
         </svg>
       </div>
       <h3 class="assistant-name">销售智能助手</h3>
-      <p class="assistant-desc">产品知识问答、竞品对比、场景推荐</p>
-      <span class="assistant-status status-coming">即将上线</span>
+      <p class="assistant-desc">产品知识问答、报价工作台</p>
+      <span class="assistant-status status-active">立即进入</span>
     </div>
 
     <!-- 营销中心 -->
@@ -537,7 +537,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
     </div>
 
     <!-- 客户管理系统 -->
-    <div class="assistant-card disabled" role="button" tabindex="0">
+    <div class="assistant-card" onclick="enterModule('customers.html')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterModule('customers.html')">
       <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
@@ -550,8 +550,39 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
         </svg>
       </div>
       <h3 class="assistant-name">客户管理系统</h3>
-      <p class="assistant-desc">客户档案、商机跟进、成交转化</p>
-      <span class="assistant-status status-planning">规划中</span>
+      <p class="assistant-desc">客户档案、跟进状态、关联订单</p>
+      <span class="assistant-status status-active">立即进入</span>
+    </div>
+
+    <!-- 订单履约中心 -->
+    <div class="assistant-card" onclick="enterModule('orders.html')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterModule('orders.html')">
+      <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+      <div class="assistant-icon icon-blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M21 3l-7.5 7.5"/><path d="M3 21l7.5-7.5"/>
+          <rect x="9" y="9" width="6" height="6" rx="1"/>
+        </svg>
+      </div>
+      <h3 class="assistant-name">订单履约中心</h3>
+      <p class="assistant-desc">订单看板、履约节点、全程可视</p>
+      <span class="assistant-status status-active">立即进入</span>
+    </div>
+
+    <!-- 售后中心 -->
+    <div class="assistant-card" onclick="enterModule('aftersales.html')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterModule('aftersales.html')">
+      <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+      <div class="assistant-icon icon-red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+        </svg>
+      </div>
+      <h3 class="assistant-name">售后中心</h3>
+      <p class="assistant-desc">售后工单、问题处理、服务记录</p>
+      <span class="assistant-status status-active">立即进入</span>
     </div>
   </div>
 
@@ -728,6 +759,10 @@ function showToast(msg, type) {
 
 function enterMarketing() {
   window.location.href = 'index.html?from=panel';
+}
+
+function enterModule(page) {
+  window.location.href = page + '?from=panel';
 }
 
 function handleLogout() {

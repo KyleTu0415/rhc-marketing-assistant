@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHC 安瑞康 — 销售智能助手</title>
+<style>
+:root{
+  --color-bg:#F7F8FA; --color-surface:#FFFFFF;
+  --color-primary:#C8102E; --color-primary-dark:#A50D26;
+  --color-primary-light:#FDE8EB; --color-primary-xlight:#FFF1F3;
+  --color-text:#1A1A1A; --color-text-secondary:#6B7280; --color-text-tertiary:#9CA3AF;
+  --color-border:#E5E7EB; --color-border-light:#F3F4F6;
+  --color-success:#16A37B; --color-warning:#F3A94B; --color-danger:#E5484D; --color-info:#3B82F6;
+  --font-sans:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --radius-sm:6px; --radius-md:10px; --radius-lg:14px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.06); --shadow-md:0 4px 12px rgba(0,0,0,0.08); --shadow-lg:0 8px 24px rgba(0,0,0,0.10);
+  --transition-fast:0.15s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font-sans);font-size:14px;line-height:1.5;color:var(--color-text);background:var(--color-bg);overflow:hidden}
+a{color:var(--color-primary);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;font-size:13px}
+input,select,textarea{font-family:var(--font-sans);font-size:13px;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--color-text);background:var(--color-surface);outline:none;transition:border-color var(--transition-fast)}
+input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,46,0.12)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--color-text-tertiary)}
+
+.app-layout{display:flex;height:100vh;width:100vw}
+.sidebar{width:200px;min-width:200px;background:var(--color-surface);border-right:1px solid var(--color-border);display:flex;flex-direction:column;overflow-y:auto;z-index:100}
+.sidebar-logo{padding:16px 0 14px;text-align:center}
+.logo-badge{width:42px;height:42px;border-radius:10px;background:var(--color-primary);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin:0 auto;letter-spacing:0.5px}
+.sidebar-logo span{display:block;font-size:13px;font-weight:700;color:var(--color-primary);margin-top:8px;letter-spacing:3px}
+.sidebar-nav{flex:1}
+.sidebar-nav .nav-section{padding:12px 16px 8px;font-size:12px;letter-spacing:1px;color:var(--color-text-tertiary);font-weight:600}
+.sidebar-nav .nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;color:var(--color-text-secondary);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--transition-fast);border-left:3px solid transparent;text-decoration:none}
+.sidebar-nav a.nav-item:hover{text-decoration:none}
+.sidebar-nav .nav-item:hover{background:var(--color-primary-xlight);color:var(--color-primary)}
+.sidebar-nav .nav-item.active{background:var(--color-primary-xlight);color:var(--color-primary);font-weight:600;border-left-color:var(--color-primary)}
+.sidebar-nav .nav-item .nav-icon{width:16px;height:16px;flex-shrink:0;color:var(--color-text-tertiary)}
+.sidebar-nav .nav-item:hover .nav-icon,.sidebar-nav .nav-item.active .nav-icon{color:var(--color-primary)}
+.sidebar-nav .nav-item-back-home{border-top:1px solid var(--color-border-light);margin-top:6px}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--color-border-light)}
+.sidebar-user{display:flex;align-items:center;gap:8px}
+.sidebar-user .avatar{width:30px;height:30px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.sidebar-user .user-name{font-size:13px;font-weight:600}
+.sidebar-user .user-role{font-size:11px;color:var(--color-text-tertiary)}
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:56px;min-height:56px;background:var(--color-surface);border-bottom:1px solid var(--color-border);display:flex;align-items:center;padding:0 28px;gap:16px}
+.topbar-title{font-size:16px;font-weight:600;flex:1}
+.content-area{flex:1;overflow-y:auto;padding:20px 28px 28px}
+
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:20px}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--color-border-light);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-header h3{font-size:14px;font-weight:600}
+.card-header .card-sub{font-size:12px;color:var(--color-text-tertiary);font-weight:400}
+.card-body{padding:20px}
+
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.2px;white-space:nowrap}
+.tag-success{background:#E6F9F1;color:#0D7B57}
+.tag-warning{background:#FFF4E0;color:#B27A1B}
+.tag-gray{background:#F0F2F3;color:#637089}
+.tag-primary{background:var(--color-primary-light);color:var(--color-primary-dark)}
+.tag-info{background:#E8F0FE;color:#1A56C4}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:all var(--transition-fast)}
+.btn-primary{background:var(--color-primary);color:#fff}
+.btn-primary:hover{background:var(--color-primary-dark)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-outline{border:1px solid var(--color-border);color:var(--color-text-secondary);background:var(--color-surface)}
+.btn-outline:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);letter-spacing:0.5px;margin-bottom:6px}
+.form-group select,.form-group input,.form-group textarea{width:100%}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--color-text);color:#fff;padding:12px 24px;border-radius:var(--radius-md);font-size:13px;font-weight:500;z-index:2000;opacity:0;transition:all .3s ease;box-shadow:var(--shadow-lg);pointer-events:none;max-width:80vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-success{background:var(--color-success)}
+.toast-error{background:var(--color-danger)}
+
+/* ===== Chat ===== */
+.chat-messages{background:var(--color-bg);border:1px solid var(--color-border-light);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:14px;height:380px;overflow-y:auto}
+.msg{display:flex;gap:10px;max-width:82%}
+.msg .msg-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.msg-bot .msg-avatar{background:var(--color-primary)}
+.msg-bot .msg-bubble{background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px var(--radius-md) var(--radius-md) var(--radius-md);padding:10px 14px;font-size:13px;line-height:1.65;white-space:pre-wrap}
+.msg-user{align-self:flex-end;flex-direction:row-reverse}
+.msg-user .msg-avatar{background:var(--color-text-secondary)}
+.msg-user .msg-bubble{background:var(--color-primary);color:#fff;border-radius:var(--radius-md) 4px var(--radius-md) var(--radius-md);padding:10px 14px;font-size:13px;line-height:1.65;white-space:pre-wrap}
+.msg-bubble .msg-source{display:block;margin-top:8px;font-size:11px;color:var(--color-text-tertiary)}
+.msg-user .msg-bubble .msg-source{color:rgba(255,255,255,.75)}
+.chat-quick{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.quick-chip{padding:6px 14px;border:1px solid var(--color-border);border-radius:20px;font-size:12px;color:var(--color-text-secondary);background:var(--color-surface);cursor:pointer;transition:all var(--transition-fast)}
+.quick-chip:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.chat-input-bar{display:flex;gap:10px;margin-top:12px}
+.chat-input-bar input{flex:1;padding:10px 14px}
+.typing-dots{display:inline-flex;gap:4px;align-items:center}
+.typing-dots i{width:6px;height:6px;border-radius:50%;background:var(--color-text-tertiary);animation:blink 1.2s infinite}
+.typing-dots i:nth-child(2){animation-delay:.2s}
+.typing-dots i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+
+/* ===== Quote workbench ===== */
+.quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.product-pick{border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.product-pick-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--color-border-light);transition:background var(--transition-fast)}
+.product-pick-row:last-child{border-bottom:none}
+.product-pick-row:hover{background:var(--color-primary-xlight)}
+.product-pick-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--color-primary);flex-shrink:0}
+.product-pick-row .pp-name{flex:1;font-size:13px;font-weight:600}
+.product-pick-row .pp-desc{font-size:11px;color:var(--color-text-tertiary);font-weight:400;margin-top:2px}
+.product-pick-row input[type=number]{width:72px;padding:6px 8px;text-align:center}
+
+/* ===== PI preview ===== */
+.pi-doc{border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;padding:28px;box-shadow:var(--shadow-sm)}
+.pi-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--color-primary);padding-bottom:14px;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.pi-brand{font-size:16px;font-weight:800;color:var(--color-primary);letter-spacing:1px}
+.pi-brand small{display:block;font-size:11px;color:var(--color-text-tertiary);font-weight:400;letter-spacing:0;margin-top:4px}
+.pi-title{font-size:18px;font-weight:700;text-align:right}
+.pi-title small{display:block;font-size:11px;color:var(--color-text-tertiary);font-weight:400;margin-top:4px}
+.pi-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;font-size:12px;margin-bottom:16px}
+.pi-meta div span{color:var(--color-text-tertiary);margin-right:6px}
+.pi-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+.pi-table th{background:var(--color-bg);padding:9px 10px;text-align:left;font-size:11px;color:var(--color-text-secondary);border:1px solid var(--color-border-light);letter-spacing:0.4px}
+.pi-table td{padding:9px 10px;border:1px solid var(--color-border-light);vertical-align:top}
+.pi-table .pi-qty{text-align:center;width:52px}
+.pi-table .pi-price{text-align:right;width:110px;color:var(--color-text-tertiary)}
+.pi-total-row{display:flex;justify-content:flex-end;gap:20px;font-size:13px;padding:10px 4px;border-top:2px solid var(--color-border)}
+.pi-total-row strong{font-size:15px}
+.pi-terms{font-size:11px;color:var(--color-text-secondary);background:var(--color-bg);border-radius:var(--radius-sm);padding:12px 14px;line-height:1.7}
+.pi-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:280px;gap:10px;color:var(--color-text-tertiary)}
+.pi-note{font-size:11px;color:var(--color-warning);margin-top:10px}
+
+@media(max-width:860px){
+  .sidebar{width:56px;min-width:56px}
+  .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section,.sidebar .sidebar-user .user-info{display:none}
+  .sidebar-logo{padding:16px 8px}
+  .sidebar-nav .nav-item{padding:12px 0;justify-content:center;border-left:none;border-bottom:2px solid transparent}
+  .sidebar-nav .nav-item.active{border-bottom-color:var(--color-primary)}
+  .content-area{padding:16px}
+  .quote-grid{grid-template-columns:1fr}
+  .msg{max-width:95%}
+}
+</style>
+</head>
+<body>
+<div class="app-layout">
+<nav class="sidebar" aria-label="主导航">
+  <div class="sidebar-logo"><div class="logo-badge">RHC</div><span>安瑞康</span></div>
+  <div class="sidebar-nav">
+    <div class="nav-section">RHC 管理平台</div>
+    <a class="nav-item" href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>经营仪表盘</span></a>
+    <a class="nav-item active" href="sales.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>销售智能助手</span></a>
+    <a class="nav-item" href="index.html?from=panel"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg><span>营销中心</span></a>
+    <a class="nav-item" href="customers.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>客户管理</span></a>
+    <a class="nav-item" href="orders.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>订单履约</span></a>
+    <a class="nav-item" href="aftersales.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg><span>售后中心</span></a>
+    <a class="nav-item nav-item-back-home" href="panel.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-user"><div class="avatar">E</div><div><div class="user-name">Ella</div><div class="user-role">市场部</div></div></div>
+  </div>
+</nav>
+<div class="main-area">
+  <header class="topbar"><div class="topbar-title">销售智能助手</div></header>
+  <main class="content-area">
+
+    <div class="card">
+      <div class="card-header"><h3>产品知识问答</h3><span class="card-sub">基于 RHC 产品清单的智能问答，可接入后端 AI 接口</span></div>
+      <div class="card-body">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-quick">
+          <button class="quick-chip" onclick="askQuick('VAM-200 和 VAM-300 有什么区别？')">VAM-200 和 VAM-300 有什么区别？</button>
+          <button class="quick-chip" onclick="askQuick('VM-12 监护仪有哪些参数？')">VM-12 监护仪有哪些参数？</button>
+          <button class="quick-chip" onclick="askQuick('输液泵可以多机联动吗？')">输液泵可以多机联动吗？</button>
+        </div>
+        <div class="chat-input-bar">
+          <input type="text" id="chat-input" placeholder="输入产品问题，例如：VAM-200 适合哪些动物？" onkeydown="if(event.key==='Enter')sendQuestion()">
+          <button class="btn btn-primary" id="chat-send-btn" onclick="sendQuestion()">发送</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>报价工作台</h3><span class="card-sub">选择客户与产品，生成形式发票（PI）预览</span></div>
+      <div class="card-body">
+        <div class="quote-grid">
+          <div>
+            <div class="form-group">
+              <label>客户</label>
+              <select id="quote-customer"><option value="">— 选择客户（加载中…）—</option></select>
+            </div>
+            <div class="form-group">
+              <label>产品与数量</label>
+              <div class="product-pick" id="product-pick"></div>
+            </div>
+            <button class="btn btn-primary" onclick="generatePI()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> 生成 PI 预览</button>
+          </div>
+          <div id="pi-area">
+            <div class="pi-doc pi-placeholder">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div style="font-size:13px;font-weight:500;color:var(--color-text-secondary)">尚未生成 PI</div>
+              <div style="font-size:12px">选择客户与产品后，点击「生成 PI 预览」</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* ===== 产品清单（内置，问答与报价共用） ===== */
+var PRODUCTS=[
+  {model:'VAM-200',name:'VAM-200 兽医麻醉机',desc:'小动物麻醉，适合猫、狗',specs:'标准配置含麻醉呼吸回路、挥发罐、流量计',keywords:['VAM-200','vam200','200','小动物','猫','狗','犬','宠物','麻醉机','挥发罐','流量计','呼吸回路'],
+   answer:'VAM-200 兽医麻醉机面向小动物临床，适用于猫、狗等宠物的吸入麻醉。标准配置包含麻醉呼吸回路、麻醉挥发罐和流量计，操作简洁，适合宠物医院常规手术使用。'},
+  {model:'VAM-300',name:'VAM-300 大型动物麻醉机',desc:'马、牛等大型动物，大流量通气',specs:'大流量通气设计',keywords:['VAM-300','vam300','300','大型动物','大动物','马','牛','大流量','马场','牧场'],
+   answer:'VAM-300 大型动物麻醉机专为马、牛等大型动物设计，支持大流量通气，满足大型动物手术中的麻醉通气需求，适用于马场、大型动物诊疗中心及牧场兽医站。'},
+  {model:'VM-12',name:'VM-12 多参数监护仪',desc:'心电/血氧/血压/呼吸/体温/呼末二氧化碳 六参数',specs:'心电、血氧、血压、呼吸、体温、呼末二氧化碳',keywords:['VM-12','vm12','12','监护','监护仪','心电','血氧','血压','呼吸','体温','二氧化碳','etco2','spo2','参数','六参数'],
+   answer:'VM-12 多参数监护仪提供六项核心参数监护：心电（ECG）、血氧（SpO₂）、血压（NIBP）、呼吸（RESP）、体温（TEMP）和呼末二氧化碳（EtCO₂），可配套麻醉机用于术中及术后监护。'},
+  {model:'VW-8',name:'VW-8 输液泵',desc:'高精度输注，可多机联动',specs:'高精度输注，支持多机联动',keywords:['VW-8','vw8','8','输液泵','输注','注射','输液','联动','多机','精度','高精度'],
+   answer:'VW-8 输液泵提供高精度输注控制，支持多机联动，便于在病区或手术中统一管理多台设备的输液任务，适用于兽医医院的住院与术中补液场景。'}
+];
+
+var snapshotData=null;
+var toastTimer=null;
+function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3200)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+/* ===== 聊天 ===== */
+function addMsg(role,html,sourceTag){
+  var box=document.getElementById('chat-messages');
+  var row=document.createElement('div');
+  row.className='msg '+(role==='user'?'msg-user':'msg-bot');
+  row.innerHTML='<div class="msg-avatar">'+(role==='user'?'我':'AI')+'</div><div class="msg-bubble">'+html+(sourceTag?'<span class="msg-source">'+esc(sourceTag)+'</span>':'')+'</div>';
+  box.appendChild(row);box.scrollTop=box.scrollHeight;
+}
+function localAnswer(q){
+  var ql=q.toLowerCase();
+  var hits=PRODUCTS.filter(function(p){return p.keywords.some(function(k){return ql.indexOf(k.toLowerCase())>=0})});
+  if(hits.length===0){
+    return {text:'您好，我目前掌握的产品信息覆盖以下四款产品：\n· VAM-200 兽医麻醉机（小动物/猫狗）\n· VAM-300 大型动物麻醉机（马/牛等大动物）\n· VM-12 多参数监护仪（六参数）\n· VW-8 输液泵（高精度、多机联动）\n请直接输入产品型号或应用场景（如「猫」「马」「监护参数」），我会给出对应说明。更复杂的商务与报价问题请联系销售同事。',source:'本地产品清单兜底（未匹配到具体型号）'};
+  }
+  return {text:hits.map(function(p){return '【'+p.name+'】\n'+p.answer+'\n标准配置/特点：'+p.specs}).join('\n\n'),source:'本地产品清单'};
+}
+function askQuestion(q){
+  addMsg('user',esc(q));
+  var box=document.getElementById('chat-messages');
+  var typing=document.createElement('div');typing.className='msg msg-bot';typing.id='typing-row';
+  typing.innerHTML='<div class="msg-avatar">AI</div><div class="msg-bubble"><span class="typing-dots"><i></i><i></i><i></i></span></div>';
+  box.appendChild(typing);box.scrollTop=box.scrollHeight;
+
+  function done(text,source){
+    var tr=document.getElementById('typing-row');if(tr)tr.remove();
+    addMsg('bot',esc(text),source);
+  }
+  // 1) 优先 POST /api/chat
+  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})})
+    .then(function(r){if(!r.ok)throw new Error('chat '+r.status);return r.json()})
+    .then(function(d){
+      var text=d.reply||d.message||d.response||d.answer||d.text||(d.data&&(d.data.reply||d.data.message))||'';
+      if(!text)throw new Error('empty chat reply');
+      done(String(text),'后端智能问答接口 /api/chat');
+    })
+    .catch(function(){
+      // 2) 兜底 POST /api/copy
+      fetch('/api/copy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_model:'',target_language:'en',platform:'',extra_keywords:q})})
+        .then(function(r){if(!r.ok)throw new Error('copy '+r.status);return r.json()})
+        .then(function(d){
+          var text=d.copy||d.content||d.text||d.message||(d.data&&(d.data.copy||d.data.content))||'';
+          if(!text)throw new Error('empty copy reply');
+          done(String(text),'后端文案接口 /api/copy');
+        })
+        .catch(function(){
+          // 3) 本地兜底
+          setTimeout(function(){var a=localAnswer(q);done(a.text,a.source)},300);
+        });
+    });
+}
+function sendQuestion(){
+  var inp=document.getElementById('chat-input');
+  var q=inp.value.trim();if(!q)return;
+  inp.value='';askQuestion(q);
+}
+function askQuick(q){document.getElementById('chat-input').value=q;sendQuestion()}
+
+/* ===== 报价工作台 ===== */
+function renderProductPick(){
+  document.getElementById('product-pick').innerHTML=PRODUCTS.map(function(p,i){
+    return '<label class="product-pick-row"><input type="checkbox" id="pp-'+i+'" data-model="'+esc(p.model)+'"><span class="pp-name">'+esc(p.name)+'<span class="pp-desc">'+esc(p.desc)+'</span></span><input type="number" min="1" max="999" value="1" id="pq-'+i+'"></label>';
+  }).join('');
+}
+function generatePI(){
+  var custSel=document.getElementById('quote-customer');
+  var custName=custSel.value;
+  if(!custName){showToast('请先选择客户','error');return}
+  var lines=[];
+  PRODUCTS.forEach(function(p,i){
+    if(document.getElementById('pp-'+i).checked){
+      var qty=parseInt(document.getElementById('pq-'+i).value,10)||1;
+      if(qty>0)lines.push({product:p,qty:qty});
+    }
+  });
+  if(lines.length===0){showToast('请至少勾选一个产品','error');return}
+  var cust=(snapshotData.customers||[]).filter(function(c){return c['客户名称']===custName})[0]||{};
+  var today=new Date();
+  var dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var piNo='PI-FRAME-'+String(today.getFullYear()).slice(2)+String(today.getMonth()+1).padStart(2,'0')+'-'+String(Math.floor(Math.random()*900)+100);
+  var rows=lines.map(function(l){
+    return '<tr><td>'+esc(l.product.name)+'<div style="color:var(--color-text-tertiary);font-size:11px;margin-top:2px">'+esc(l.product.desc)+'</div></td><td class="pi-qty">'+l.qty+'</td><td class="pi-price">待销售填写</td><td class="pi-price">待销售填写</td></tr>';
+  }).join('');
+  document.getElementById('pi-area').innerHTML=
+    '<div class="pi-doc">'+
+      '<div class="pi-head"><div class="pi-brand">RHC 安瑞康<small>RHC Medical · Veterinary Equipment</small></div><div class="pi-title">形式发票 PROFORMA INVOICE<small>'+esc(piNo)+'</small></div></div>'+
+      '<div class="pi-meta">'+
+        '<div><span>客户：</span>'+esc(custName)+'</div>'+
+        '<div><span>日期：</span>'+dateStr+'</div>'+
+        '<div><span>国家/地区：</span>'+esc(cust['国家/地区']||'—')+'</div>'+
+        '<div><span>联系人：</span>'+esc(cust['联系人']||'—')+'</div>'+
+        '<div><span>主营产品：</span>'+esc(cust['主营产品']||'—')+'</div>'+
+        '<div><span>负责销售：</span>—</div>'+
+      '</div>'+
+      '<table class="pi-table"><thead><tr><th>产品</th><th class="pi-qty">数量</th><th class="pi-price">单价</th><th class="pi-price">金额</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+      '<div class="pi-total-row"><span>合计：</span><strong>待销售填写（价格隔离：正式版价格仅销售可见）</strong></div>'+
+      '<div class="pi-terms"><strong>条款（正式版自动带出）：</strong><br>付款方式：待销售填写　|　贸易术语（Incoterms）：待销售填写　|　交货期：待销售填写<br>质保：按 RHC 标准质保条款执行　|　报价有效期：待销售填写</div>'+
+      '<div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap"><button class="btn btn-outline btn-sm" onclick="showToast(\'框架阶段：正式版支持在线编辑 PI 明细\')">编辑明细</button><button class="btn btn-primary btn-sm" onclick="showToast(\'框架阶段：正式版将生成PDF并推送Ella\',\'success\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 导出 / 发送（正式版）</button></div>'+
+      '<div class="pi-note">注：当前为框架预览，单价与合计在正式版中按销售权限自动填充，框架阶段不展示价格数据。</div>'+
+    '</div>';
+  showToast('PI 预览已生成','success');
+}
+
+/* ===== 初始化 ===== */
+addMsg('bot','您好，我是 RHC 销售智能助手。您可以向我咨询 VAM-200、VAM-300、VM-12、VW-8 等产品的参数、适用场景与配置信息。点击下方常见问题，或直接输入问题开始。');
+renderProductPick();
+fetch('data/snapshot.json',{cache:'no-store'})
+  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+  .then(function(d){
+    snapshotData=d;
+    var sel=document.getElementById('quote-customer');
+    sel.innerHTML='<option value="">— 选择客户 —</option>'+(d.customers||[]).map(function(c){
+      return '<option value="'+esc(c['客户名称'])+'">'+esc(c['客户名称'])+'（'+esc(c['国家/地区']||'')+'）</option>';
+    }).join('');
+  })
+  .catch(function(){
+    document.getElementById('quote-customer').innerHTML='<option value="">客户数据加载失败</option>';
+    showToast('客户数据加载失败，请通过本地 HTTP 服务访问本页面','error');
+  });
+</script>
+</body>
+</html>
