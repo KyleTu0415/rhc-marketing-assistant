@@ -22,15 +22,13 @@
     '#rhc-widget-close{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#9CA3AF;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}' +
     '#rhc-widget-close:hover{background:#FDE8EB;color:#C8102E}' +
     '#rhc-widget-close svg{width:15px;height:15px;display:block}' +
-    '.rhc-widget-messages{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;background:#F7F8FA;padding:14px 18px;display:flex;flex-direction:column;gap:10px}' +
+    '.rhc-widget-messages{flex:1;min-height:0;overflow-y:auto;background:#F7F8FA;padding:18px;display:flex;flex-direction:column;gap:10px}' +
     '.rhc-widget-msg{display:flex;max-width:82%}' +
-    '.rhc-widget-bot{align-self:flex-start;margin-left:8px}' +
+    '.rhc-widget-bot{align-self:flex-start;margin-left:36px}' +
     '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse;margin-right:8px}' +
-    '.rhc-widget-bubble{position:relative;display:block;padding:10px 14px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word;border-radius:8px;max-width:100%}' +
-    '.rhc-widget-bot .rhc-widget-bubble{background:#EDEDED;color:#1A1A1A}' +
-    '.rhc-widget-bot .rhc-widget-bubble::before{content:"";position:absolute;left:-6px;top:12px;width:0;height:0;border-style:solid;border-width:5px 6px 5px 0;border-color:transparent #EDEDED transparent transparent}' +
-    '.rhc-widget-user .rhc-widget-bubble{background:#95EC69;color:#1A1A1A}' +
-    '.rhc-widget-user .rhc-widget-bubble::before{content:"";position:absolute;right:-6px;top:12px;width:0;height:0;border-style:solid;border-width:5px 0 5px 6px;border-color:transparent transparent transparent #95EC69}' +
+    '.rhc-widget-bubble{display:block;padding:10px 14px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word;border-radius:12px}' +
+    '.rhc-widget-bot .rhc-widget-bubble{background:#FFFFFF;border:none;box-shadow:0 2px 8px rgba(0,0,0,.08);border-radius:12px;color:#1A1A1A}' +
+    '.rhc-widget-user .rhc-widget-bubble{background:#C8102E;color:#FFFFFF;border-radius:12px}' +
     '.rhc-widget-typing{display:inline-flex;gap:4px;align-items:center}' +
     '.rhc-widget-typing i{width:6px;height:6px;border-radius:50%;background:#9CA3AF;animation:rhc-widget-blink 1.2s infinite}' +
     '.rhc-widget-typing i:nth-child(2){animation-delay:.2s}' +
