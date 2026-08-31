@@ -26,7 +26,7 @@
     '.rhc-widget-msg{display:flex;max-width:82%}' +
     '.rhc-widget-bot{align-self:flex-start}' +
     '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse}' +
-    '.rhc-widget-bubble{display:block;padding:7px 10px;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word;border-radius:12px}' +
+    '.rhc-widget-bubble{display:block;padding:7px 10px;font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;border-radius:12px}' +
     '.rhc-widget-bot .rhc-widget-bubble{background:#FFFFFF;border:1px solid #E5E7EB;border-top-left-radius:4px;color:#1A1A1A}' +
     '.rhc-widget-user .rhc-widget-bubble{background:#C8102E;color:#FFFFFF;border-top-right-radius:4px}' +
     '.rhc-widget-typing{display:inline-flex;gap:4px;align-items:center}' +
