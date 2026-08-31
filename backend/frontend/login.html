@@ -46,7 +46,9 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
   color:#fff;
   padding:56px 48px;
   display:flex;flex-direction:column;
+  min-height:100vh;height:100vh;
   position:relative;overflow:hidden;
+  justify-content:space-between;
 }
 .brand-panel::before{
   content:'';position:absolute;top:-200px;right:-200px;width:500px;height:500px;
@@ -103,6 +105,7 @@ input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,4
 .form-panel{
   flex:1;display:flex;align-items:center;justify-content:center;
   padding:40px;background:#FFFFFF;
+  min-height:100vh;height:100vh;
 }
 .login-card{
   width:100%;max-width:480px;
