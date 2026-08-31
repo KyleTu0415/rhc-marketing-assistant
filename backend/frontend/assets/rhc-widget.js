@@ -22,7 +22,8 @@
     '#rhc-widget-close{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#9CA3AF;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}' +
     '#rhc-widget-close:hover{background:#FDE8EB;color:#C8102E}' +
     '#rhc-widget-close svg{width:15px;height:15px;display:block}' +
-    '.rhc-widget-messages{flex:1;min-height:0;overflow-y:auto;background:#F7F8FA;padding:18px;display:flex;flex-direction:column;gap:10px}' +
+    '.rhc-widget-messages{flex:1;min-height:0;background:#F7F8FA;padding:18px 24px;display:flex;flex-direction:column}' +
+    '.rhc-widget-messages-inner{flex:1;min-height:0;overflow-y:auto;padding:0 8px;display:flex;flex-direction:column;gap:10px}' +
     '.rhc-widget-msg{display:flex;max-width:82%}' +
     '.rhc-widget-bot{align-self:flex-start;margin-left:10px}' +
     '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse;margin-right:10px}' +
@@ -110,7 +111,7 @@
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
           '</button>' +
         '</div>' +
-        '<div class="rhc-widget-messages" id="rhc-widget-messages"></div>' +
+        '<div class="rhc-widget-messages"><div class="rhc-widget-messages-inner" id="rhc-widget-messages"></div></div>' +
         '<div class="rhc-widget-quick" id="rhc-widget-quick">' + chipsHtml + '</div>' +
         '<div class="rhc-widget-input-bar">' +
           '<input type="text" id="rhc-widget-input" placeholder="输入产品问题，例如：V5 Plus 适合哪些动物？">' +
