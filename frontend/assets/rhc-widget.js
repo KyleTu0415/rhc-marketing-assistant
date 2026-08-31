@@ -102,7 +102,7 @@
       '</button>' +
       '<div id="rhc-widget-panel" role="dialog" aria-label="知识问答">' +
         '<div class="rhc-widget-header">' +
-          '<div class="rhc-widget-title"><span class="rhc-widget-title-main">知识问答</span><span class="rhc-widget-title-sub">基于RHC产品资料库</span></div>' +
+          '<div class="rhc-widget-title"><span class="rhc-widget-title-main">   知识问答</span><span class="rhc-widget-title-sub">基于RHC产品资料库</span></div>' +
           '<button type="button" id="rhc-widget-close" aria-label="关闭">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
           '</button>' +
