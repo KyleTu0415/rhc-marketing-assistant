@@ -16,7 +16,7 @@
     '#rhc-widget-panel{position:fixed;right:20px;bottom:88px;width:340px;height:580px;max-height:75vh;box-sizing:border-box;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18);z-index:2147483601;display:none;flex-direction:column;overflow:hidden}' +
     '#rhc-widget-panel.rhc-widget-open{display:flex}' +
     '.rhc-widget-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #F3F4F6;background:#FFFFFF;flex-shrink:0}' +
-    '.rhc-widget-title{display:flex;flex-direction:column;gap:2px;min-width:0;padding-left:10px}' +
+    '.rhc-widget-title{display:flex;flex-direction:column;gap:2px;min-width:0;margin-left:10px}' +
     '.rhc-widget-title-main{font-size:14px;font-weight:700;color:#C8102E;line-height:1.3}' +
     '.rhc-widget-title-sub{font-size:11px;color:#9CA3AF;line-height:1.3}' +
     '#rhc-widget-close{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#9CA3AF;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}' +
