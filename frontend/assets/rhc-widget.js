@@ -22,7 +22,7 @@
     '#rhc-widget-close{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#9CA3AF;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}' +
     '#rhc-widget-close:hover{background:#FDE8EB;color:#C8102E}' +
     '#rhc-widget-close svg{width:15px;height:15px;display:block}' +
-    '.rhc-widget-messages{flex:1;overflow-y:auto;background:#F7F8FA;padding:14px;display:flex;flex-direction:column;gap:10px}' +
+    '.rhc-widget-messages{flex:1;overflow-y:auto;background:#F7F8FA;padding:14px 14px 80px 14px;display:flex;flex-direction:column;gap:10px}' +
     '.rhc-widget-msg{display:flex;max-width:88%}' +
     '.rhc-widget-bot{align-self:flex-start}' +
     '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse}' +
