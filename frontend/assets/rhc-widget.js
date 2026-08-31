@@ -24,12 +24,15 @@
     '#rhc-widget-close svg{width:15px;height:15px;display:block}' +
     '.rhc-widget-messages{flex:1;min-height:0;overflow-y:auto;background:#F7F8FA;padding:18px;display:flex;flex-direction:column;gap:10px}' +
     '.rhc-widget-msg{display:flex;max-width:82%}' +
-    '.rhc-widget-bot{align-self:flex-start;margin-left:36px}' +
-    '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse;margin-right:8px}' +
-    '.rhc-widget-bubble{display:block;padding:10px 14px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word;border-radius:12px}' +
-    '.rhc-widget-bot .rhc-widget-bubble{background:#FFFFFF;border:none;box-shadow:0 2px 8px rgba(0,0,0,.08);border-radius:12px;color:#1A1A1A}' +
-    '.rhc-widget-user .rhc-widget-bubble{background:#C8102E;color:#FFFFFF;border-radius:12px}' +
+    '.rhc-widget-bot{align-self:flex-start;margin-left:10px}' +
+    '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse;margin-right:10px}' +
+    '.rhc-widget-bubble{display:block;padding:10px 14px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word;border-radius:8px;position:relative;max-width:100%}' +
+    '.rhc-widget-bot .rhc-widget-bubble{background:#EDEDED;color:#1A1A1A;border-radius:8px}' +
+    '.rhc-widget-bot .rhc-widget-bubble::before{content:"";position:absolute;left:-6px;top:12px;width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:7px solid #EDEDED}' +
+    '.rhc-widget-user .rhc-widget-bubble{background:#95EC69;color:#1A1A1A;border-radius:8px}' +
+    '.rhc-widget-user .rhc-widget-bubble::before{content:"";position:absolute;right:-6px;top:12px;width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:7px solid #95EC69}' +
     '.rhc-widget-typing{display:inline-flex;gap:4px;align-items:center}' +
+    '.rhc-widget-bot .rhc-widget-bubble.rhc-widget-typing::before{display:none}' +
     '.rhc-widget-typing i{width:6px;height:6px;border-radius:50%;background:#9CA3AF;animation:rhc-widget-blink 1.2s infinite}' +
     '.rhc-widget-typing i:nth-child(2){animation-delay:.2s}' +
     '.rhc-widget-typing i:nth-child(3){animation-delay:.4s}' +
