@@ -13,16 +13,16 @@
     '#rhc-widget-fab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;background:#C8102E;border:none;cursor:pointer;z-index:2147483600;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(200,16,46,.35);transition:transform .15s ease,background .15s ease}' +
     '#rhc-widget-fab:hover{background:#A50D26;transform:scale(1.06)}' +
     '#rhc-widget-fab svg{width:26px;height:26px;color:#fff;display:block}' +
-    '#rhc-widget-panel{position:fixed;right:20px;bottom:88px;width:340px;height:580px;max-height:75vh;min-width:280px;max-width:90vw;box-sizing:border-box;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18);z-index:2147483601;display:none;flex-direction:column;overflow:auto;resize:both}' +
+    '#rhc-widget-panel{position:fixed;right:20px;bottom:88px;width:340px;height:580px;max-height:75vh;min-width:280px;max-width:90vw;box-sizing:border-box;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18);z-index:2147483601;display:none;flex-direction:column;overflow:auto;resize:both;direction:rtl}' +
     '#rhc-widget-panel.rhc-widget-open{display:flex}' +
-    '.rhc-widget-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 26px 13px 16px;border-bottom:1px solid #F3F4F6;background:#FFFFFF;flex-shrink:0}' +
+    '.rhc-widget-header{direction:ltr;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 26px 13px 16px;border-bottom:1px solid #F3F4F6;background:#FFFFFF;flex-shrink:0}' +
     '.rhc-widget-title{display:flex;flex-direction:column;gap:2px;min-width:0;margin-left:10px}' +
     '.rhc-widget-title-main{font-size:14px;font-weight:700;color:#C8102E;line-height:1.3}' +
     '.rhc-widget-title-sub{font-size:11px;color:#9CA3AF;line-height:1.3}' +
     '#rhc-widget-close{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#9CA3AF;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}' +
     '#rhc-widget-close:hover{background:#FDE8EB;color:#C8102E}' +
     '#rhc-widget-close svg{width:15px;height:15px;display:block}' +
-    '.rhc-widget-messages{flex:1;min-height:0;overflow-y:auto;background:#F7F8FA;padding:10px;display:flex;flex-direction:column;gap:10px}' +
+    '.rhc-widget-messages{direction:ltr;flex:1;min-height:0;overflow-y:auto;background:#F7F8FA;padding:10px;display:flex;flex-direction:column;gap:10px}' +
     '.rhc-widget-msg{display:flex;max-width:82%}' +
     '.rhc-widget-bot{align-self:flex-start;margin-left:8px}' +
     '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse;margin-right:8px}' +
@@ -34,10 +34,10 @@
     '.rhc-widget-typing i:nth-child(2){animation-delay:.2s}' +
     '.rhc-widget-typing i:nth-child(3){animation-delay:.4s}' +
     '@keyframes rhc-widget-blink{0%,80%,100%{opacity:.3}40%{opacity:1}}' +
-    '.rhc-widget-quick{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px 10px;background:#F7F8FA;flex-shrink:0;border-top:1px solid #ECEEF0}' +
+    '.rhc-widget-quick{direction:ltr;display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px 10px;background:#F7F8FA;flex-shrink:0;border-top:1px solid #ECEEF0}' +
     '.rhc-widget-chip{padding:4px 9px;border:1px solid #E5E7EB;border-radius:14px;font-size:11px;color:#6B7280;background:#FFFFFF;cursor:pointer;transition:all .15s ease;font-family:inherit;line-height:1.4}' +
     '.rhc-widget-chip:hover{border-color:#C8102E;color:#C8102E}' +
-    '.rhc-widget-input-bar{display:flex;gap:6px;padding:8px 10px;border-top:1px solid #F3F4F6;background:#FFFFFF;flex-shrink:0}' +
+    '.rhc-widget-input-bar{direction:ltr;display:flex;gap:6px;padding:8px 10px;border-top:1px solid #F3F4F6;background:#FFFFFF;flex-shrink:0}' +
     '.rhc-widget-input-bar input{flex:1;min-width:0;padding:7px 10px;font-size:12px;border:1px solid #E5E7EB;border-radius:6px;outline:none;font-family:inherit;color:#1A1A1A;background:#FFFFFF}' +
     '.rhc-widget-input-bar input:focus{border-color:#C8102E;box-shadow:0 0 0 3px rgba(200,16,46,.12)}' +
     '#rhc-widget-send{padding:7px 12px;border:none;border-radius:6px;background:#C8102E;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;transition:background .15s ease}' +
