@@ -34,7 +34,7 @@
     '.rhc-widget-typing i:nth-child(2){animation-delay:.2s}' +
     '.rhc-widget-typing i:nth-child(3){animation-delay:.4s}' +
     '@keyframes rhc-widget-blink{0%,80%,100%{opacity:.3}40%{opacity:1}}' +
-    '.rhc-widget-quick{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px 12px;background:#F7F8FA;flex-shrink:0;border-top:1px solid #ECEEF0}' +
+    '.rhc-widget-quick{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px 12px;background:#F7F8FA;flex-shrink:0;border-top:1px solid #ECEEF0;margin-bottom:8px}' +
     '.rhc-widget-chip{padding:5px 12px;border:1px solid #E5E7EB;border-radius:16px;font-size:12px;color:#6B7280;background:#FFFFFF;cursor:pointer;transition:all .15s ease;font-family:inherit;line-height:1.4}' +
     '.rhc-widget-chip:hover{border-color:#C8102E;color:#C8102E}' +
     '.rhc-widget-input-bar{display:flex;gap:8px;padding:12px 14px;border-top:1px solid #F3F4F6;background:#FFFFFF;flex-shrink:0}' +
