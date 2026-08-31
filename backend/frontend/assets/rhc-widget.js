@@ -24,8 +24,8 @@
     '#rhc-widget-close svg{width:15px;height:15px;display:block}' +
     '.rhc-widget-messages{flex:1;min-height:0;overflow-y:auto;background:#F7F8FA;padding:10px;display:flex;flex-direction:column;gap:10px}' +
     '.rhc-widget-msg{display:flex;max-width:82%}' +
-    '.rhc-widget-bot{align-self:flex-start}' +
-    '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse}' +
+    '.rhc-widget-bot{align-self:flex-start;margin-left:8px}' +
+    '.rhc-widget-user{align-self:flex-end;flex-direction:row-reverse;margin-right:8px}' +
     '.rhc-widget-bubble{display:block;padding:7px 10px;font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;border-radius:12px}' +
     '.rhc-widget-bot .rhc-widget-bubble{background:#FFFFFF;border:1px solid #E5E7EB;border-top-left-radius:4px;color:#1A1A1A}' +
     '.rhc-widget-user .rhc-widget-bubble{background:#C8102E;color:#FFFFFF;border-top-right-radius:4px}' +
