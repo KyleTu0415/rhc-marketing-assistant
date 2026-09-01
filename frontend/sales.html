@@ -103,6 +103,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .product-pick-row .pp-name{flex:1;font-size:13px;font-weight:600}
 .product-pick-row .pp-desc{font-size:11px;color:var(--color-text-tertiary);font-weight:400;margin-top:2px}
 .product-pick-row input[type=number]{width:72px;padding:6px 8px;text-align:left}
+.ms{position:relative}
+.ms-trigger{width:100%;text-align:left;padding:9px 12px;border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg,#fff);cursor:pointer;font-size:13px;color:var(--color-text-primary);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ms-trigger:hover{border-color:var(--color-primary)}
+.ms-trigger .ms-count{color:var(--color-text-tertiary);font-weight:400}
+.ms-menu{display:none;position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);background:var(--color-bg,#fff);border:1px solid var(--color-border);border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.10);max-height:280px;overflow:auto;padding:4px 0}
+.ms.open .ms-menu{display:block}
+.ms-menu label{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;cursor:pointer;font-size:13px;font-weight:600}
+.ms-menu label:hover{background:var(--color-primary-xlight)}
+.ms-menu input[type=checkbox]{width:16px;height:16px;accent-color:var(--color-primary);flex-shrink:0;margin-top:2px}
+.ms-menu .pp-desc{display:block;font-weight:400}
+.ms-qty{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.ms-qty label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary);border:1px solid var(--color-border-light);border-radius:var(--radius-sm);padding:6px 10px}
+.ms-qty input[type=number]{width:64px;padding:5px 8px}
 .mail-preview{border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;min-height:320px;max-height:480px;overflow-y:auto;padding:22px 24px}
 .mail-preview-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:280px;gap:10px;color:var(--color-text-tertiary)}
 .mail-subject{font-size:14px;font-weight:700;color:var(--color-text);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--color-border-light);white-space:pre-wrap}
@@ -520,14 +533,31 @@ function onMailCustomerChange(){
   var manual=document.getElementById('mail-customer-manual');
   manual.style.display=(sel.value==='__manual__')?'block':'none';
 }
+/* ===== 多选下拉通用交互 ===== */
+function toggleMs(btn){
+  var ms=btn.closest('.ms');
+  document.querySelectorAll('.ms.open').forEach(function(m){if(m!==ms)m.classList.remove('open')});
+  ms.classList.toggle('open');
+}
+function updateMsTrigger(box){
+  var ms=box.closest('.ms');
+  var boxes=ms.querySelectorAll('input[type=checkbox]');
+  var sel=[];boxes.forEach(function(b){if(b.checked)sel.push(b.getAttribute('data-label')||b.getAttribute('data-model')||'')});
+  var lab=ms.querySelector('.ms-label');
+  lab.textContent=sel.length?('已选 '+sel.length+' 项：'+sel.join('、')):lab.getAttribute('data-ph')||'请选择（可多选）';
+  if(!lab.getAttribute('data-ph'))lab.setAttribute('data-ph',lab.textContent);
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.ms'))document.querySelectorAll('.ms.open').forEach(function(m){m.classList.remove('open')})});
 function renderMailProducts(list){
   mailProducts=list;
-  document.getElementById('mail-product-pick').innerHTML=list.map(function(p,i){
-    var nm=p.name||(p.product_model+' '+(p.product_name||''));
-    var model=p.model||p.product_model||'';
-    var desc=p.desc||p.main_selling_point||p.category||'';
-    return '<label class="product-pick-row"><input type="checkbox" id="mp-'+i+'" data-model="'+esc(model)+'"><span class="pp-name">'+esc(nm)+(desc?'<span class="pp-desc">'+esc(desc)+'</span>':'')+'</span></label>';
-  }).join('');
+  document.getElementById('mail-product-pick').innerHTML=
+    '<div class="ms"><button type="button" class="ms-trigger" onclick="toggleMs(this)"><span class="ms-label" data-ph="请选择相关产品（可多选，不选则全量参考）">请选择相关产品（可多选，不选则全量参考）</span><span>▾</span></button><div class="ms-menu">'+
+    list.map(function(p,i){
+      var nm=p.name||(p.product_model+' '+(p.product_name||''));
+      var model=p.model||p.product_model||'';
+      var desc=p.desc||p.main_selling_point||p.category||'';
+      return '<label><input type="checkbox" id="mp-'+i+'" data-model="'+esc(model)+'" data-label="'+esc(nm)+'" onchange="updateMsTrigger(this)"><span class="pp-name">'+esc(nm)+(desc?'<span class="pp-desc">'+esc(desc)+'</span>':'')+'</span></label>';
+    }).join('')+'</div></div>';
 }
 function getMailCustomer(){
   var sel=document.getElementById('mail-customer');
@@ -640,8 +670,19 @@ function fallbackCopy(text){
 
 /* ===== PI 工作台 ===== */
 function renderProductPick(){
-  document.getElementById('product-pick').innerHTML=PRODUCTS.map(function(p,i){
-    return '<label class="product-pick-row"><input type="checkbox" id="pp-'+i+'" data-model="'+esc(p.model)+'"><span class="pp-name">'+esc(p.name)+'<span class="pp-desc">'+esc(p.desc)+'</span></span><input type="number" min="1" max="999" value="1" id="pq-'+i+'"></label>';
+  document.getElementById('product-pick').innerHTML=
+    '<div class="ms"><button type="button" class="ms-trigger" onclick="toggleMs(this)"><span class="ms-label" data-ph="请选择报价产品（可多选）">请选择报价产品（可多选）</span><span>▾</span></button><div class="ms-menu">'+
+    PRODUCTS.map(function(p,i){
+      return '<label><input type="checkbox" id="pp-'+i+'" data-model="'+esc(p.model)+'" data-label="'+esc(p.name)+'" onchange="updateMsTrigger(this);renderPiQty()"><span class="pp-name">'+esc(p.name)+'<span class="pp-desc">'+esc(p.desc)+'</span></span></label>';
+    }).join('')+'</div></div><div class="ms-qty" id="pi-qty-area"></div>';
+}
+function renderPiQty(){
+  var area=document.getElementById('pi-qty-area');
+  if(!area)return;
+  area.innerHTML=PRODUCTS.map(function(p,i){
+    var b=document.getElementById('pp-'+i);
+    if(!b||!b.checked)return '';
+    return '<label>'+esc(p.model)+' 数量 <input type="number" min="1" max="999" value="1" id="pq-'+i+'"></label>';
   }).join('');
 }
 function generatePI(){
