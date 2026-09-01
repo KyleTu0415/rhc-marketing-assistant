@@ -290,6 +290,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       </div>
     </div>
 
+    <div class="card" style="margin-top:14px">
+      <div class="card-header"><h3>客户回函 · 收件箱</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span>　正式版接通企业邮箱自动拉取回函</span></div>
+      <div class="card-body">
+        <div style="border:1px solid var(--color-border-light);border-radius:8px;padding:12px 14px;background:var(--color-bg-subtle,#fafbfc)">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--color-text-secondary)"><span><strong style="color:var(--color-text-primary)">James Carter</strong> &lt;j.carter@northpet.ca&gt; · NorthPet Distribution（加拿大）</span><span>2026-09-02 09:41（加拿大时间 9月1日晚）</span></div>
+          <div style="margin:8px 0 4px;font-weight:600">Re: X35VET Total Cost of Ownership Comparison</div>
+          <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">"Hi, thanks for the TCO sheet — the turbine-free airflow story is compelling. Two questions before we move forward: <strong>1)</strong> what distributor discount do you offer for the Canadian market? <strong>2)</strong> how are spare parts and annual service handled in North America? We'd also like a quote for 3 units to start."</div>
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="tag tag-success" style="font-size:11px">客户已回复 · 商机信号已同步</span><button class="btn btn-primary btn-sm" onclick="switchPage('signals',document.querySelector('[data-page=signals]'));showToast('NorthPet 已在商机信号标记「客户已回复」，可点「转为客户」','info')">去商机信号转为客户 →</button><button class="btn btn-outline btn-sm" onclick="switchMailTab('inquiry');showToast('选择 NorthPet 客户后，AI 将据此回函内容生成回复邮件','info')">用询盘回复模板回信</button></div>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：正式版接通企业微信邮箱/企业邮箱后，客户回函自动拉取到此处、按客户归档到对应信号与客户档案；AI 自动判定回复类型（询价/拒绝/要资料），商机信号状态同步更新为「客户已回复」，并可一键生成英文回信。</div>
+      </div>
+    </div>
+
     </section>
 
     <section class="page" id="page-pi">
