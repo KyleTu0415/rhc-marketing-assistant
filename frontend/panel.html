@@ -623,6 +623,22 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
       <p class="assistant-desc">售后工单、问题处理、服务记录</p>
       <span class="assistant-status status-active">立即进入</span>
     </div>
+
+    <!-- 规则配置中心 -->
+    <div class="assistant-card" onclick="enterModule('config.html')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterModule('config.html')">
+      <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+      <div class="assistant-icon icon-gray">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </div>
+      <h3 class="assistant-name">规则配置中心</h3>
+      <p class="assistant-desc">分级规则、信号规则、邮件规范集中维护</p>
+      <span class="assistant-status" style="color:var(--color-text-tertiary,#9CA3AF)">管理层功能</span>
+    </div>
   </div>
 
   <footer class="page-footer">

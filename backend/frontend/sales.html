@@ -235,18 +235,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 
     <section class="page" id="page-grading">
     <div class="page-header">
-      <div><h2>客户分级</h2><p>按规则自动打分分级，高等级客户优先投入精力（默认外贸规则，top sales 经验访谈后替换）</p></div>
+      <div><h2>客户分级</h2><p>按规则自动打分分级，高等级客户优先投入精力（规则在规则配置中心维护，调整后即时生效）</p></div>
     </div>
     <div class="card">
-      <div class="card-header"><h3>分级规则（默认版）</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span>　规则可配置，访谈后替换不改代码</span></div>
-      <div class="card-body">
-        <div class="intel-point"><span class="ip-tag">合作状态 30分</span><div>已成交 30 分 / 复购中 25 分 / 询盘谈判 15 分 / 初步接触 5 分。</div></div>
-        <div class="intel-point"><span class="ip-tag">客户类型 20分</span><div>连锁集团/分销经销商 20 分 / 单体医院 10 分 / 个人或不明 0 分（取自客户档案备注）。</div></div>
-        <div class="intel-point"><span class="ip-tag">区域市场 20分</span><div>北美/欧洲/中东/东南亚（重点增量市场）20 分 / 其他区域 10 分。</div></div>
-        <div class="intel-point"><span class="ip-tag">产品宽度 15分</span><div>主营产品覆盖 ≥3 款 15 分 / 2 款 10 分 / 1 款 5 分。</div></div>
-        <div class="intel-point"><span class="ip-tag">跟进新鲜度 15分</span><div>7 天内有跟进 15 分 / 14 天内 8 分 / 超过 14 天 0 分（超期自动提醒）。</div></div>
-        <div style="margin-top:12px;font-size:12px;color:var(--color-text-secondary)"><strong>等级划分：</strong><span class="tag tag-success">A 级 ≥80分</span> 重点保障，优先响应与资源投入　<span class="tag tag-warning">B 级 60–79分</span> 标准节奏跟进　<span class="tag tag-gray">C 级 &lt;60分</span> 低成本批量维护</div>
-      </div>
+      <div class="card-header"><h3>当前生效的分级规则</h3><span class="card-sub"><a href="config.html" style="font-weight:600">规则配置中心 →</a></span></div>
+      <div class="card-body" id="grading-rules-card"></div>
     </div>
     <div class="card">
       <div class="card-header"><h3>客户分级看板</h3><span class="card-sub">数据来源：飞书客户主库 + 演示线索</span></div>
@@ -395,6 +388,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 </div>
 </div>
 <div class="toast" id="toast"></div>
+<script src="assets/rhc-config.js"></script>
 <script>
 function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');var ca=document.querySelector('.content-area');if(ca)ca.scrollTop=0}
 document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
@@ -690,22 +684,41 @@ var GRADING_DEMO_LEADS=[
   {客户名称:'SaoPaulo Vet Supply',国家地区:'巴西',跟进状态:'询盘谈判',来源渠道:'官网询盘',来源链接:'',来源链接说明:'内部渠道，正式版可查看询盘原文与客户留资',主营产品:'SA Series注射泵',备注:'巴西兽医器材供应商；采购量级未知；演示信号',最近跟进:'2026-08-30 询盘待回复',demo:true},
   {客户名称:'GreenField Pet Clinic',国家地区:'越南',跟进状态:'初步接触',来源渠道:'B2B平台',来源链接:'https://www.made-in-china.com/products-search/hot-china-products/Veterinary_Anesthesia_Machine.html',来源链接说明:'原始询盘页（演示链接）',主营产品:'X35VET兽用麻醉机',备注:'越南单体宠物诊所，求购单台麻醉机；演示信号',最近跟进:'2026-08-30 首次接触',demo:true}
 ];
-var KEY_REGIONS=['美国','加拿大','英国','德国','法国','澳大利亚','瑞典','挪威','丹麦','荷兰','阿联酋','沙特','新加坡','马来西亚','泰国','越南','印尼','菲律宾'];
+/* 分级规则从规则配置中心读取（assets/rhc-config.js），不再写死在本页面 */
+function getGradingRules(){
+  var d=RHC_CONFIG.DEFAULT.grading;
+  try{var g=RHC_CONFIG.get().grading;return g||d}catch(e){return d}
+}
 function gradeCustomer(c){
+  var g=getGradingRules();
   var note=(c['备注']||'')+(c['客户名称']||'');
   var status=c['跟进状态']||'';
-  var sStatus=/已成交/.test(status)?30:/复购/.test(status)?25:/询盘|谈判/.test(status)?15:5;
-  var sType=/连锁|集团|分销|经销|进口商|代理|供应/.test(note)?20:/医院|诊所|医疗中心/.test(note)?10:0;
-  var sRegion=KEY_REGIONS.some(function(r){return (c['国家/地区']||c['国家地区']||'').indexOf(r)>=0})?20:10;
+  var sStatus=/已成交/.test(status)?g.status.won:/复购/.test(status)?g.status.repeat:/询盘|谈判/.test(status)?g.status.inquiry:g.status.new;
+  var sType=/连锁|集团|分销|经销|进口商|代理|供应/.test(note)?g.type.chain:/医院|诊所|医疗中心/.test(note)?g.type.hospital:g.type.other;
+  var keyRegions=g.keyRegions||[];
+  var sRegion=keyRegions.some(function(r){return r&&(c['国家/地区']||c['国家地区']||'').indexOf(r)>=0})?g.region.key:g.region.other;
   var prods=(c['主营产品']||'').split(/[、,，\/]/).filter(function(x){return x.trim()});
-  var sWidth=prods.length>=3?15:prods.length===2?10:5;
+  var sWidth=prods.length>=3?g.width.three:prods.length===2?g.width.two:g.width.one;
   var days=999,m=(c['最近跟进']||'').match(/(\d{4})-(\d{2})-(\d{2})/);
   if(m){var d=new Date(+m[1],+m[2]-1,+m[3]);days=Math.round((Date.now()-d.getTime())/86400000)}
-  var sFresh=days<=7?15:days<=14?8:0;
+  var sFresh=days<=7?g.fresh.d7:days<=14?g.fresh.d14:g.fresh.stale;
   var total=sStatus+sType+sRegion+sWidth+sFresh;
-  var grade=total>=80?'A':total>=60?'B':'C';
+  var grade=total>=g.gradeA?'A':total>=g.gradeB?'B':'C';
   return {total:total,grade:grade,days:days,parts:[
     '合作状态'+sStatus,'客户类型'+sType,'区域市场'+sRegion,'产品宽度'+sWidth,'跟进新鲜度'+sFresh]};
+}
+/* 规则说明卡片随配置动态渲染 */
+function renderGradingRulesCard(){
+  var g=getGradingRules();
+  var el=document.getElementById('grading-rules-card');
+  if(!el)return;
+  el.innerHTML=
+    '<div class="intel-point"><span class="ip-tag">合作状态</span><div>已成交 '+g.status.won+' 分 / 复购中 '+g.status.repeat+' 分 / 询盘谈判 '+g.status.inquiry+' 分 / 初步接触 '+g.status.new+' 分。</div></div>'+
+    '<div class="intel-point"><span class="ip-tag">客户类型</span><div>连锁集团/分销经销商 '+g.type.chain+' 分 / 单体医院 '+g.type.hospital+' 分 / 个人或不明 '+g.type.other+' 分（取自客户档案备注）。</div></div>'+
+    '<div class="intel-point"><span class="ip-tag">区域市场</span><div>重点市场 '+g.region.key+' 分 / 其他区域 '+g.region.other+' 分。重点市场：'+(g.keyRegions||[]).join('、')+'。</div></div>'+
+    '<div class="intel-point"><span class="ip-tag">产品宽度</span><div>主营产品覆盖 ≥3 款 '+g.width.three+' 分 / 2 款 '+g.width.two+' 分 / 1 款 '+g.width.one+' 分。</div></div>'+
+    '<div class="intel-point"><span class="ip-tag">跟进新鲜度</span><div>7 天内有跟进 '+g.fresh.d7+' 分 / 14 天内 '+g.fresh.d14+' 分 / 超过 14 天 '+g.fresh.stale+' 分（超期自动提醒）。</div></div>'+
+    '<div style="margin-top:12px;font-size:12px;color:var(--color-text-secondary)"><strong>等级划分：</strong><span class="tag tag-success">A 级 ≥'+g.gradeA+'分</span> 重点保障，优先响应与资源投入　<span class="tag tag-warning">B 级 '+g.gradeB+'–'+(g.gradeA-1)+'分</span> 标准节奏跟进　<span class="tag tag-gray">C 级 &lt;'+g.gradeB+'分</span> 低成本批量维护　<a href="config.html" style="font-weight:600">前往规则配置中心调整 →</a></div>';
 }
 function renderGrading(customers){
   var all=(customers||[]).concat(GRADING_DEMO_LEADS.map(function(c){
@@ -746,7 +759,30 @@ function renderGrading(customers){
   document.getElementById('grading-list').innerHTML=html;
 }
 
+/* ===== 规则配置中心联动 ===== */
+function applyMailRules(){
+  try{
+    var m=RHC_CONFIG.get().mail;
+    if(m){
+      if(m.inquiry)MAIL_TYPES.inquiry.rule=m.inquiry;
+      if(m.development)MAIL_TYPES.development.rule=m.development;
+      if(m.followup)MAIL_TYPES.followup.rule=m.followup;
+      if(m.quotation)MAIL_TYPES.quotation.rule=m.quotation;
+    }
+  }catch(e){}
+}
+function refreshAfterConfigChange(){
+  applyMailRules();
+  renderGradingRulesCard();
+  switchMailTab(mailType);
+  if(snapshotData){renderGrading(snapshotData.customers||[])}
+}
+window.addEventListener('storage',function(e){if(e.key===RHC_CONFIG.KEY)refreshAfterConfigChange()});
+window.addEventListener('rhc-config-changed',refreshAfterConfigChange);
+
 /* ===== 初始化 ===== */
+applyMailRules();
+renderGradingRulesCard();
 switchMailTab('inquiry');
 renderProductPick();
 renderMailProducts(PRODUCTS);
