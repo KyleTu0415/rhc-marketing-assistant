@@ -204,7 +204,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
           <div class="ii-desc">VMX 展会名片回访：经销商，对 X35VET 报价有兴趣，需对比本地竞品价格。</div>
           <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：VMX 展会名片名录（线下交换、无公开网页；正式版在此查看名片扫描件与现场备注）</div>
           <div class="ii-hint"><strong>AI 初筛：</strong>渠道型客户、处比价阶段。进展：X35VET 总体拥有成本对比资料已发，<strong>客户已回复</strong>询问代理折扣与备件供应——确认真实买家，可转客户。</div>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="tag tag-success" style="font-size:11px">已认领 · 我</span><span class="tag tag-info" style="font-size:11px">客户已回复</span><button class="btn btn-outline btn-sm" onclick="switchPage('mail',document.querySelector('[data-page=mail]')">去邮件助手</button><button class="btn btn-primary btn-sm" onclick="convertCustomer(this,'NorthPet Distribution')">转为客户</button></div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="tag tag-success" style="font-size:11px">已认领 · 展会接待人</span><span class="tag tag-info" style="font-size:11px">客户已回复</span><button class="btn btn-outline btn-sm" onclick="switchPage('mail',document.querySelector('[data-page=mail]')">去邮件助手</button><button class="btn btn-primary btn-sm" onclick="convertCustomer(this,'NorthPet Distribution')">转为客户</button></div>
         </div>
         <div class="intel-item">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-info">待核实 · 补齐信息再分级</span><span class="tag tag-gray">官网询盘</span><strong>SaoPaulo Vet Supply（巴西）</strong></div>
@@ -222,7 +222,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
         <div class="intel-point"><span class="ip-tag">行业论坛</span><div>海外兽医专业社区采购/求购帖关键词监控（VIN 等公开版块；Reddit 等被墙渠道由服务器抓取并生成网页快照，在平台内直接查看）。</div></div>
         <div class="intel-point"><span class="ip-tag">展会名录</span><div>VMX、WVC 等展会名片与参展商名录导入，自动匹配跟进状态。</div></div>
         <div class="intel-point"><span class="ip-tag">官网与社媒</span><div>官网询盘表单、企业社媒消息统一汇入信号流。</div></div>
-        <div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：信号均为演示示例。正式版由 AI 定时采集→初筛去噪→分级推送。信号分三档：<strong>立即跟进</strong>（高意向 · 24 小时内响应）、<strong>建议跟进</strong>（中意向 · 3 日内）、<strong>待核实</strong>（信息不足，补齐后再分级），与客户档案的 A/B/C 分级相互独立。处理流程：<strong>认领</strong>即锁定归属（其他销售不可见联系方式，防止撞单）→ 时效内发开发信 → 客户回复确认后点<strong>「转为客户」</strong>，档案自动建立并完成 A/B/C 分级；认领后 14 天无跟进自动释放回公共池。每条信号均携带<strong>来源链接</strong>可一键核验；被过滤的噪音进入噪音列表，可逐条核查、误判可捞回。</div>
+        <div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：信号均为演示示例。正式版由 AI 定时采集→初筛去噪→分级推送。信号分三档：<strong>立即跟进</strong>（高意向 · 24 小时内响应）、<strong>建议跟进</strong>（中意向 · 3 日内）、<strong>待核实</strong>（信息不足，补齐后再分级），与客户档案的 A/B/C 分级相互独立。处理流程：线上信号进公共池，<strong>认领</strong>即锁定归属（其他销售不可见联系方式，防止撞单）；线下信号（展会扫码、手动录入）录入即自动归属接待人，无需认领。归属后在时效内发开发信 → 客户回复确认后点<strong>「转为客户」</strong>，档案自动建立并完成 A/B/C 分级；14 天无跟进自动释放回公共池。每条信号均携带<strong>来源链接</strong>可一键核验；被过滤的噪音进入噪音列表，可逐条核查、误判可捞回。</div>
       </div>
     </div>
     </section>
