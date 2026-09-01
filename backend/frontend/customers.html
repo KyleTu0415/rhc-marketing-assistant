@@ -32,11 +32,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 
 .app-layout{display:flex;height:100vh;width:100vw}
 .sidebar{width:200px;min-width:200px;background:var(--color-surface);border-right:1px solid var(--color-border);display:flex;flex-direction:column;overflow-y:auto;z-index:100}
-.sidebar-logo{padding:15px 0 20px;text-align:center}
+.sidebar-logo{padding:15px 0 20px;text-align:left}
 .sidebar-logo img{height:90px;width:auto;margin:0 auto;display:block}
 .sidebar-logo span{display:block;font-size:13px;font-weight:700;color:var(--color-primary);margin-top:10px;letter-spacing:2px;text-transform:uppercase}
 .sidebar-nav{flex:1;display:flex;flex-direction:column}
-.sidebar-nav .nav-section{padding:4px 16px 10px;font-size:15px;letter-spacing:0.5px;color:var(--color-text-secondary);font-weight:700;text-align:center}
+.sidebar-nav .nav-section{padding:4px 16px 10px;font-size:15px;letter-spacing:0.5px;color:var(--color-text-secondary);font-weight:700;text-align:left}
 .sidebar-nav .nav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;color:#6B7280;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--transition-fast);border-left:3px solid transparent;text-decoration:none;position:relative}
 .sidebar-nav a.nav-item:hover{text-decoration:none}
 .sidebar-nav .nav-item:hover{background:var(--color-primary-xlight);color:var(--color-primary)}
@@ -145,7 +145,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 @media(max-width:860px){
   .sidebar{width:56px;min-width:56px}
   .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section,.sidebar .sidebar-user .user-info{display:none}
-  .sidebar-logo{padding:16px 8px;text-align:center}
+  .sidebar-logo{padding:16px 8px;text-align:left}
   .sidebar-logo img{height:28px;margin:0 auto}
   .sidebar-nav .nav-item{padding:12px 0;justify-content:center;border-left:none;border-bottom:2px solid transparent}
   .sidebar-nav .nav-item.active{border-bottom-color:var(--color-primary)}
