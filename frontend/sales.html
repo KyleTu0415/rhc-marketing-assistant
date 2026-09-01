@@ -678,7 +678,13 @@ function claimSignal(btn,name){
 }
 function convertCustomer(btn,name){
   btn.disabled=true;btn.textContent='已转入客户库';
-  showToast('「'+name+'」已转为客户：档案自动建立、规则引擎完成 A/B/C 分级，可在客户分级页查看','success');
+  if(!window.__convertedSig)window.__convertedSig={};
+  if(!window.__convertedSig[name]){
+    window.__convertedSig[name]=true;
+    GRADING_DEMO_LEADS.push({客户名称:'NorthPet Distribution',国家地区:'加拿大',跟进状态:'询盘谈判',来源渠道:'展会名录',来源链接:'',来源链接说明:'VMX 展会名片转化（正式版关联名片扫描件与现场备注）',主营产品:'X35VET兽用麻醉机',备注:'加拿大经销商，VMX展会名片；已回复询问代理折扣与备件供应；由商机信号转化',最近跟进:'2026-09-02 客户回函询价',demo:true,converted:true});
+    try{renderGrading();}catch(e){}
+  }
+  showToast('「'+name+'」已转为客户：档案自动建立、规则引擎完成分级，现已出现在「客户分级」页（绿色"信号转化"标签）','success');
 }
 
 /* ===== 客户分级（默认规则，top sales 访谈后可替换） ===== */
@@ -727,7 +733,7 @@ function renderGradingRulesCard(){
 }
 function renderGrading(customers){
   var all=(customers||[]).concat(GRADING_DEMO_LEADS.map(function(c){
-    return {'客户名称':c.客户名称,'国家/地区':c.国家地区,'跟进状态':c.跟进状态,'来源渠道':c.来源渠道,'来源链接':c.来源链接||'','来源链接说明':c.来源链接说明||'','主营产品':c.主营产品,'备注':c.备注,'最近跟进':c.最近跟进,demo:c.demo};
+    return {'客户名称':c.客户名称,'国家/地区':c.国家地区,'跟进状态':c.跟进状态,'来源渠道':c.来源渠道,'来源链接':c.来源链接||'','来源链接说明':c.来源链接说明||'','主营产品':c.主营产品,'备注':c.备注,'最近跟进':c.最近跟进,demo:c.demo,converted:c.converted};
   }));
   var rows=all.map(function(c){
     var g=gradeCustomer(c);
@@ -748,7 +754,7 @@ function renderGrading(customers){
     if(stale)followNote+='　<span class="tag tag-warning" style="font-size:10px">跟进超期</span>';
     else if(near)followNote+='　<span class="tag tag-gray" style="font-size:10px">临近超期</span>';
     return '<div class="intel-item">'+
-      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag '+tagCls+'">'+g.grade+' 级 · '+g.total+'分</span><strong>'+esc(c['客户名称'])+'</strong>'+(c.demo?'<span class="tag tag-gray">演示客户</span>':'<span class="tag tag-info">客户主库</span>')+'</div>'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag '+tagCls+'">'+g.grade+' 级 · '+g.total+'分</span><strong>'+esc(c['客户名称'])+'</strong>'+(c.converted?'<span class="tag tag-success">信号转化</span>':c.demo?'<span class="tag tag-gray">演示客户</span>':'<span class="tag tag-info">客户主库</span>')+'</div>'+
       '<div class="ii-desc">'+esc(c['国家/地区']||'—')+'　·　'+esc(c['跟进状态']||'—')+'　·　来源：'+esc(c['来源渠道']||'—')+'<br>主营：'+esc(c['主营产品']||'—')+'</div>'+
       (c['来源链接']
         ? '<div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'+esc(c['来源链接说明']||'查看原始来源')+'<a href="'+esc(c['来源链接'])+'" target="_blank" rel="noopener noreferrer">打开来源链接 →</a></div>'
