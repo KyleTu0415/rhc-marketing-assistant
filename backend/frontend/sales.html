@@ -121,6 +121,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .intel-item .ii-desc{font-size:12.5px;color:var(--color-text-secondary);line-height:1.7}
 .intel-item .ii-hint{font-size:12px;color:var(--color-primary-dark);background:var(--color-primary-xlight);border-radius:var(--radius-sm);padding:8px 10px;margin-top:8px;line-height:1.6}
 .intel-item .ii-hint strong{color:var(--color-primary)}
+.intel-item .ii-source{margin-top:8px;font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.intel-item .ii-source a{color:var(--color-primary);font-weight:600;white-space:nowrap}
+.intel-item .ii-source a:hover{text-decoration:underline}
+.intel-item .ii-source .src-icon{width:12px;height:12px;flex-shrink:0}
 @media(max-width:860px){.intel-grid{grid-template-columns:1fr}}
 
 /* ===== PI 工作台 ===== */
@@ -184,30 +188,35 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
         <div class="intel-item">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-success">A 级 · 24小时内响应</span><span class="tag tag-gray">阿里国际站</span><strong>VetCare Group（美国）</strong></div>
           <div class="ii-desc">「Looking for anesthesia workstation supplier for 12-clinic expansion, CE & ISO 13485 required, initial order 8 units」——美国连锁兽医集团扩店，寻麻醉工作站供应商，首单 8 台，明确要求 CE 与 ISO 13485。</div>
+          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：阿里国际站询盘（演示链接，正式版直达原始询盘页）<a href="https://www.alibaba.com/trade/search?SearchText=veterinary+anesthesia+machine" target="_blank" rel="noopener noreferrer">查看原始信息 →</a></div>
           <div class="ii-hint"><strong>AI 初筛：</strong>采购量明确、认证要求与我方资质匹配、连锁集团复购潜力高。建议：24h 内发开发信并附 V5 Plus 工作站资料与认证清单。</div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="showToast('正式版：录入客户库并自动分级，跳转邮件助手','success')">录入客户库</button><button class="btn btn-outline btn-sm" onclick="switchPage('mail',document.querySelector('[data-page=mail]'))">去邮件助手</button></div>
         </div>
         <div class="intel-item">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-success">A 级 · 24小时内响应</span><span class="tag tag-gray">行业论坛</span><strong>EquineMed Clinic（阿联酋）</strong></div>
           <div class="ii-desc">兽医论坛发帖：马场扩建需大动物麻醉设备，询问 M800 类工作站的交期与本地售后。</div>
+          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：海外兽医论坛帖子（演示链接，正式版直达原帖）<a href="https://www.reddit.com/r/veterinary/search/?q=anesthesia%20equipment&sort=new" target="_blank" rel="noopener noreferrer">查看原始信息 →</a></div>
           <div class="ii-hint"><strong>AI 初筛：</strong>明确大动物场景、中东增量市场、机型指向 M800。建议：当日回复交期与 CE 认证，附中东代理售后响应说明。</div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="showToast('正式版：录入客户库并自动分级，跳转邮件助手','success')">录入客户库</button><button class="btn btn-outline btn-sm" onclick="switchPage('mail',document.querySelector('[data-page=mail]'))">去邮件助手</button></div>
         </div>
         <div class="intel-item">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-warning">B 级 · 3日内跟进</span><span class="tag tag-gray">展会名录</span><strong>NorthPet Distribution（加拿大）</strong></div>
           <div class="ii-desc">VMX 展会名片回访：经销商，对 X35VET 报价有兴趣，需对比本地竞品价格。</div>
+          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：VMX 展会名片名录（展会名片无公开URL，正式版关联名片扫描件）<a href="https://vmx.vin.com/" target="_blank" rel="noopener noreferrer">VMX 展会官网 →</a></div>
           <div class="ii-hint"><strong>AI 初筛：</strong>渠道型客户、处比价阶段。建议：发 X35VET 总体拥有成本对比资料（涡轮免驱动气的使用成本优势）。</div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="showToast('正式版：录入客户库并自动分级，跳转邮件助手','success')">录入客户库</button><button class="btn btn-outline btn-sm" onclick="switchPage('mail',document.querySelector('[data-page=mail]'))">去邮件助手</button></div>
         </div>
         <div class="intel-item">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-warning">B 级 · 3日内跟进</span><span class="tag tag-gray">官网询盘</span><strong>SaoPaulo Vet Supply（巴西）</strong></div>
           <div class="ii-desc">官网表单询 SA Series 注射泵价格与 DERS 药库功能细节，未说明采购数量。</div>
+          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：RHC 官网询盘表单（内部渠道，正式版点击可查看询盘原文与客户留资）</div>
           <div class="ii-hint"><strong>AI 初筛：</strong>需求真实但量级未知。建议：回复药库功能说明并询问诊所/渠道规模与预计采购量，补齐信息后再分级。</div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="showToast('正式版：录入客户库并自动分级，跳转邮件助手','success')">录入客户库</button><button class="btn btn-outline btn-sm" onclick="switchPage('mail',document.querySelector('[data-page=mail]'))">去邮件助手</button></div>
         </div>
         <div class="intel-item">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-gray">C 级 · 批量维护</span><span class="tag tag-gray">B2B平台</span><strong>通用采购信息（3 条合并）</strong></div>
           <div class="ii-desc">个人诊所求购单台二手设备、学生论文咨询、跨品类（影像设备）询盘等 3 条，与我方产品线/客户画像不匹配。</div>
+          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：B2B 平台批量采集（3 条合并，正式版逐条保留原始链接，可在噪音列表中打开核查）</div>
           <div class="ii-hint"><strong>AI 初筛：</strong>非目标客户，不占用销售精力。建议：纳入月度批量开发信名单，不单独跟进。</div>
         </div>
       </div>
@@ -219,7 +228,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
         <div class="intel-point"><span class="ip-tag">行业论坛</span><div>海外兽医论坛采购/求购帖关键词监控（VIN、Reddit r/veterinary 等公开版块）。</div></div>
         <div class="intel-point"><span class="ip-tag">展会名录</span><div>VMX、WVC 等展会名片与参展商名录导入，自动匹配跟进状态。</div></div>
         <div class="intel-point"><span class="ip-tag">官网与社媒</span><div>官网询盘表单、企业社媒消息统一汇入信号流。</div></div>
-        <div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：信号均为演示示例。正式版由 AI 定时采集→初筛去噪→按规则分级推送，A 级信号 24 小时响应时效计入客户跟进看板。</div>
+        <div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：信号均为演示示例。正式版由 AI 定时采集→初筛去噪→按规则分级推送，每条信号均携带<strong>来源链接</strong>（原始帖子/询盘页/海关记录），销售可一键核验出处；信号录入客户库后来源信息自动带入客户档案。A 级信号 24 小时响应时效计入客户跟进看板。</div>
       </div>
     </div>
     </section>
@@ -675,11 +684,11 @@ function generatePI(){
 
 /* ===== 客户分级（默认规则，top sales 访谈后可替换） ===== */
 var GRADING_DEMO_LEADS=[
-  {客户名称:'VetCare Group',国家地区:'美国',跟进状态:'询盘谈判',来源渠道:'阿里国际站',主营产品:'V5 Plus兽用麻醉工作站、SA Series注射泵、DC50制氧机',备注:'美国连锁兽医集团，12家诊所扩店；演示信号：2026-09-01首单8台',最近跟进:'2026-09-01 信号录入待开发信',demo:true},
-  {客户名称:'EquineMed 连锁马术医疗中心',国家地区:'阿联酋',跟进状态:'询盘谈判',来源渠道:'行业论坛',主营产品:'M800大动物麻醉工作站、SA Series注射泵、DC50制氧机',备注:'中东连锁马术医疗中心，马场扩建；演示信号：论坛求购大动物设备',最近跟进:'2026-09-01 信号录入待回复',demo:true},
-  {客户名称:'NorthPet Distribution',国家地区:'加拿大',跟进状态:'询盘谈判',来源渠道:'展会名录',主营产品:'X35VET兽用麻醉机',备注:'加拿大经销商，VMX展会名片；比价阶段；演示信号',最近跟进:'2026-08-31 展会回访待报价资料',demo:true},
-  {客户名称:'SaoPaulo Vet Supply',国家地区:'巴西',跟进状态:'询盘谈判',来源渠道:'官网询盘',主营产品:'SA Series注射泵',备注:'巴西兽医器材供应商；采购量级未知；演示信号',最近跟进:'2026-08-30 询盘待回复',demo:true},
-  {客户名称:'GreenField Pet Clinic',国家地区:'越南',跟进状态:'初步接触',来源渠道:'B2B平台',主营产品:'X35VET兽用麻醉机',备注:'越南单体宠物诊所，求购单台麻醉机；演示信号',最近跟进:'2026-08-30 首次接触',demo:true}
+  {客户名称:'VetCare Group',国家地区:'美国',跟进状态:'询盘谈判',来源渠道:'阿里国际站',来源链接:'https://www.alibaba.com/trade/search?SearchText=veterinary+anesthesia+machine',来源链接说明:'原始询盘页（演示链接）',主营产品:'V5 Plus兽用麻醉工作站、SA Series注射泵、DC50制氧机',备注:'美国连锁兽医集团，12家诊所扩店；演示信号：2026-09-01首单8台',最近跟进:'2026-09-01 信号录入待开发信',demo:true},
+  {客户名称:'EquineMed 连锁马术医疗中心',国家地区:'阿联酋',跟进状态:'询盘谈判',来源渠道:'行业论坛',来源链接:'https://www.reddit.com/r/veterinary/search/?q=anesthesia%20equipment&sort=new',来源链接说明:'论坛原帖（演示链接）',主营产品:'M800大动物麻醉工作站、SA Series注射泵、DC50制氧机',备注:'中东连锁马术医疗中心，马场扩建；演示信号：论坛求购大动物设备',最近跟进:'2026-09-01 信号录入待回复',demo:true},
+  {客户名称:'NorthPet Distribution',国家地区:'加拿大',跟进状态:'询盘谈判',来源渠道:'展会名录',来源链接:'https://vmx.vin.com/',来源链接说明:'VMX 展会官网（名片无公开URL，正式版关联名片扫描件）',主营产品:'X35VET兽用麻醉机',备注:'加拿大经销商，VMX展会名片；比价阶段；演示信号',最近跟进:'2026-08-31 展会回访待报价资料',demo:true},
+  {客户名称:'SaoPaulo Vet Supply',国家地区:'巴西',跟进状态:'询盘谈判',来源渠道:'官网询盘',来源链接:'',来源链接说明:'内部渠道，正式版可查看询盘原文与客户留资',主营产品:'SA Series注射泵',备注:'巴西兽医器材供应商；采购量级未知；演示信号',最近跟进:'2026-08-30 询盘待回复',demo:true},
+  {客户名称:'GreenField Pet Clinic',国家地区:'越南',跟进状态:'初步接触',来源渠道:'B2B平台',来源链接:'https://www.made-in-china.com/products-search/hot-china-products/Veterinary_Anesthesia_Machine.html',来源链接说明:'原始询盘页（演示链接）',主营产品:'X35VET兽用麻醉机',备注:'越南单体宠物诊所，求购单台麻醉机；演示信号',最近跟进:'2026-08-30 首次接触',demo:true}
 ];
 var KEY_REGIONS=['美国','加拿大','英国','德国','法国','澳大利亚','瑞典','挪威','丹麦','荷兰','阿联酋','沙特','新加坡','马来西亚','泰国','越南','印尼','菲律宾'];
 function gradeCustomer(c){
@@ -700,7 +709,7 @@ function gradeCustomer(c){
 }
 function renderGrading(customers){
   var all=(customers||[]).concat(GRADING_DEMO_LEADS.map(function(c){
-    return {'客户名称':c.客户名称,'国家/地区':c.国家地区,'跟进状态':c.跟进状态,'来源渠道':c.来源渠道,'主营产品':c.主营产品,'备注':c.备注,'最近跟进':c.最近跟进,demo:c.demo};
+    return {'客户名称':c.客户名称,'国家/地区':c.国家地区,'跟进状态':c.跟进状态,'来源渠道':c.来源渠道,'来源链接':c.来源链接||'','来源链接说明':c.来源链接说明||'','主营产品':c.主营产品,'备注':c.备注,'最近跟进':c.最近跟进,demo:c.demo};
   }));
   var rows=all.map(function(c){
     var g=gradeCustomer(c);
@@ -723,12 +732,17 @@ function renderGrading(customers){
     return '<div class="intel-item">'+
       '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag '+tagCls+'">'+g.grade+' 级 · '+g.total+'分</span><strong>'+esc(c['客户名称'])+'</strong>'+(c.demo?'<span class="tag tag-gray">演示线索</span>':'<span class="tag tag-info">客户主库</span>')+'</div>'+
       '<div class="ii-desc">'+esc(c['国家/地区']||'—')+'　·　'+esc(c['跟进状态']||'—')+'　·　来源：'+esc(c['来源渠道']||'—')+'<br>主营：'+esc(c['主营产品']||'—')+'</div>'+
+      (c['来源链接']
+        ? '<div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'+esc(c['来源链接说明']||'查看原始来源')+'<a href="'+esc(c['来源链接'])+'" target="_blank" rel="noopener noreferrer">打开来源链接 →</a></div>'
+        : (c.demo
+            ? '<div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'+esc(c['来源链接说明']||'内部渠道，无外部链接')+'</div>'
+            : ''))+
       '<div class="ii-hint"><strong>评级依据：</strong>'+g.parts.join(' + ')+' = '+g.total+' 分</div>'+
       '<div style="margin-top:8px;font-size:12px;color:'+(stale?'var(--color-danger)':'var(--color-text-tertiary)')+'">'+followNote+'</div>'+
       '<div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="switchPage(\'mail\',document.querySelector(\'[data-page=mail]\'))">去跟进（邮件助手）</button></div>'+
     '</div>';
   }).join('');
-  html+='<div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：分级打分为默认外贸规则；标注「演示线索」的为商机信号池样例数据。top sales 经验访谈后，规则在配置中心替换，分数与理由自动重算，跟进成单/丢单结果回流用于校准规则。</div>';
+  html+='<div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：分级打分为默认外贸规则；标注「演示线索」的为商机信号池样例数据，其来源链接由信号录入时自动带入客户档案（展会名片等无URL渠道记录渠道名与备注）。top sales 经验访谈后，规则在配置中心替换，分数与理由自动重算，跟进成单/丢单结果回流用于校准规则。</div>';
   document.getElementById('grading-list').innerHTML=html;
 }
 
