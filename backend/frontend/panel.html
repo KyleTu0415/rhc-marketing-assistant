@@ -928,34 +928,40 @@ function renderInsightList(filterCat) {
   var prefs = _getUserPreferences();
   var savedIds = _getSavedInsights();
 
-  var items = RHC_INSIGHT_DATA.slice();
+  var allItems = RHC_INSIGHT_DATA.slice();
+  allItems.sort(function(a, b) { return b.date.localeCompare(a.date); });
 
-  // 按类别筛选
+  var displayItems, items;
   if (filterCat && filterCat !== 'all') {
-    items = items.filter(function(it) { return it.category === filterCat; });
+    // 分类 tab：该类内按日期倒序，展示最新 4 条
+    items = allItems.filter(function(it) { return it.category === filterCat; });
+    displayItems = items.slice(0, INSIGHT_PREVIEW_COUNT);
   } else {
-    // 全部模式下按用户偏好排序
-    items.sort(function(a, b) {
-      var sa = _matchPreferenceScore(a, prefs);
-      var sb = _matchPreferenceScore(b, prefs);
-      if (sb !== sa) return sb - sa;
-      return b.date.localeCompare(a.date);
-    });
+    // 全部：四类各取最新一条，顺序固定为行业趋势/市场动态/同行新闻/产品技术；
+    // 某类无新闻时用其余最新条目补位
+    items = allItems;
+    var CAT_ORDER = ['industry', 'market', 'competitor', 'product'];
+    var picked = [];
+    var pickedIds = {};
+    for (var c = 0; c < CAT_ORDER.length; c++) {
+      for (var k = 0; k < allItems.length; k++) {
+        if (allItems[k].category === CAT_ORDER[c] && !pickedIds[allItems[k].id]) {
+          picked.push(allItems[k]);
+          pickedIds[allItems[k].id] = true;
+          break;
+        }
+      }
+    }
+    for (var m = 0; m < allItems.length && picked.length < INSIGHT_PREVIEW_COUNT; m++) {
+      if (!pickedIds[allItems[m].id]) { picked.push(allItems[m]); pickedIds[allItems[m].id] = true; }
+    }
+    displayItems = picked.slice(0, INSIGHT_PREVIEW_COUNT);
   }
 
-  // 非全部模式按日期倒序
-  if (filterCat && filterCat !== 'all') {
-    items.sort(function(a, b) {
-      return b.date.localeCompare(a.date);
-    });
-  }
-
-  if (items.length === 0) {
+  if (displayItems.length === 0) {
     list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--color-text-tertiary);font-size:13px">暂无相关内容</div>';
     return;
   }
-
-  var displayItems = items.length > INSIGHT_PREVIEW_COUNT ? items.slice(0, INSIGHT_PREVIEW_COUNT) : items;
 
   var html = '';
   for (var i = 0; i < displayItems.length; i++) {

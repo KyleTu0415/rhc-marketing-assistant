@@ -435,7 +435,11 @@ async def api_products_list():
 @app.get("/api/insights")
 async def api_insights_list():
     from app import insights_store
-    items = insights_store.get_items()
+    all_items = insights_store.get_items()
+    # 线上只对外提供 RSS 真新闻；source='seed' 的 12 条手工快照仅用于
+    # 前端离线兜底（文件里自带），不混入线上数据。RSS 为空时才退回种子。
+    rss_items = [it for it in all_items if it.get("source") != "seed"]
+    items = rss_items if rss_items else all_items
     return {
         "items": items,
         "total": len(items),
