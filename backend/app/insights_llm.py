@@ -137,14 +137,58 @@ def _extract_json(content: str) -> str:
     return content
 
 
+# 降级分类关键词（无 LLM Key 时用，按优先级匹配标题+摘要+来源）
+_FB_RULES = [
+    # 同行新闻：公司商业动作（优先级高于产品，公司新品发布算同行动作）
+    ("competitor", [
+        "zoetis", "idexx", "covetrus", "midmark", "virbac", "heska", "elanco",
+        "merck animal", "boehringer ingelheim", "cev", "mars petcare", "petco",
+        "acquires", "acquisition", "merger", "partners with", "partnership",
+        "raises $", "funding", "series a", "series b", "ipo", "revenue",
+        "earnings", "quarterly", "financial results", "launches new", "unveils",
+        "announces launch", "company announces", "appoints", "ceo",
+    ]),
+    # 产品技术：新品/技术/获批/临床
+    ("product", [
+        "new product", "launches", "launch", "unveil", "device", "monitor",
+        "anesthesia", "imaging", "ultrasound", "x-ray", "radiograph", "ventilator",
+        "infusion pump", "syringe pump", "sensor", "software", "ai-powered",
+        "fda approves", "fda-approved", "approval", "approved", "clearance",
+        "clinical study", "clinical trial", "study finds", "researchers",
+        "breakthrough", "technology", "diagnostic", "test kit", "vaccine",
+        "new drug", "therapeutic", "treatment for",
+    ]),
+    # 行业趋势：宏观/政策/投资/报告
+    ("industry", [
+        "market size", "market report", "industry report", "forecast", "outlook",
+        "trends 20", "trend report", "billion", "million by", "cagr",
+        "regulation", "regulatory", "legislation", "guideline", "guidelines",
+        "aaha", "avma", "fda ", "usda", "policy", "veterinary industry",
+        "pet care market", "veterinary market", "animal health market",
+        "survey", "shortage", "workforce", "veterinarians are",
+    ]),
+]
+
+
+def _fb_classify(text: str) -> str:
+    """降级路径的关键词分类，返回 category key；兜底 market。"""
+    t = text.lower()
+    for cat, kws in _FB_RULES:
+        if any(kw in t for kw in kws):
+            return cat
+    return "market"
+
+
 def _fallback_items(raw_items: list) -> list:
-    """无 LLM Key 时的降级：粗筛已通过关键词，直接保留英文原文，归为市场动态。"""
+    """无 LLM Key 时的降级：保留英文原文，用关键词启发式分类到四列。"""
     out = []
     for it in raw_items:
+        text = f"{it['title']} {it.get('summary', '')} {it.get('source', '')}"
+        cat = _fb_classify(text)
         out.append({
-            "category": "market",
-            "categoryLabel": "市场动态",
-            "categoryColor": "market",
+            "category": cat,
+            "categoryLabel": CATEGORY_LABELS.get(cat, "市场动态"),
+            "categoryColor": cat,
             "title": it["title"],
             "summary": (it.get("summary", "") or "")[:120],
             "date": it["date"],

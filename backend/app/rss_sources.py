@@ -4,6 +4,7 @@ RHC 市场洞察 —— RSS 源配置与抓取解析
 零第三方依赖：xml.etree 解析 RSS 2.0 / Atom 1.0，httpx 拉取。
 每个源记录最近抓取健康状态，供运维替换失效源。
 """
+import html
 import re
 import time
 import xml.etree.ElementTree as ET
@@ -85,13 +86,10 @@ def _clean_text(s: str) -> str:
         s = s[:-3]
     # HTML 标签
     s = re.sub(r"<[^>]+>", " ", s)
-    # 常见实体
-    for a, b in (("&amp;", "&"), ("&lt;", "<"), ("&gt;", ">"),
-                 ("&quot;", '"'), ("&#39;", "'"), ("&nbsp;", " "),
-                 ("&apos;", "'")):
-        s = s.replace(a, b)
-    # 数字实体
-    s = re.sub(r"&#(\d+);", lambda m: chr(int(m.group(1))), s)
+    # 全部实体（&amp; &#8482; &#x2122; &nbsp; 等）一次解码
+    s = html.unescape(s)
+    # 解码后可能露出新标签，再清一轮
+    s = re.sub(r"<[^>]+>", " ", s)
     # 压缩空白
     s = re.sub(r"\s+", " ", s).strip()
     return s
