@@ -34,10 +34,11 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);
   border-bottom:1px solid var(--color-border);
   display:flex;align-items:center;gap:16px;
-  padding:0 28px;height:56px;
+  padding:0 28px;height:60px;
 }
-.topbar-logo{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;color:var(--color-primary);font-size:15px}
-.topbar-logo img{height:30px;width:auto}
+.topbar-logo{display:flex;align-items:center;gap:12px;cursor:pointer}
+.topbar-logo img{height:40px;width:auto;object-fit:contain}
+.topbar-logo .brand-sub{font-size:15px;font-weight:600;color:var(--color-text);letter-spacing:0.5px}
 .topbar-title{font-size:14px;color:var(--color-text-secondary);border-left:1px solid var(--color-border);padding-left:16px}
 .topbar-back{
   margin-left:auto;display:inline-flex;align-items:center;gap:6px;
@@ -56,7 +57,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 /* Tabs */
 .cat-tabs{
   display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;
-  position:sticky;top:56px;z-index:50;
+  position:sticky;top:60px;z-index:50;
   background:var(--color-bg);padding:12px 0;
 }
 .cat-tab{
@@ -148,7 +149,7 @@ a.news-card-title:hover,.news-card:hover .news-card-title{color:var(--color-prim
 <div class="topbar">
   <div class="topbar-logo" onclick="location.href='panel.html'">
     <img src="assets/rhc-logo-mark.png?v=20260903" alt="RHC" onerror="this.style.display='none'">
-    <span>RHC 营销中心</span>
+    <span class="brand-sub">智能工作平台</span>
   </div>
   <span class="topbar-title">新闻中心</span>
   <button class="topbar-back" onclick="location.href='panel.html'">← 返回门户</button>
