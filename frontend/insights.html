@@ -65,6 +65,16 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 }
 .cat-tab:hover{border-color:var(--color-primary);color:var(--color-primary)}
 .cat-tab.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+.cat-tab[data-cat]::before{
+  content:'';display:inline-block;width:7px;height:7px;border-radius:50%;
+  margin-right:7px;vertical-align:0;
+}
+.cat-tab[data-cat="industry"]::before{background:#1565C0}
+.cat-tab[data-cat="market"]::before{background:#2E7D32}
+.cat-tab[data-cat="competitor"]::before{background:#E65100}
+.cat-tab[data-cat="product"]::before{background:#7C3AED}
+.cat-tab.active::before{background:#fff !important}
+.cat-tab[data-cat="all"]::before{display:none}
 .cat-tab .tab-count{
   display:inline-block;margin-left:6px;font-size:11px;font-weight:700;
   opacity:0.75;
@@ -150,10 +160,10 @@ a.news-card-title:hover,.news-card:hover .news-card-title{color:var(--color-prim
 
   <div class="cat-tabs" id="cat-tabs">
     <button class="cat-tab active" data-cat="all" onclick="switchCat('all')">全部<span class="tab-count" id="count-all"></span></button>
-    <button class="cat-tab" data-cat="industry" onclick="switchCat('industry')">🔵 行业趋势<span class="tab-count" id="count-industry"></span></button>
-    <button class="cat-tab" data-cat="market" onclick="switchCat('market')">🟢 市场动态<span class="tab-count" id="count-market"></span></button>
-    <button class="cat-tab" data-cat="competitor" onclick="switchCat('competitor')">🟠 同行新闻<span class="tab-count" id="count-competitor"></span></button>
-    <button class="cat-tab" data-cat="product" onclick="switchCat('product')">🟣 产品技术<span class="tab-count" id="count-product"></span></button>
+    <button class="cat-tab" data-cat="industry" onclick="switchCat('industry')">行业趋势<span class="tab-count" id="count-industry"></span></button>
+    <button class="cat-tab" data-cat="market" onclick="switchCat('market')">市场动态<span class="tab-count" id="count-market"></span></button>
+    <button class="cat-tab" data-cat="competitor" onclick="switchCat('competitor')">同行新闻<span class="tab-count" id="count-competitor"></span></button>
+    <button class="cat-tab" data-cat="product" onclick="switchCat('product')">产品技术<span class="tab-count" id="count-product"></span></button>
   </div>
 
   <div id="news-feed"></div>

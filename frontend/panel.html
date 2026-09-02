@@ -210,6 +210,16 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   border-color:var(--color-primary);
   color:#fff;
 }
+.insight-tab[data-cat]::before{
+  content:'';width:7px;height:7px;border-radius:50%;
+  margin-right:7px;flex-shrink:0;
+}
+.insight-tab[data-cat="industry"]::before{background:#1565C0}
+.insight-tab[data-cat="market"]::before{background:#2E7D32}
+.insight-tab[data-cat="competitor"]::before{background:#E65100}
+.insight-tab[data-cat="product"]::before{background:#7C3AED}
+.insight-tab.active::before{background:#fff !important}
+.insight-tab[data-cat="all"]::before{display:none}
 
 .insight-card{
   background:var(--color-surface);
@@ -636,12 +646,11 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
         <div class="insight-tabs" id="insight-tabs">
           <button class="insight-tab active" data-cat="all" onclick="filterInsight('all')">全部</button>
-          <button class="insight-tab" data-cat="industry" onclick="filterInsight('industry')">🔵 行业趋势</button>
-          <button class="insight-tab" data-cat="market" onclick="filterInsight('market')">🟢 市场动态</button>
-          <button class="insight-tab" data-cat="competitor" onclick="filterInsight('competitor')">🟠 同行新闻</button>
-          <button class="insight-tab" data-cat="product" onclick="filterInsight('product')">🟣 产品技术</button>
+          <button class="insight-tab" data-cat="industry" onclick="filterInsight('industry')">行业趋势</button>
+          <button class="insight-tab" data-cat="market" onclick="filterInsight('market')">市场动态</button>
+          <button class="insight-tab" data-cat="competitor" onclick="filterInsight('competitor')">同行新闻</button>
+          <button class="insight-tab" data-cat="product" onclick="filterInsight('product')">产品技术</button>
         </div>
-        <a href="insights.html" class="insight-more-link">更多 →</a>
       </div>
     </div>
     <div id="insight-list"><!-- JS 动态渲染 --></div>
@@ -975,7 +984,7 @@ function renderInsightList(filterCat) {
   }
 
   if (items.length > INSIGHT_PREVIEW_COUNT) {
-    html += '<a href="insights.html" class="insight-toggle-btn">查看全部 ' + items.length + ' 条，进入新闻中心 →</a>';
+    html += '<a href="insights.html" class="insight-toggle-btn">查看更多，进入新闻中心 →</a>';
   }
 
   list.innerHTML = html;
