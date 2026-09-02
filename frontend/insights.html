@@ -53,89 +53,96 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 }
 .topbar-back:hover{background:var(--color-primary);color:#fff}
 
-/* ===== 主体 ===== */
-.page{max-width:860px;margin:0 auto;padding:28px 24px 60px}
-.page-header{margin-bottom:20px}
-.page-header h1{font-size:22px;font-weight:700;margin-bottom:6px}
-.page-header p{font-size:13px;color:var(--color-text-secondary)}
+/* ===== 主体：资讯看板 ===== */
+.page{max-width:1280px;margin:0 auto;padding:22px 32px 60px}
 
-/* Tabs */
-.cat-tabs{
-  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;
-  position:sticky;top:60px;z-index:50;
-  background:var(--color-bg);padding:12px 0;
+/* 工具栏 */
+.board-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.board-meta{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--color-text-secondary)}
+.board-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--color-success);flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(22,163,123,0.15);
 }
-.cat-tab{
-  padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;
-  background:var(--color-surface);color:var(--color-text-secondary);
-  border:1px solid var(--color-border);
+.board-meta strong{color:var(--color-text);font-weight:600}
+.refresh-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 16px;border-radius:var(--radius-sm);
+  border:1px solid var(--color-border);background:var(--color-surface);
+  font-size:13px;font-weight:600;color:var(--color-text-secondary);
   transition:all var(--transition-fast);
 }
-.cat-tab:hover{border-color:var(--color-primary);color:var(--color-primary)}
-.cat-tab.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
-.cat-tab[data-cat]::before{
-  content:'';display:inline-block;width:7px;height:7px;border-radius:50%;
-  margin-right:7px;vertical-align:0;
+.refresh-btn:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.refresh-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.refresh-btn.spinning svg{animation:spin 0.7s linear infinite}
+
+/* 看板 4 列 */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
+.kanban-col{min-width:0}
+.col-header{
+  position:sticky;top:60px;z-index:40;
+  display:flex;align-items:center;gap:8px;
+  padding:10px 6px;margin-bottom:10px;
+  background:var(--color-bg);
+  border-bottom:2px solid var(--color-border);
 }
-.cat-tab[data-cat="industry"]::before{background:#1565C0}
-.cat-tab[data-cat="market"]::before{background:#2E7D32}
-.cat-tab[data-cat="competitor"]::before{background:#E65100}
-.cat-tab[data-cat="product"]::before{background:#7C3AED}
-.cat-tab.active::before{background:#fff !important}
-.cat-tab[data-cat="all"]::before{display:none}
-.cat-tab .tab-count{
-  display:inline-block;margin-left:6px;font-size:11px;font-weight:700;
-  opacity:0.75;
+.col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.col-name{font-size:13px;font-weight:700;color:var(--color-text);letter-spacing:0.3px}
+.col-count{
+  margin-left:auto;font-size:11px;font-weight:700;color:var(--color-text-secondary);
+  background:var(--color-border-light);border-radius:10px;padding:1px 8px;line-height:1.6;
 }
 
-/* 新闻卡片 */
+/* 新闻小卡片 */
 .news-card{
   background:var(--color-surface);
   border:1px solid var(--color-border);
-  border-radius:var(--radius-lg);
-  box-shadow:var(--shadow-sm);
-  padding:18px 22px;margin-bottom:14px;
+  border-radius:var(--radius-md);
+  padding:12px 14px;margin-bottom:10px;
   transition:all var(--transition-fast);
 }
-.news-card:hover{border-color:var(--color-primary);box-shadow:var(--shadow-md)}
-.news-card-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.news-cat-tag{
-  display:inline-flex;align-items:center;
-  padding:2px 10px;border-radius:4px;
-  font-size:11px;font-weight:600;line-height:1.5;white-space:nowrap;
+.news-card:hover{border-color:var(--color-primary);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.news-card-date{font-size:11px;color:var(--color-text-tertiary);font-variant-numeric:tabular-nums;letter-spacing:0.3px}
+.news-card-title{
+  font-size:13px;font-weight:600;color:var(--color-text);line-height:1.55;
+  margin:6px 0 9px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  transition:color var(--transition-fast);
 }
-.news-cat-tag.industry{background:#E3F2FD;color:#1565C0}
-.news-cat-tag.market{background:#E8F5E9;color:#2E7D32}
-.news-cat-tag.competitor{background:#FFF3E0;color:#E65100}
-.news-cat-tag.product{background:#F3E8FD;color:#7C3AED}
-.news-date{font-size:12px;color:var(--color-text-tertiary);margin-left:auto;white-space:nowrap}
+a.news-card-title:hover{color:var(--color-primary)}
+.news-card-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.news-region-tag{
+  font-size:10px;color:var(--color-text-tertiary);
+  background:var(--color-border-light);border-radius:4px;padding:1px 7px;line-height:1.6;
+}
 .news-bookmark-btn{
-  width:30px;height:30px;display:flex;align-items:center;justify-content:center;
-  border-radius:6px;color:var(--color-text-tertiary);transition:all var(--transition-fast);
+  margin-left:auto;width:24px;height:24px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:5px;color:var(--color-text-tertiary);transition:all var(--transition-fast);
 }
 .news-bookmark-btn:hover{color:var(--color-primary);background:var(--color-primary-xlight)}
 .news-bookmark-btn.saved{color:var(--color-primary)}
 .news-bookmark-btn.saved svg{fill:var(--color-primary)}
-.news-bookmark-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;transition:fill var(--transition-fast)}
-.news-card-title{
-  font-size:15px;font-weight:600;color:var(--color-text);line-height:1.5;
-  display:block;margin-bottom:6px;transition:color var(--transition-fast);
-}
-a.news-card-title:hover,.news-card:hover .news-card-title{color:var(--color-primary)}
-.news-card-summary{font-size:13px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:10px}
-.news-card-footer{display:flex;align-items:center;gap:14px}
-.news-link{font-size:12px;font-weight:600;color:var(--color-primary);display:inline-flex;align-items:center;gap:4px}
-.news-region-tag{font-size:11px;color:var(--color-text-tertiary);background:var(--color-border-light);padding:2px 8px;border-radius:4px}
+.news-bookmark-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:fill var(--transition-fast)}
 
 /* 加载状态 */
-.load-status{text-align:center;padding:20px 0;color:var(--color-text-tertiary);font-size:13px}
+.load-status{text-align:center;padding:22px 0 6px;color:var(--color-text-tertiary);font-size:13px}
 .load-status .spinner{
   display:inline-block;width:16px;height:16px;border:2px solid var(--color-border);
   border-top-color:var(--color-primary);border-radius:50%;
   animation:spin 0.7s linear infinite;vertical-align:-3px;margin-right:8px;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty-tip{text-align:center;padding:60px 0;color:var(--color-text-tertiary);font-size:13px}
+
+/* 响应式 */
+@media(max-width:1100px){
+  .page{padding:20px 20px 60px}
+  .kanban{grid-template-columns:repeat(2,1fr)}
+  .col-header{position:static}
+}
+@media(max-width:640px){
+  .kanban{grid-template-columns:1fr}
+  .topbar{padding:0 16px}
+}
 
 /* Toast */
 .toast{
@@ -166,20 +173,52 @@ a.news-card-title:hover,.news-card:hover .news-card-title{color:var(--color-prim
 </div>
 
 <div class="page">
-  <div class="page-header">
-    <h1>新闻中心</h1>
-    <p>行业趋势、市场动态、同行新闻与产品技术，持续更新，销售可随时收藏为邮件素材</p>
+  <div class="board-toolbar">
+    <div class="board-meta">
+      <span class="board-dot"></span>
+      <span>市场洞察<strong id="board-count"></strong> · 更新至<strong id="board-latest"></strong></span>
+    </div>
+    <button class="refresh-btn" id="refresh-btn" onclick="refreshBoard()">
+      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      刷新
+    </button>
   </div>
 
-  <div class="cat-tabs" id="cat-tabs">
-    <button class="cat-tab active" data-cat="all" onclick="switchCat('all')">全部<span class="tab-count" id="count-all"></span></button>
-    <button class="cat-tab" data-cat="industry" onclick="switchCat('industry')">行业趋势<span class="tab-count" id="count-industry"></span></button>
-    <button class="cat-tab" data-cat="market" onclick="switchCat('market')">市场动态<span class="tab-count" id="count-market"></span></button>
-    <button class="cat-tab" data-cat="competitor" onclick="switchCat('competitor')">同行新闻<span class="tab-count" id="count-competitor"></span></button>
-    <button class="cat-tab" data-cat="product" onclick="switchCat('product')">产品技术<span class="tab-count" id="count-product"></span></button>
+  <div class="kanban" id="kanban">
+    <div class="kanban-col">
+      <div class="col-header">
+        <span class="col-dot" style="background:#1565C0"></span>
+        <span class="col-name">行业趋势</span>
+        <span class="col-count" id="col-count-industry"></span>
+      </div>
+      <div class="col-body" id="col-industry"></div>
+    </div>
+    <div class="kanban-col">
+      <div class="col-header">
+        <span class="col-dot" style="background:#2E7D32"></span>
+        <span class="col-name">市场动态</span>
+        <span class="col-count" id="col-count-market"></span>
+      </div>
+      <div class="col-body" id="col-market"></div>
+    </div>
+    <div class="kanban-col">
+      <div class="col-header">
+        <span class="col-dot" style="background:#E65100"></span>
+        <span class="col-name">同行新闻</span>
+        <span class="col-count" id="col-count-competitor"></span>
+      </div>
+      <div class="col-body" id="col-competitor"></div>
+    </div>
+    <div class="kanban-col">
+      <div class="col-header">
+        <span class="col-dot" style="background:#7C3AED"></span>
+        <span class="col-name">产品技术</span>
+        <span class="col-count" id="col-count-product"></span>
+      </div>
+      <div class="col-body" id="col-product"></div>
+    </div>
   </div>
 
-  <div id="news-feed"></div>
   <div class="load-status" id="load-status"></div>
 </div>
 
@@ -187,10 +226,22 @@ a.news-card-title:hover,.news-card:hover .news-card-title{color:var(--color-prim
 
 <script src="assets/rhc-insights.js"></script>
 <script>
-var PAGE_SIZE = 6;
-var _cat = 'all';
-var _loadedCount = 0;
-var _allItems = [];
+/* ============================================================
+ * 新闻中心：四列资讯看板 + 滚动分批加载 + 手动刷新
+ * 数据来源：assets/rhc-insights.js（RHC_INSIGHT_DATA，四页共享）
+ * 后期接入 RSS/后端接口时：
+ *   1. refreshBoard() 中替换为真实数据拉取，更新 RHC_INSIGHT_DATA
+ *   2. _colData 重建后调 loadMore(true) 即可，渲染逻辑无需改动
+ * ============================================================ */
+var CATS = [
+  { key:'industry',   label:'行业趋势' },
+  { key:'market',     label:'市场动态' },
+  { key:'competitor', label:'同行新闻' },
+  { key:'product',    label:'产品技术' }
+];
+var COL_BATCH = 2;          // 每列每批加载条数
+var _colData = {};          // cat -> 按日期倒序的新闻数组
+var _colLoaded = {};        // cat -> 已加载条数
 var _loading = false;
 var toastTimer = null;
 
@@ -220,72 +271,87 @@ function esc(s) {
   });
 }
 
-function getItems(cat) {
-  var items = RHC_INSIGHT_DATA.slice();
-  if (cat && cat !== 'all') items = items.filter(function(it){ return it.category === cat; });
-  items.sort(function(a, b){ return b.date.localeCompare(a.date); });
-  return items;
-}
-
-function renderCounts() {
-  document.getElementById('count-all').textContent = RHC_INSIGHT_DATA.length;
-  ['industry','market','competitor','product'].forEach(function(c){
-    document.getElementById('count-' + c).textContent = RHC_INSIGHT_DATA.filter(function(it){ return it.category === c; }).length;
+function buildData() {
+  CATS.forEach(function(c){
+    var items = RHC_INSIGHT_DATA.filter(function(it){ return it.category === c.key; });
+    items.sort(function(a, b){ return b.date.localeCompare(a.date); });
+    _colData[c.key] = items;
+    _colLoaded[c.key] = 0;
+    document.getElementById('col-count-' + c.key).textContent = items.length;
   });
+  var total = RHC_INSIGHT_DATA.length;
+  var latest = RHC_INSIGHT_DATA.map(function(it){ return it.date; }).sort().pop();
+  document.getElementById('board-count').textContent = ' · 共 ' + total + ' 条';
+  document.getElementById('board-latest').textContent = latest ? latest.slice(5).replace('-', '/') : '';
 }
 
 function cardHtml(item) {
   var saved = getSavedIds();
   var isSaved = saved.indexOf(item.id) !== -1;
-  var titleInner = item.url
+  var title = item.url
     ? '<a class="news-card-title" href="' + item.url + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>'
     : '<div class="news-card-title">' + esc(item.title) + '</div>';
-  var regions = (item.regions || []).map(function(r){
+  var regions = (item.regions || []).slice(0, 2).map(function(r){
     return '<span class="news-region-tag">' + esc(REGION_LABELS[r] || r) + '</span>';
   }).join('');
-  var link = item.url ? '<a class="news-link" href="' + item.url + '" target="_blank" rel="noopener">查看原文 ↗</a>' : '';
   return '<div class="news-card">'
-    + '<div class="news-card-top">'
-    +   '<span class="news-cat-tag ' + item.categoryColor + '">' + esc(item.categoryLabel) + '</span>'
-    +   '<span class="news-date">' + esc(item.date) + '</span>'
+    + '<div class="news-card-date">' + esc(item.date) + '</div>'
+    + title
+    + '<div class="news-card-foot">'
+    +   regions
     +   '<button class="news-bookmark-btn' + (isSaved ? ' saved' : '') + '" onclick="toggleSave(\'' + item.id + '\')" title="' + (isSaved ? '取消收藏' : '收藏到素材库') + '" aria-label="收藏">'
-    +     '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>'
+    +     '<svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>'
     +   '</button>'
     + '</div>'
-    + titleInner
-    + '<p class="news-card-summary">' + esc(item.summary) + '</p>'
-    + '<div class="news-card-footer">' + link + regions + '</div>'
     + '</div>';
 }
 
-function renderBatch(reset) {
+function renderCol(catKey, reset) {
+  var body = document.getElementById('col-' + catKey);
+  if (reset) { body.innerHTML = ''; _colLoaded[catKey] = 0; }
+  var all = _colData[catKey];
+  var next = all.slice(_colLoaded[catKey], _colLoaded[catKey] + COL_BATCH);
+  var html = '';
+  for (var i = 0; i < next.length; i++) html += cardHtml(next[i]);
+  body.insertAdjacentHTML('beforeend', html);
+  _colLoaded[catKey] += next.length;
+}
+
+function totalLoaded() {
+  var t = 0;
+  CATS.forEach(function(c){ t += _colLoaded[c.key]; });
+  return t;
+}
+function allDone() {
+  return CATS.every(function(c){ return _colLoaded[c.key] >= _colData[c.key].length; });
+}
+
+function loadMore(reset) {
   if (_loading) return;
+  if (!reset && allDone()) return;
   _loading = true;
   var status = document.getElementById('load-status');
-  var feed = document.getElementById('news-feed');
-
-  if (reset) {
-    feed.innerHTML = '';
-    _loadedCount = 0;
-  }
-
   status.innerHTML = '<span class="spinner"></span>加载中...';
-
   // 模拟异步加载（后期接 RSS/后端接口时，替换为真实分页请求）
   setTimeout(function(){
-    var next = _allItems.slice(_loadedCount, _loadedCount + PAGE_SIZE);
-    var html = '';
-    for (var i = 0; i < next.length; i++) html += cardHtml(next[i]);
-    feed.insertAdjacentHTML('beforeend', html);
-    _loadedCount += next.length;
-
-    if (_loadedCount >= _allItems.length) {
-      status.textContent = _allItems.length === 0 ? '' : '— 已加载全部 ' + _allItems.length + ' 条 —';
+    CATS.forEach(function(c){ renderCol(c.key, reset); });
+    if (allDone()) {
+      status.textContent = '— 已加载全部 ' + RHC_INSIGHT_DATA.length + ' 条资讯 —';
     } else {
-      status.textContent = '下滑加载更多（已加载 ' + _loadedCount + '/' + _allItems.length + '）';
+      status.textContent = '下滑加载更多（已加载 ' + totalLoaded() + '/' + RHC_INSIGHT_DATA.length + '）';
     }
     _loading = false;
-  }, 300);
+  }, reset ? 400 : 300);
+}
+
+function refreshBoard() {
+  var btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  // 后期接 RSS/后端：此处先重新拉取最新数据，再 buildData() + loadMore(true)
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  loadMore(true);
+  setTimeout(function(){ btn.classList.remove('spinning'); }, 800);
+  showToast('新闻已刷新', 'success');
 }
 
 function toggleSave(id) {
@@ -294,39 +360,25 @@ function toggleSave(id) {
   if (idx !== -1) { saved.splice(idx, 1); showToast('已取消收藏'); }
   else { saved.push(id); showToast('已收藏到个人素材库', 'success'); }
   setSavedIds(saved);
-  // 刷新当前可见卡片的收藏按钮状态
-  var btns = document.querySelectorAll('.news-bookmark-btn');
-  // 简单做法：重渲染已加载部分
-  var feed = document.getElementById('news-feed');
-  var html = '';
-  for (var i = 0; i < _loadedCount; i++) html += cardHtml(_allItems[i]);
-  feed.innerHTML = html;
-}
-
-function switchCat(cat) {
-  _cat = cat;
-  var tabs = document.querySelectorAll('.cat-tab');
-  for (var i = 0; i < tabs.length; i++) {
-    tabs[i].classList.toggle('active', tabs[i].getAttribute('data-cat') === cat);
-  }
-  _allItems = getItems(cat);
-  window.scrollTo({ top: document.getElementById('news-feed').offsetTop - 130, behavior: 'smooth' });
-  renderBatch(true);
+  // 重渲染四列已加载部分的收藏按钮状态
+  CATS.forEach(function(c){
+    var body = document.getElementById('col-' + c.key);
+    var html = '';
+    for (var i = 0; i < _colLoaded[c.key]; i++) html += cardHtml(_colData[c.key][i]);
+    body.innerHTML = html;
+  });
 }
 
 function onScroll() {
-  if (_loadedCount >= _allItems.length || _loading) return;
+  if (_loading || allDone()) return;
   var status = document.getElementById('load-status');
   var rect = status.getBoundingClientRect();
-  if (rect.top < window.innerHeight + 100) {
-    renderBatch(false);
-  }
+  if (rect.top < window.innerHeight + 120) loadMore(false);
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-  renderCounts();
-  _allItems = getItems('all');
-  renderBatch(true);
+  buildData();
+  loadMore(true);
   window.addEventListener('scroll', onScroll);
 });
 </script>
