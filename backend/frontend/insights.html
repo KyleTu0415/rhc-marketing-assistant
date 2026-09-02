@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 
   // 拉取后端数据（RSS 抓取入库 + LLM 翻译分类）
-  // 服务刚启动时首轮抓取约需 1-2 分钟，期间返回空列表，自动重试覆盖
+  // 服务刚启动时首轮抓取+翻译约需 2-3 分钟，期间返回空列表，自动重试覆盖
   (function initLoad(retries) {
     apiFetch(API.list).then(function(res){
       if (res && res.items && res.items.length) {
@@ -480,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if (retries > 0) setTimeout(function(){ initLoad(retries - 1); }, 5000);
       else showOffline();
     });
-  })(20);
+  })(40);
 
   // 自动更新：每 10 分钟静默检查一次后端是否有新内容
   setInterval(function(){

@@ -117,13 +117,28 @@ def _existing_keys(items: list):
 
 
 # ---------------- 刷新编排 ----------------
-def _do_refresh() -> dict:
-    """实际执行一轮抓取+加工+合并。调用方持锁。"""
-    _state["refreshing"] = True
+def refresh(force: bool = False) -> dict:
+    """手动/自动刷新入口。force=True 跳过限频。
+    慢操作（RSS 抓取 + LLM 翻译，约 20s~2min）在锁外执行，期间页面请求
+    读取上一轮数据不被阻塞；仅状态翻转与结果提交使用短锁。"""
+    with _lock:
+        if _state["refreshing"]:
+            return {"limited": True, "reason": "refreshing"}
+        if not force and time.time() - _state["last_refresh_ts"] < REFRESH_MIN_INTERVAL:
+            remain = int(REFRESH_MIN_INTERVAL - (time.time() - _state["last_refresh_ts"]))
+            return {"limited": True, "reason": "rate_limited", "remain_seconds": remain}
+        _state["refreshing"] = True
+
     try:
         t0 = time.time()
+        # —— 锁外：抓取（慢）——
         raw = rss_sources.fetch_all_feeds()
-        existing_urls, existing_fps = _existing_keys(_state["items"])
+
+        # 短锁取当前库存快照，用于去重和 ID 分配
+        with _lock:
+            snapshot = list(_state["items"])
+        existing_urls, existing_fps = _existing_keys(snapshot)
+
         # 粗去重：URL/标题指纹命中的不送 LLM（省 token）
         new_raw = []
         for it in raw:
@@ -133,6 +148,7 @@ def _do_refresh() -> dict:
                 continue
             new_raw.append(it)
 
+        # —— 锁外：LLM 翻译分类（最慢）——
         processed = insights_llm.process_items(new_raw) if new_raw else []
 
         # LLM 后再去重（翻译后可能与库内中文标题指纹重合）
@@ -149,9 +165,9 @@ def _do_refresh() -> dict:
             existing_fps.add(fp_zh)
             added.append(p)
 
-        # 分配 ID
+        # 分配 ID（基于快照编号，刷新是唯一写者，无并发冲突）
         max_num = 0
-        for it in _state["items"]:
+        for it in snapshot:
             m = re.match(r"ins-(\d+)", it.get("id", ""))
             if m:
                 max_num = max(max_num, int(m.group(1)))
@@ -160,41 +176,30 @@ def _do_refresh() -> dict:
             p["id"] = f"ins-{max_num:03d}"
             p["products"] = []
 
-        if added:
-            _state["items"].extend(added)
-            # 按日期倒序，裁剪上限
-            _state["items"].sort(key=lambda x: x.get("date", ""), reverse=True)
-            if len(_state["items"]) > MAX_ITEMS:
-                _state["items"] = _state["items"][:MAX_ITEMS]
-
-        _state["last_refresh_ts"] = time.time()
-        info = {
-            "time": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M"),
-            "fetched": len(raw),
-            "new_candidates": len(new_raw),
-            "added": len(added),
-            "total": len(_state["items"]),
-            "cost_seconds": round(time.time() - t0, 1),
-            "sources": rss_sources.health_snapshot(),
-        }
-        _state["last_refresh_info"] = info
-        _save()
-        return info
-    finally:
-        _state["refreshing"] = False
-
-
-def refresh(force: bool = False) -> dict:
-    """手动/自动刷新入口。force=True 跳过限频。返回 (info, limited)。"""
-    with _lock:
-        if _state["refreshing"]:
-            return {"limited": True, "reason": "refreshing"}
-        if not force and time.time() - _state["last_refresh_ts"] < REFRESH_MIN_INTERVAL:
-            remain = int(REFRESH_MIN_INTERVAL - (time.time() - _state["last_refresh_ts"]))
-            return {"limited": True, "reason": "rate_limited", "remain_seconds": remain}
-        info = _do_refresh()
+        # —— 短锁：合并提交 ——
+        with _lock:
+            if added:
+                _state["items"].extend(added)
+                _state["items"].sort(key=lambda x: x.get("date", ""), reverse=True)
+                if len(_state["items"]) > MAX_ITEMS:
+                    _state["items"] = _state["items"][:MAX_ITEMS]
+            _state["last_refresh_ts"] = time.time()
+            info = {
+                "time": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M"),
+                "fetched": len(raw),
+                "new_candidates": len(new_raw),
+                "added": len(added),
+                "total": len(_state["items"]),
+                "cost_seconds": round(time.time() - t0, 1),
+                "sources": rss_sources.health_snapshot(),
+            }
+            _state["last_refresh_info"] = info
+            _save()
         info["limited"] = False
         return info
+    finally:
+        with _lock:
+            _state["refreshing"] = False
 
 
 def get_items() -> list:
