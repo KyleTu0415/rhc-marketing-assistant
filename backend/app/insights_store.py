@@ -131,10 +131,9 @@ def refresh(force: bool = False) -> dict:
 
     try:
         t0 = time.time()
-        # —— 锁外：抓取（慢）——
+        # —— 锁外：RSS 抓取（约 15-25 秒）——
         raw = rss_sources.fetch_all_feeds()
 
-        # 短锁取当前库存快照，用于去重和 ID 分配
         with _lock:
             snapshot = list(_state["items"])
         existing_urls, existing_fps = _existing_keys(snapshot)
@@ -148,58 +147,101 @@ def refresh(force: bool = False) -> dict:
                 continue
             new_raw.append(it)
 
-        # —— 锁外：LLM 翻译分类（最慢）——
-        processed = insights_llm.process_items(new_raw) if new_raw else []
+        # —— 阶段1：英文原文立即入库（约 20 秒页面即有新闻），
+        #          配 LLM 时标记 pending_translate，阶段2 被中文版替换 ——
+        en_items = insights_llm._fallback_items(new_raw)
+        for it in en_items:
+            it["lang"] = "en"
+            it["pending_translate"] = True
+        n_en = _commit_items(en_items)
+        print(f"[insights_store] 阶段1 英文新闻已发布 {n_en} 条，耗时 {time.time()-t0:.0f}s")
 
-        # LLM 后再去重（翻译后可能与库内中文标题指纹重合）
-        added = []
+        if not insights_llm._client_cfg().get("api_key"):
+            # 未配 LLM：英文即最终版
+            info = _build_info(t0, len(raw), len(new_raw), len(snapshot))
+            with _lock:
+                _state["last_refresh_ts"] = time.time()
+                _state["last_refresh_info"] = info
+            info["limited"] = False
+            return info
+
+        # —— 阶段2（锁外，约 1-2 分钟）：LLM 翻译分类精筛 ——
+        processed = insights_llm.process_items(new_raw) if new_raw else []
+        zh = []
         for p in processed:
-            if p.get("url") and _norm_url(p["url"]) in existing_urls:
-                continue
             fp_en = _title_fp(p.get("title_en", ""))
             fp_zh = _title_fp(p.get("title", ""))
+            u = _norm_url(p.get("url", ""))
+            if p.get("url") and u in existing_urls:
+                continue
             if fp_en in existing_fps or fp_zh in existing_fps:
                 continue
-            existing_urls.add(_norm_url(p.get("url", "")))
+            existing_urls.add(u)
             existing_fps.add(fp_en)
             existing_fps.add(fp_zh)
-            added.append(p)
+            p["lang"] = "zh"
+            zh.append(p)
 
-        # 分配 ID（基于快照编号，刷新是唯一写者，无并发冲突）
-        max_num = 0
-        for it in snapshot:
-            m = re.match(r"ins-(\d+)", it.get("id", ""))
-            if m:
-                max_num = max(max_num, int(m.group(1)))
-        for p in added:
-            max_num += 1
-            p["id"] = f"ins-{max_num:03d}"
-            p["products"] = []
-
-        # —— 短锁：合并提交 ——
+        # 用中文版替换阶段1英文条目：仅替换翻译成功的；
+        # 未翻译/翻译失败/判无关的英文条目保留为最终版（宁多勿漏）
+        zh_urls = {_norm_url(p.get("url", "")) for p in zh if p.get("url")}
         with _lock:
-            if added:
-                _state["items"].extend(added)
-                _state["items"].sort(key=lambda x: x.get("date", ""), reverse=True)
-                if len(_state["items"]) > MAX_ITEMS:
-                    _state["items"] = _state["items"][:MAX_ITEMS]
+            kept = []
+            for it in _state["items"]:
+                if it.get("pending_translate"):
+                    u = _norm_url(it.get("url", ""))
+                    if u in zh_urls:
+                        continue  # 有中文版，丢弃英文条目
+                    it.pop("pending_translate", None)  # 保留英文为最终版
+                kept.append(it)
+            _state["items"] = kept
+        n_zh = _commit_items(zh)
+        print(f"[insights_store] 阶段2 中文新闻替换完成，中文 {n_zh} 条，总耗时 {time.time()-t0:.0f}s")
+
+        info = _build_info(t0, len(raw), len(new_raw), len(snapshot))
+        with _lock:
             _state["last_refresh_ts"] = time.time()
-            info = {
-                "time": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M"),
-                "fetched": len(raw),
-                "new_candidates": len(new_raw),
-                "added": len(added),
-                "total": len(_state["items"]),
-                "cost_seconds": round(time.time() - t0, 1),
-                "sources": rss_sources.health_snapshot(),
-            }
             _state["last_refresh_info"] = info
-            _save()
         info["limited"] = False
         return info
     finally:
         with _lock:
             _state["refreshing"] = False
+
+
+def _commit_items(new_items: list) -> int:
+    """短锁内合并条目：分配 ID、排序、裁剪、保存。去重由调用方完成
+    （阶段2 中文条目的 URL 与阶段1 英文条目相同，此处不能再按 URL 去重）。"""
+    with _lock:
+        max_num = 0
+        for it in _state["items"]:
+            m = re.match(r"ins-(\d+)", it.get("id", ""))
+            if m:
+                max_num = max(max_num, int(m.group(1)))
+        for p in new_items:
+            max_num += 1
+            p["id"] = f"ins-{max_num:03d}"
+            p.setdefault("products", [])
+        _state["items"].extend(new_items)
+        _state["items"].sort(key=lambda x: x.get("date", ""), reverse=True)
+        if len(_state["items"]) > MAX_ITEMS:
+            _state["items"] = _state["items"][:MAX_ITEMS]
+        _save()
+        return len(new_items)
+
+
+def _build_info(t0: float, fetched: int, candidates: int, snapshot_len: int) -> dict:
+    with _lock:
+        total = len(_state["items"])
+    return {
+        "time": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M"),
+        "fetched": fetched,
+        "new_candidates": candidates,
+        "added": total - snapshot_len,
+        "total": total,
+        "cost_seconds": round(time.time() - t0, 1),
+        "sources": rss_sources.health_snapshot(),
+    }
 
 
 def get_items() -> list:
@@ -220,8 +262,8 @@ def status() -> dict:
 
 # ---------------- 自动调度 ----------------
 def _auto_loop():
-    # 启动后 90 秒做首轮（等服务就绪），之后每 6 小时
-    time.sleep(90)
+    # 启动后 15 秒做首轮（英文新闻约 20 秒即可发布），之后每 12 小时
+    time.sleep(15)
     while True:
         try:
             with _lock:
@@ -238,7 +280,7 @@ def _auto_loop():
 def start_scheduler():
     t = threading.Thread(target=_auto_loop, daemon=True)
     t.start()
-    print("[insights_store] 自动刷新调度器已启动（6小时间隔）")
+    print("[insights_store] 自动刷新调度器已启动（12小时间隔，启动15秒后首轮）")
 
 
 # 模块导入即加载数据

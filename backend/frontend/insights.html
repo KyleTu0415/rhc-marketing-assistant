@@ -414,15 +414,28 @@ function refreshBoard() {
     });
   }
 
-  // 轮询刷新状态：后端后台抓取+翻译，refreshing 转 false 后拉新数据
+  // 轮询：后端两阶段发布——英文新闻 ~20 秒先上，中文版 ~2 分钟替换。
+  // 每轮拉列表，内容有更新就即时渲染，refreshing 结束后收尾。
   var waits = 0;
   function poll(){
-    apiFetch('/api/insights/status').then(function(st){
-      if (st && st.refreshing) {
-        if (waits++ < 40) { setTimeout(poll, 5000); return; }  // 最多等 ~3.5 分钟
+    apiFetch(API.list).then(function(res){
+      if (res && res.items && res.items.length) {
+        var changed = res.items.length !== RHC_INSIGHT_DATA.length ||
+          (res.last_refresh && window.__LAST_REFRESH && res.last_refresh.time !== window.__LAST_REFRESH.time);
+        if (changed) {
+          applyData(res.items, res.last_refresh);
+        }
       }
-      finishList().catch(function(){ showOffline(); })
-        .finally(function(){ btn.classList.remove('spinning'); });
+      return apiFetch('/api/insights/status').then(function(st){
+        if (st && st.refreshing) {
+          if (waits++ < 40) { setTimeout(poll, 5000); return; }  // 最多等 ~3.5 分钟
+        }
+        var total = res && res.items ? res.items.length : RHC_INSIGHT_DATA.length;
+        var n = total - beforeTotal;
+        if (n > 0) showToast('刷新完成，新增 ' + n + ' 条新闻，共 ' + total + ' 条', 'success');
+        else showToast('已是最新，共 ' + total + ' 条', 'success');
+        btn.classList.remove('spinning');
+      });
     }).catch(function(){
       if (waits++ < 40) { setTimeout(poll, 5000); return; }
       showToast('刷新失败，新闻服务暂不可用', 'warning');
@@ -435,7 +448,7 @@ function refreshBoard() {
   apiFetch(API.refresh, { method: 'POST' })
     .then(function(res){
       if (res && res.accepted) {
-        showToast('正在抓取最新新闻，约需 1-2 分钟...', 'success');
+        showToast('正在抓取最新新闻，内容将陆续更新...', 'success');
         poll();
       } else if (res && res.reason === 'rate_limited') {
         var mins = Math.ceil(res.remain_seconds / 60);
