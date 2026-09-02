@@ -513,24 +513,6 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
     <p class="welcome-subtitle">欢迎回到 Real Healthcare 智能工作平台</p>
   </section>
 
-  <!-- News Section / 市场洞察 -->
-  <section class="news-section">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-      <h2 class="section-title" style="margin-bottom:0">市场洞察</h2>
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <div class="insight-tabs" id="insight-tabs">
-          <button class="insight-tab active" data-cat="all" onclick="filterInsight('all')">全部</button>
-          <button class="insight-tab" data-cat="industry" onclick="filterInsight('industry')">🔵 行业趋势</button>
-          <button class="insight-tab" data-cat="market" onclick="filterInsight('market')">🟢 市场动态</button>
-          <button class="insight-tab" data-cat="competitor" onclick="filterInsight('competitor')">🟠 同行新闻</button>
-          <button class="insight-tab" data-cat="product" onclick="filterInsight('product')">🟣 产品技术</button>
-        </div>
-        <a href="insights.html" class="insight-more-link">更多 →</a>
-      </div>
-    </div>
-    <div id="insight-list"><!-- JS 动态渲染 --></div>
-  </section>
-
   <h2 class="section-title">选择工作台</h2>
 
   <div class="assistant-grid">
@@ -646,6 +628,25 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
       <span class="assistant-status" style="color:var(--color-text-tertiary,#9CA3AF)">管理层功能</span>
     </div>
   </div>
+
+  <!-- News Section / 市场洞察 -->
+  <section class="news-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <h2 class="section-title" style="margin-bottom:0">市场洞察</h2>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div class="insight-tabs" id="insight-tabs">
+          <button class="insight-tab active" data-cat="all" onclick="filterInsight('all')">全部</button>
+          <button class="insight-tab" data-cat="industry" onclick="filterInsight('industry')">🔵 行业趋势</button>
+          <button class="insight-tab" data-cat="market" onclick="filterInsight('market')">🟢 市场动态</button>
+          <button class="insight-tab" data-cat="competitor" onclick="filterInsight('competitor')">🟠 同行新闻</button>
+          <button class="insight-tab" data-cat="product" onclick="filterInsight('product')">🟣 产品技术</button>
+        </div>
+        <a href="insights.html" class="insight-more-link">更多 →</a>
+      </div>
+    </div>
+    <div id="insight-list"><!-- JS 动态渲染 --></div>
+  </section>
+
 
   <footer class="page-footer">
     © 2026 Real Healthcare. All rights reserved.
