@@ -1,0 +1,30 @@
+/* ============================================================
+ * RHC 字体加载（全系统共享）
+ * HarmonyOS Sans SC，仅声明实际使用的 3 个字重（400/500/700）
+ *
+ * 关键点：font-display: optional
+ * - 首次访问：字体未就绪时直接用系统字体渲染，不发生二次切换（无闪烁）
+ * - 字体进入浏览器缓存后，后续刷新直接命中缓存，稳定显示 HarmonyOS
+ * - 覆盖 CDN 原 CSS 的 font-display: swap（swap 会导致先显示系统字体再跳变）
+ * ============================================================ */
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: url('https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@main/fonts/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: optional;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: url('https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@main/fonts/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Medium.woff2') format('woff2');
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: optional;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: url('https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@main/fonts/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Bold.woff2') format('woff2');
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: optional;
+}
