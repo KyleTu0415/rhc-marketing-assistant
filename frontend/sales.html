@@ -163,6 +163,37 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .pi-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:280px;gap:10px;color:var(--color-text-tertiary)}
 .pi-note{font-size:11px;color:var(--color-warning);margin-top:10px}
 
+/* 素材库 chip */
+.material-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:20px;
+  border:1px solid var(--color-border);
+  background:var(--color-surface);
+  font-size:12px;cursor:pointer;
+  transition:all var(--transition-fast);
+  max-width:260px;
+}
+.material-chip:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.material-chip.selected{
+  border-color:var(--color-primary);
+  background:var(--color-primary-xlight);
+  color:var(--color-primary);
+}
+.material-chip-cat{
+  font-size:10px;font-weight:600;
+  padding:1px 6px;border-radius:10px;
+  flex-shrink:0;
+}
+.material-chip-title{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  flex:1;min-width:0;
+}
+.material-chip-check{
+  width:14px;height:14px;flex-shrink:0;
+  display:none;
+}
+.material-chip.selected .material-chip-check{display:block}
+
 @media(max-width:860px){
   .sidebar{width:56px;min-width:56px}
   .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section,.sidebar .sidebar-user .user-info{display:none}
@@ -283,6 +314,18 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
             <div class="form-group">
               <label>要点</label>
               <textarea id="mail-keypoints" rows="4" placeholder="填写客户关注点、报价要点、特殊条款等关键信息"></textarea>
+            </div>
+            <div class="form-group">
+              <label style="display:flex;align-items:center;justify-content:space-between">
+                <span>📚 个人素材库</span>
+                <a href="library.html" style="font-size:12px;color:var(--color-primary);font-weight:normal" target="_blank">管理素材库 →</a>
+              </label>
+              <div id="mail-material-pool" style="display:flex;flex-wrap:wrap;gap:8px;min-height:40px">
+                <!-- JS 动态渲染收藏的新闻列表 -->
+              </div>
+              <div id="mail-material-empty" style="font-size:12px;color:var(--color-text-tertiary);padding:8px 0;display:none">
+                暂无收藏素材。在首页「市场洞察」中收藏感兴趣的新闻，即可在此处选用。
+              </div>
             </div>
             <button class="btn btn-primary" onclick="generateMail()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> 生成英文邮件</button>
           </div>
@@ -427,6 +470,62 @@ var currentMailText='';
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3200)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+/* ===== 个人素材库 ===== */
+var selectedMaterialIds=[];
+var RHC_INSIGHT_DATA=[
+  {id:'ins_01',category:'industry',categoryLabel:'行业趋势',title:'AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增',summary:'AI技术正在加速重塑兽医行业，诊断影像AI、临床文档自动化和远程监护系统成为投资热点。全球多家兽医科技公司完成新一轮融资，AI辅助诊断准确率已接近资深兽医水平，推动行业数字化转型。',date:'2026-08-19'},
+  {id:'ins_02',category:'industry',categoryLabel:'行业趋势',title:'全球兽医医疗器械市场预计2030年达91亿美元',summary:'根据最新市场研究报告，全球兽医医疗器械市场规模预计2030年将达到91亿美元，年复合增长率约6.8%。增长动力主要来自宠物人口增长、慢性病诊疗需求增加以及新兴市场兽医基础设施建设。',date:'2026-08-25'},
+  {id:'ins_03',category:'industry',categoryLabel:'行业趋势',title:'IDEXX推出犬猫双物种心脏生物标志物检测',summary:'IDEXX最新推出可同时检测犬和猫心脏生物标志物的检测试剂盒，覆盖cTnI、NT-proBNP等关键指标，检测时间缩短至15分钟，将显著提升基层诊所心脏疾病筛查效率。',date:'2026-08-12'},
+  {id:'ins_04',category:'industry',categoryLabel:'行业趋势',title:'兽医影像数字化与AI辅助诊断加速，北美设备进入替换窗口',summary:'北美兽医诊所平均设备更新周期约7年，2026年正值2019年采购潮的替换窗口期。数字化DR、超声设备与AI辅助诊断功能成为本轮更新的核心选型指标，设备厂商加速推出智能化升级方案。',date:'2026-08-31'},
+  {id:'ins_05',category:'market',categoryLabel:'市场动态',title:'中东、东南亚兽医诊所扩容，基础设备批量需求上升',summary:'中东及东南亚地区连锁兽医诊所扩张提速，新院开业普遍需要麻醉机、监护仪、DR等整套设备配置，批量采购需求显著上升，当地代理渠道对高性价比中国设备的兴趣持续增长。',date:'2026-08-31'},
+  {id:'ins_06',category:'market',categoryLabel:'市场动态',title:'巴西宠物医疗市场持续增长，INMETRO认证新规即将实施',summary:'巴西宠物医疗市场保持两位数增长，INMETRO认证新规将于2027年正式实施，所有进口兽医设备需完成本地注册。提前布局认证的中国厂商将在市场竞争中获得先发优势。',date:'2026-08-28'},
+  {id:'ins_07',category:'market',categoryLabel:'市场动态',title:'非洲 veterinary equipment 需求年增15%',summary:'非洲兽医设备市场需求年增长率约15%，基础诊疗设备和疫苗冷链设备需求最为旺盛。国际援助项目和本土资本共同推动当地兽医基础设施建设，中国设备凭借性价比优势快速渗透。',date:'2026-08-22'},
+  {id:'ins_08',category:'market',categoryLabel:'市场动态',title:'VMX/WVC 2026：麻醉与监护一体化成主流展示方向',summary:'VMX和WVC 2026展会上，麻醉工作站与多参数监护仪的一体化集成方案成为主流展示方向，设备厂商普遍强调智能化、人机协同和操作简化，一体化工作站产品占比显著提升。',date:'2026-08-31'},
+  {id:'ins_09',category:'competitor',categoryLabel:'同行新闻',title:'中宠兽与日本尼普洛（NIPRO）达成全面战略合作',summary:'中宠兽与日本医疗器械巨头尼普洛达成全面战略合作，双方将在兽医输液设备、透析产品等领域展开深度合作，借助尼普洛的渠道和技术资源加速海外市场布局。',date:'2026-08-01'},
+  {id:'ins_10',category:'competitor',categoryLabel:'同行新闻',title:'Zoetis Portela猫骨关节炎止痛药在英国获批',summary:'硕腾（Zoetis）旗下Portela猫骨关节炎口服止痛药在英国获得市场授权，成为欧洲首个获批用于猫长期疼痛管理的口服药物，预计将显著提升伴侣动物疼痛管理市场规模。',date:'2026-07-30'},
+  {id:'ins_11',category:'competitor',categoryLabel:'同行新闻',title:'睿视医疗与晓闻科技合作推进宠物CT智能化升级',summary:'睿视医疗与AI影像公司晓闻科技达成合作，共同推出宠物CT AI智能诊断系统，可自动识别骨骼、软组织异常并生成结构化报告，帮助基层诊所缩短诊断时间、提高诊断准确率。',date:'2026-08-06'},
+  {id:'ins_12',category:'competitor',categoryLabel:'同行新闻',title:'Mindray发布新款兽用麻醉工作站 VetAnesthesia Pro',summary:'迈瑞医疗发布新款兽用麻醉工作站VetAnesthesia Pro，集成多参数监护、智能通气模式和云端数据管理功能，定位中高端市场，将与德尔格、GE等国际品牌直接竞争。',date:'2026-08-15'}
+];
+var MATERIAL_CAT_STYLES={
+  industry:{bg:'#E3F2FD',color:'#1565C0'},
+  market:{bg:'#E8F5E9',color:'#2E7D32'},
+  competitor:{bg:'#FFF3E0',color:'#E65100'}
+};
+function renderMailMaterials(){
+  var pool=document.getElementById('mail-material-pool');
+  var empty=document.getElementById('mail-material-empty');
+  var saved=[];
+  try{saved=JSON.parse(localStorage.getItem('rhc_saved_insights')||'[]')}catch(e){saved=[]}
+  var items=RHC_INSIGHT_DATA.filter(function(item){return saved.indexOf(item.id)!==-1});
+  if(!pool||!empty)return;
+  if(items.length===0){
+    pool.innerHTML='';
+    empty.style.display='block';
+    return;
+  }
+  empty.style.display='none';
+  pool.innerHTML=items.map(function(item){
+    var style=MATERIAL_CAT_STYLES[item.category]||MATERIAL_CAT_STYLES.industry;
+    var isSelected=selectedMaterialIds.indexOf(item.id)!==-1;
+    var title=item.title.length>20?item.title.substring(0,20)+'…':item.title;
+    return '<div class="material-chip'+(isSelected?' selected':'')+'" data-id="'+item.id+'" onclick="toggleMaterialSelect(\''+item.id+'\')">'+
+      '<span class="material-chip-cat" style="background:'+style.bg+';color:'+style.color+'">'+item.categoryLabel+'</span>'+
+      '<span class="material-chip-title">'+esc(title)+'</span>'+
+      '<span class="material-chip-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>'+
+      '</div>';
+  }).join('');
+}
+function toggleMaterialSelect(id){
+  var idx=selectedMaterialIds.indexOf(id);
+  if(idx===-1){
+    if(selectedMaterialIds.length>=2){showToast('最多选择2条素材','warning');return}
+    selectedMaterialIds.push(id);
+  }else{
+    selectedMaterialIds.splice(idx,1);
+  }
+  renderMailMaterials();
+}
 
 /* ===== 邮件助手 ===== */
 var MAIL_TYPES={
@@ -619,14 +718,21 @@ function generateMail(){
   if(!ctx0.name){showToast('请先选择或输入客户','error');return}
   var prods=getSelectedMailProducts();
   var keyPoints=document.getElementById('mail-keypoints').value.trim();
-  var ctx={customerName:ctx0.name,country:ctx0.country,products:prods,keyPoints:keyPoints};
+  // 读取选中的素材
+  var selectedMaterials=RHC_INSIGHT_DATA.filter(function(item){return selectedMaterialIds.indexOf(item.id)!==-1});
+  var ctx={customerName:ctx0.name,country:ctx0.country,products:prods,keyPoints:keyPoints,materials:selectedMaterials};
   var prodText=prods.length?prods.map(function(p){return p.name}).join('、'):'未指定产品';
+  var materialText='';
+  if(selectedMaterials.length>0){
+    materialText='[参考素材]\n'+selectedMaterials.map(function(m,i){return (i+1)+'. '+m.title+' —— '+m.summary}).join('\n')+'\n';
+  }
   var prompt='你是 RHC Medical（兽用医疗设备制造商）的外贸销售。'+MAIL_TYPES[mailType].prompt+'\n'+
     '邮件类型：'+MAIL_TYPES[mailType].label+'\n'+
     '客户名称：'+ctx.customerName+'\n'+
     '客户国家/地区：'+(ctx.country||'未知')+'\n'+
     '相关产品：'+prodText+'\n'+
     '关键要点：'+(keyPoints||'（客户未补充要点，请按通用专业表述处理）')+'\n'+
+    (materialText?materialText:'')+
     '写作规范（必须遵守）：'+MAIL_TYPES[mailType].rule+'\n'+
     '请输出一封专业英文商务邮件：第一行为 "Subject: 邮件主题"，空一行后为正文；落款统一使用 "Sales Team, RHC Medical"，不要写具体人名；不要输出任何中文或解释说明。';
 
@@ -851,6 +957,7 @@ renderGradingRulesCard();
 switchMailTab('inquiry');
 renderProductPick();
 renderMailProducts(PRODUCTS);
+renderMailMaterials();
 fetch('/api/products',{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('products '+r.status);return r.json()})
   .then(function(d){

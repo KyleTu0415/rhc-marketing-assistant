@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<script>
+(function(){
+  if (!localStorage.getItem('rhc_logged_in')) {
+    location.href = 'login.html';
+  }
+})();
+</script>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人素材库 — Real Healthcare 智能工作平台</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@main/css/harmonyos_sans_sc.css">
+<style>
+:root{
+  --color-bg:#F7F8FA;
+  --color-surface:#FFFFFF;
+  --color-primary:#C8102E;
+  --color-primary-dark:#A50D26;
+  --color-primary-light:#FDE8EB;
+  --color-primary-xlight:#FFF1F3;
+  --color-text:#1A1A1A;
+  --color-text-secondary:#6B7280;
+  --color-text-tertiary:#9CA3AF;
+  --color-border:#E5E7EB;
+  --color-border-light:#F3F4F6;
+  --color-success:#16A37B;
+  --color-warning:#F3A94B;
+  --color-info:#3B82F6;
+  --font-sans:"HarmonyOS Sans SC","HarmonyOS Sans","Noto Sans SC",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.10);
+  --transition-fast:0.15s ease;
+  --transition-normal:0.25s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font-sans);font-size:14px;line-height:1.5;color:var(--color-text);background:var(--color-bg);overflow:hidden}
+a{color:var(--color-primary);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;font-size:13px}
+input,select,textarea{font-family:var(--font-sans);font-size:13px;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--color-text);background:var(--color-surface);outline:none;transition:border-color var(--transition-fast)}
+input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,46,0.12)}
+
+/* ===== LAYOUT ===== */
+.app-layout{display:flex;height:100vh;width:100vw}
+.sidebar{
+  width:200px;min-width:200px;
+  background:var(--color-sidebar,#FFFFFF);
+  border-right:1px solid var(--color-border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;z-index:100;
+}
+.sidebar-logo{padding:15px 0 20px;text-align:center}
+.sidebar-logo img{height:90px;width:auto;margin:0 auto;display:block}
+.sidebar-logo span{display:block;font-size:13px;font-weight:700;color:var(--color-primary);margin-top:10px;letter-spacing:2px;text-transform:uppercase}
+.sidebar-nav{padding:0 0;flex:1;display:flex;flex-direction:column}
+.sidebar-nav .nav-section{padding:4px 16px 10px;font-size:15px;text-transform:uppercase;letter-spacing:0.5px;color:var(--color-text-secondary);font-weight:700;text-align:left}
+.sidebar-nav .nav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;color:var(--color-text-secondary,#6B7280);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--transition-fast);border-left:3px solid transparent;text-decoration:none;position:relative}
+.sidebar-nav a.nav-item:hover{text-decoration:none}
+.sidebar-nav .nav-item:hover{background:var(--color-primary-xlight);color:var(--color-primary)}
+.sidebar-nav .nav-item.active{background:var(--color-primary-xlight);color:var(--color-primary);font-weight:600;border-left-color:var(--color-primary)}
+.sidebar-nav .nav-item .nav-icon{width:14px;height:14px;flex-shrink:0;color:var(--color-text-tertiary);opacity:0.7}
+.sidebar-nav .nav-item:hover .nav-icon,.sidebar-nav .nav-item.active .nav-icon{color:var(--color-primary)}
+.sidebar-nav .nav-item-back-home{border-top:1px solid var(--color-border-light);margin-top:auto;padding-top:11px}
+.nav-item.nav-item-back-home,.nav-item.nav-item-back-home .nav-icon{color:var(--color-primary);font-weight:600;font-size:14px;opacity:1}
+
+/* Main area */
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{
+  height:56px;min-height:56px;background:var(--color-surface);
+  border-bottom:1px solid var(--color-border);
+  display:flex;align-items:center;padding:0 28px;gap:16px;
+}
+.topbar-breadcrumb{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--color-text-secondary)}
+.topbar-breadcrumb a{color:var(--color-text-secondary);font-weight:500}
+.topbar-breadcrumb a:hover{color:var(--color-primary)}
+.topbar-breadcrumb .sep{color:var(--color-text-tertiary);font-size:12px}
+.topbar-breadcrumb .current{color:var(--color-text);font-weight:600}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:var(--color-text)}
+
+.content-area{flex:1;overflow-y:auto;padding:32px 36px}
+
+/* ===== Library Content ===== */
+.library-header{margin-bottom:28px}
+.library-title{font-size:22px;font-weight:700;color:var(--color-text);margin-bottom:6px}
+.library-subtitle{font-size:13px;color:var(--color-text-secondary)}
+
+.library-tabs{display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid var(--color-border-light);padding-bottom:0}
+.lib-tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);margin-bottom:-1px}
+.lib-tab:hover{color:var(--color-primary)}
+.lib-tab.active{color:var(--color-primary);border-bottom-color:var(--color-primary)}
+
+/* Filter bar */
+.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.filter-bar input[type="text"]{flex:1;min-width:200px;padding:8px 14px 8px 36px;border-radius:20px;background:var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 12px center no-repeat}
+.filter-count{font-size:12px;color:var(--color-text-tertiary);white-space:nowrap}
+
+/* Material cards */
+.material-list{display:flex;flex-direction:column;gap:12px}
+.material-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-md);padding:18px 20px;
+  transition:all var(--transition-fast);position:relative;
+}
+.material-card:hover{box-shadow:var(--shadow-md);border-color:var(--color-primary)}
+.material-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.material-card-title{font-size:14px;font-weight:600;color:var(--color-text);line-height:1.5;flex:1}
+.material-card-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.material-cat-badge{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:4px;
+  font-size:11px;font-weight:600;line-height:1.4;
+}
+.cat-industry{background:#E3F2FD;color:#1565C0}
+.cat-market{background:#E8F5E9;color:#2E7D32}
+.cat-competitor{background:#FFF3E0;color:#E65100}
+.material-date{font-size:12px;color:var(--color-text-tertiary)}
+.material-summary{font-size:13px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:12px}
+.material-actions{display:flex;gap:8px;flex-wrap:wrap}
+.material-actions .btn{font-size:12px;padding:5px 12px;border-radius:var(--radius-sm);font-weight:500}
+
+/* Buttons */
+.btn{font-family:var(--font-sans);cursor:pointer;border:none;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:all var(--transition-fast)}
+.btn-primary{background:var(--color-primary);color:#fff;padding:8px 18px;border-radius:var(--radius-sm);font-weight:600}
+.btn-primary:hover{background:var(--color-primary-dark)}
+.btn-outline{border:1px solid var(--color-border);color:var(--color-text-secondary);padding:6px 14px;border-radius:var(--radius-sm);background:var(--color-surface)}
+.btn-outline:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-danger-outline{border:1px solid var(--color-border);color:var(--color-text-tertiary);padding:5px 12px;border-radius:var(--radius-sm);background:var(--color-surface)}
+.btn-danger-outline:hover{border-color:#E5484D;color:#E5484D}
+
+/* Settings panel */
+.settings-panel{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);padding:24px;margin-bottom:24px;
+}
+.settings-title{font-size:15px;font-weight:700;color:var(--color-text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.settings-group label{display:block;font-size:13px;font-weight:600;color:var(--color-text);margin-bottom:8px}
+.checkbox-group{display:flex;flex-wrap:wrap;gap:8px}
+.checkbox-item{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:20px;
+  border:1px solid var(--color-border);
+  font-size:12px;font-weight:500;color:var(--color-text-secondary);
+  cursor:pointer;transition:all var(--transition-fast);
+  user-select:none;
+}
+.checkbox-item:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.checkbox-item.checked{background:var(--color-primary-light);border-color:var(--color-primary);color:var(--color-primary);font-weight:600}
+.checkbox-item input{display:none}
+
+/* Empty state */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:60px 20px;gap:12px;
+}
+.empty-state svg{color:var(--color-text-tertiary);opacity:0.5}
+.empty-state .empty-title{font-size:15px;font-weight:600;color:var(--color-text-secondary)}
+.empty-state .empty-desc{font-size:13px;color:var(--color-text-tertiary);max-width:320px}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--color-text);color:#fff;padding:12px 24px;border-radius:var(--radius-md);
+  font-size:13px;font-weight:500;z-index:2000;opacity:0;
+  transition:all .3s ease;box-shadow:var(--shadow-lg);pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-success{background:var(--color-success)}
+.toast-error{background:#E5484D}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .content-area{padding:20px 16px}
+  .settings-grid{grid-template-columns:1fr}
+  .filter-bar{flex-direction:column;align-items:stretch}
+}
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40'%3E%3Crect width='120' height='40' rx='8' fill='%23C8102E'/%3E%3Ctext x='60' y='26' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='Arial'%3ERHC%3C/text%3E%3C/svg%3E" alt="RHC">
+      <span>智能工作平台</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">个人素材库</div>
+      <div class="nav-item active" data-page="materials" onclick="switchTab('materials')" role="button">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        <span>我的收藏</span>
+      </div>
+      <div class="nav-item" data-page="settings" onclick="switchTab('settings')" role="button">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>我的关注</span>
+      </div>
+      <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>返回首页</span>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-breadcrumb">
+        <a href="panel.html">首页</a>
+        <span class="sep">›</span>
+        <span class="current" id="breadcrumb-current">我的收藏</span>
+      </div>
+      <div class="topbar-right">
+        <div class="user-name">Ella</div>
+        <div class="user-avatar">E</div>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <!-- 我的收藏 Tab -->
+      <div id="tab-materials">
+        <div class="library-header">
+          <h1 class="library-title">📚 我的收藏</h1>
+          <p class="library-subtitle">从「市场洞察」收藏的行业资讯和市场情报，可在邮件助手中直接引用</p>
+        </div>
+
+        <div class="filter-bar">
+          <input type="text" id="search-input" placeholder="搜索收藏的新闻..." oninput="renderMaterials()">
+          <span class="filter-count" id="material-count">共 0 条</span>
+        </div>
+
+        <div class="library-tabs" id="material-filter-tabs">
+          <div class="lib-tab active" data-cat="all" onclick="setMaterialFilter('all')">全部</div>
+          <div class="lib-tab" data-cat="industry" onclick="setMaterialFilter('industry')">行业趋势</div>
+          <div class="lib-tab" data-cat="market" onclick="setMaterialFilter('market')">市场动态</div>
+          <div class="lib-tab" data-cat="competitor" onclick="setMaterialFilter('competitor')">同行新闻</div>
+        </div>
+
+        <div class="material-list" id="material-list">
+          <!-- JS 动态渲染 -->
+        </div>
+      </div>
+
+      <!-- 我的关注 Tab -->
+      <div id="tab-settings" style="display:none">
+        <div class="library-header">
+          <h1 class="library-title">🎯 我的关注</h1>
+          <p class="library-subtitle">设置您关注的区域、产品和客户类型，首页「市场洞察」将优先推荐匹配内容</p>
+        </div>
+
+        <div class="settings-panel">
+          <div class="settings-title">📍 关注的区域市场</div>
+          <div class="settings-group">
+            <div class="checkbox-group" id="pref-regions">
+              <!-- JS 渲染 -->
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-panel">
+          <div class="settings-title">🔧 关注的产品线</div>
+          <div class="settings-group">
+            <div class="checkbox-group" id="pref-products">
+              <!-- JS 渲染 -->
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-panel">
+          <div class="settings-title">🏥 关注的客户类型</div>
+          <div class="settings-group">
+            <div class="checkbox-group" id="pref-customers">
+              <!-- JS 渲染 -->
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:20px">
+          <button class="btn btn-primary" onclick="savePreferences()">保存设置</button>
+          <button class="btn btn-outline" onclick="resetPreferences()">恢复默认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== Toast ===== */
+var toastTimer = null;
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' toast-' + type : '');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.className = 'toast' + (type ? ' toast-' + type : ''); }, 3000);
+}
+
+/* ===== 新闻数据（与首页 panel.html 保持一致） ===== */
+var RHC_INSIGHT_DATA = [
+  {id:'ins_01',category:'industry',categoryLabel:'行业趋势',title:'AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增',summary:'Digitail融资2300万美元、Lupa Pets融资2000万美元，AI X光判读30秒内完成',date:'2026-08-19',url:'https://ceo.ca/@GlobeNewswire/ai-is-reshaping-veterinary-medicine-investment-surges',regions:['global'],products:[]},
+  {id:'ins_02',category:'industry',categoryLabel:'行业趋势',title:'全球兽医医疗器械市场预计2030年达91亿美元',summary:'CAGR 6.1%，北美占55.9%，AI诊断和POC检测驱动行业增长',date:'2026-08-25',url:'https://www.globenewswire.com/news-release/2026/08/25/3350843/0/en/global-veterinary-medical-devices-market-to-reach-9-1-billion-by-2030.html',regions:['global','north-america'],products:[]},
+  {id:'ins_03',category:'industry',categoryLabel:'行业趋势',title:'IDEXX推出犬猫双物种心脏生物标志物检测',summary:'首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市',date:'2026-08-12',url:'https://animalhealthnews.com/2026/08/12/idexx-launches-dual-species-point-of-care-cardiac-biomarker-test/',regions:['north-america'],products:[]},
+  {id:'ins_04',category:'industry',categoryLabel:'行业趋势',title:'兽医影像数字化与AI辅助诊断加速，北美设备进入替换窗口',summary:'北美诊所设备平均更新周期约7年，2019年采购潮设备集中进入替换期，询盘以整机更新为主',date:'2026-08-31',url:'',regions:['north-america'],products:['anesthesia-workstation']},
+  {id:'ins_05',category:'market',categoryLabel:'市场动态',title:'中东、东南亚兽医诊所扩容，基础设备批量需求上升',summary:'新院开业带动麻醉机、注射泵整套采购，适合以「新院配置清单」话题开发客户',date:'2026-08-31',url:'',regions:['middle-east','southeast-asia'],products:['anesthesia-workstation','infusion-pump']},
+  {id:'ins_06',category:'market',categoryLabel:'市场动态',title:'巴西宠物医疗市场持续增长，INMETRO认证新规即将实施',summary:'巴西将于2027年起要求所有进口兽用麻醉设备通过INMETRO认证，提前合规的企业将获得竞争优势',date:'2026-08-28',url:'',regions:['brazil'],products:['anesthesia-workstation','ventilator']},
+  {id:'ins_07',category:'market',categoryLabel:'市场动态',title:'非洲兽医设备需求年增15%，中小型设备最受欢迎',summary:'撒哈拉以南非洲宠物医疗市场快速崛起，便携、性价比高的设备需求旺盛',date:'2026-08-22',url:'',regions:['africa'],products:['portable-anesthesia','monitor']},
+  {id:'ins_08',category:'market',categoryLabel:'市场动态',title:'VMX/WVC 2026：麻醉与监护一体化成主流展示方向',summary:'单品设备关注度下降，建议主推V5 Plus等麻醉监护一体化工作站方案',date:'2026-08-31',url:'',regions:['global','north-america'],products:['v5-plus']},
+  {id:'ins_09',category:'competitor',categoryLabel:'同行新闻',title:'中宠兽与日本尼普洛（NIPRO）达成全面战略合作',summary:'品牌授权、进口器械渠道运营、宠物医药联合研发、高端耗材国产化五大方向',date:'2026-08-01',url:'http://m.toutiao.com/group/7669029600882360875/',regions:['global','asia'],products:[]},
+  {id:'ins_10',category:'competitor',categoryLabel:'同行新闻',title:'Zoetis Portela猫骨关节炎止痛药在英国获批',summary:'首个长效抗NGF单克隆抗体，一次注射缓解猫OA疼痛长达3个月',date:'2026-07-30',url:'https://news.zoetis.com/',regions:['europe'],products:[]},
+  {id:'ins_11',category:'competitor',categoryLabel:'同行新闻',title:'睿视医疗与晓闻科技合作推进宠物CT智能化升级',summary:'融合AI影像辅助诊断模型，提升宠物CT临床诊疗能力',date:'2026-08-06',url:'https://www.petdhw.com/show-52837.html',regions:['china'],products:[]},
+  {id:'ins_12',category:'competitor',categoryLabel:'同行新闻',title:'Mindray发布新款兽用麻醉工作站 VetAnesthesia Pro',summary:'集成触摸屏操控与低流量麻醉设计，瞄准中大型动物医院市场',date:'2026-08-15',url:'',regions:['global','china'],products:['anesthesia-workstation']}
+];
+
+/* ===== Tab 切换 ===== */
+var currentTab = 'materials';
+var materialFilter = 'all';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-materials').style.display = tab === 'materials' ? '' : 'none';
+  document.getElementById('tab-settings').style.display = tab === 'settings' ? '' : 'none';
+  document.getElementById('breadcrumb-current').textContent = tab === 'materials' ? '我的收藏' : '我的关注';
+  document.querySelectorAll('.sidebar-nav .nav-item[data-page]').forEach(function(item) {
+    item.classList.toggle('active', item.getAttribute('data-page') === tab);
+  });
+}
+
+/* ===== 收藏管理 ===== */
+function getSavedIds() {
+  try { return JSON.parse(localStorage.getItem('rhc_saved_insights') || '[]'); } catch(e) { return []; }
+}
+function saveSavedIds(ids) {
+  localStorage.setItem('rhc_saved_insights', JSON.stringify(ids));
+}
+
+function removeMaterial(id) {
+  var ids = getSavedIds();
+  ids = ids.filter(function(i) { return i !== id; });
+  saveSavedIds(ids);
+  renderMaterials();
+  showToast('已从素材库移除', 'success');
+}
+
+function setMaterialFilter(cat) {
+  materialFilter = cat;
+  document.querySelectorAll('#material-filter-tabs .lib-tab').forEach(function(tab) {
+    tab.classList.toggle('active', tab.getAttribute('data-cat') === cat);
+  });
+  renderMaterials();
+}
+
+function renderMaterials() {
+  var savedIds = getSavedIds();
+  var items = RHC_INSIGHT_DATA.filter(function(item) {
+    return savedIds.indexOf(item.id) >= 0;
+  });
+
+  // 按分类筛选
+  if (materialFilter !== 'all') {
+    items = items.filter(function(item) { return item.category === materialFilter; });
+  }
+
+  // 按搜索关键词过滤
+  var keyword = (document.getElementById('search-input').value || '').trim().toLowerCase();
+  if (keyword) {
+    items = items.filter(function(item) {
+      return item.title.toLowerCase().indexOf(keyword) >= 0 ||
+             item.summary.toLowerCase().indexOf(keyword) >= 0;
+    });
+  }
+
+  // 按日期排序（最新在前）
+  items.sort(function(a, b) { return b.date.localeCompare(a.date); });
+
+  document.getElementById('material-count').textContent = '共 ' + items.length + ' 条';
+
+  var container = document.getElementById('material-list');
+  if (items.length === 0) {
+    var savedTotal = getSavedIds().length;
+    if (savedTotal === 0) {
+      container.innerHTML = '<div class="empty-state">' +
+        '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>' +
+        '<div class="empty-title">还没有收藏任何资讯</div>' +
+        '<div class="empty-desc">前往首页「市场洞察」，点击新闻卡片上的收藏按钮，感兴趣的资讯会自动收集到这里</div>' +
+        '<a href="panel.html" class="btn btn-primary" style="margin-top:8px">去市场洞察看看</a>' +
+      '</div>';
+    } else {
+      container.innerHTML = '<div class="empty-state">' +
+        '<div class="empty-title">当前分类下没有收藏</div>' +
+        '<div class="empty-desc">试试切换到「全部」查看所有收藏</div>' +
+      '</div>';
+    }
+    return;
+  }
+
+  var html = '';
+  items.forEach(function(item) {
+    var catClass = 'cat-' + item.category;
+    var actions = '';
+    if (item.url) {
+      actions += '<a href="' + item.url + '" target="_blank" rel="noopener" class="btn btn-outline btn-sm">查看原文 ↗</a>';
+    }
+    actions += '<button class="btn btn-outline btn-sm" onclick="useInMail(\'' + item.id + '\')">✉️ 用于写邮件</button>';
+    actions += '<button class="btn btn-danger-outline btn-sm" onclick="removeMaterial(\'' + item.id + '\')">移除</button>';
+
+    html += '<div class="material-card">' +
+      '<div class="material-card-header">' +
+        '<div class="material-card-title">' + escHtml(item.title) + '</div>' +
+      '</div>' +
+      '<div class="material-card-meta">' +
+        '<span class="material-cat-badge ' + catClass + '">' + escHtml(item.categoryLabel) + '</span>' +
+        '<span class="material-date">' + escHtml(item.date) + '</span>' +
+      '</div>' +
+      '<div class="material-summary">' + escHtml(item.summary) + '</div>' +
+      '<div class="material-actions">' + actions + '</div>' +
+    '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function useInMail(id) {
+  // 跳转到邮件助手并自动选中该素材
+  window.location.href = 'sales.html?from=library&material=' + id;
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+/* ===== 个人关注设置 ===== */
+var REGION_OPTIONS = [
+  {value:'brazil',label:'巴西'},{value:'africa',label:'非洲'},{value:'southeast-asia',label:'东南亚'},
+  {value:'middle-east',label:'中东'},{value:'north-america',label:'北美'},{value:'europe',label:'欧洲'},
+  {value:'china',label:'国内'},{value:'asia',label:'亚太'}
+];
+var PRODUCT_OPTIONS = [
+  {value:'anesthesia-workstation',label:'麻醉工作站'},{value:'ventilator',label:'呼吸机'},
+  {value:'v5-plus',label:'V5 Plus'},{value:'x35vet',label:'X35VET'},
+  {value:'portable-anesthesia',label:'便携麻醉设备'},{value:'monitor',label:'监护仪'},
+  {value:'infusion-pump',label:'注射泵/输液泵'}
+];
+var CUSTOMER_OPTIONS = [
+  {value:'animal-hospital',label:'动物医院'},{value:'clinic',label:'兽医诊所'},
+  {value:'research',label:'科研院所'},{value:'education',label:'教育机构'},
+  {value:'distributor',label:'经销商'},{value:'government',label:'政府采购'}
+];
+
+function getPreferences() {
+  try { return JSON.parse(localStorage.getItem('rhc_user_preferences') || '{}'); } catch(e) { return {}; }
+}
+
+function renderPreferences() {
+  var prefs = getPreferences();
+  var prefRegions = prefs.regions || [];
+  var prefProducts = prefs.products || [];
+  var prefCustomers = prefs.customers || [];
+
+  renderCheckboxGroup('pref-regions', REGION_OPTIONS, prefRegions);
+  renderCheckboxGroup('pref-products', PRODUCT_OPTIONS, prefProducts);
+  renderCheckboxGroup('pref-customers', CUSTOMER_OPTIONS, prefCustomers);
+}
+
+function renderCheckboxGroup(containerId, options, selected) {
+  var container = document.getElementById(containerId);
+  var html = '';
+  options.forEach(function(opt) {
+    var checked = selected.indexOf(opt.value) >= 0;
+    html += '<label class="checkbox-item' + (checked ? ' checked' : '') + '" onclick="toggleCheckbox(this)">' +
+      '<input type="checkbox" value="' + opt.value + '"' + (checked ? ' checked' : '') + '>' +
+      escHtml(opt.label) +
+    '</label>';
+  });
+  container.innerHTML = html;
+}
+
+function toggleCheckbox(el) {
+  var input = el.querySelector('input');
+  input.checked = !input.checked;
+  el.classList.toggle('checked', input.checked);
+}
+
+function savePreferences() {
+  var prefs = {};
+  prefs.regions = getCheckedValues('pref-regions');
+  prefs.products = getCheckedValues('pref-products');
+  prefs.customers = getCheckedValues('pref-customers');
+  localStorage.setItem('rhc_user_preferences', JSON.stringify(prefs));
+  showToast('设置已保存', 'success');
+}
+
+function resetPreferences() {
+  localStorage.removeItem('rhc_user_preferences');
+  renderPreferences();
+  showToast('已恢复默认设置', 'success');
+}
+
+function getCheckedValues(containerId) {
+  var vals = [];
+  document.querySelectorAll('#' + containerId + ' input:checked').forEach(function(input) {
+    vals.push(input.value);
+  });
+  return vals;
+}
+
+/* ===== 初始化 ===== */
+document.addEventListener('DOMContentLoaded', function() {
+  renderMaterials();
+  renderPreferences();
+});
+</script>
+<script src="assets/rhc-widget.js?v=20260831hv"></script>
+</body>
+</html>
