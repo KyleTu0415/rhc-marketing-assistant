@@ -376,10 +376,159 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   </main>
 </div>
 </div>
-<div id="library-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:12px;width:90%;max-width:800px;height:80vh;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-    <button onclick="closeLibraryModal()" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;z-index:10">&times;</button>
-    <iframe src="library.html" style="width:100%;height:100%;border:none;border-radius:12px"></iframe>
+
+<style>
+
+/* ===== 个人素材库弹窗（内嵌式） ===== */
+.lib-modal-box{
+  background:#fff;border-radius:12px;width:90%;max-width:640px;height:70vh;
+  position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  display:flex;flex-direction:column;overflow:hidden;
+  font-family:var(--font-sans);
+}
+.lib-modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--color-border-light);
+  flex-shrink:0;
+}
+.lib-modal-title{font-size:15px;font-weight:700;color:var(--color-text)}
+.lib-modal-close{
+  background:none;border:none;font-size:22px;cursor:pointer;color:#999;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:4px;transition:all var(--transition-fast);line-height:1;
+}
+.lib-modal-close:hover{background:var(--color-surface);color:var(--color-text)}
+.lib-modal-tabs{
+  display:flex;gap:0;border-bottom:1px solid var(--color-border-light);
+  flex-shrink:0;background:var(--color-surface);
+}
+.lib-modal-tab{
+  padding:10px 20px;font-size:12px;font-weight:600;
+  color:var(--color-text-secondary);cursor:pointer;
+  border-bottom:2px solid transparent;transition:all var(--transition-fast);
+  margin-bottom:-1px;
+}
+.lib-modal-tab:hover{color:var(--color-primary)}
+.lib-modal-tab.active{color:var(--color-primary);border-bottom-color:var(--color-primary);background:#fff}
+.lib-modal-body{flex:1;overflow-y:auto;padding:16px 20px}
+
+/* 收藏 tab */
+.lib-modal-search{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.lib-modal-search input[type="text"]{
+  flex:1;min-width:160px;padding:6px 12px 6px 32px;border-radius:16px;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 10px center no-repeat;
+  border:1px solid var(--color-border);font-size:12px;
+}
+.lib-modal-search input[type="text"]:focus{outline:none;border-color:var(--color-primary)}
+.lib-modal-count{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap}
+
+.lib-modal-filter{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.lib-filter-chip{
+  padding:4px 12px;font-size:11px;font-weight:500;
+  color:var(--color-text-secondary);background:var(--color-surface);
+  border:1px solid var(--color-border);border-radius:12px;
+  cursor:pointer;transition:all var(--transition-fast);
+}
+.lib-filter-chip:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.lib-filter-chip.active{
+  background:var(--color-primary-light);border-color:var(--color-primary);
+  color:var(--color-primary);font-weight:600;
+}
+
+.lib-modal-list{display:flex;flex-direction:column;gap:8px}
+.lib-fav-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:8px;padding:10px 12px;transition:all var(--transition-fast);
+}
+.lib-fav-card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06);border-color:var(--color-primary)}
+.lib-fav-title{font-size:12px;font-weight:600;color:var(--color-text);line-height:1.5;margin-bottom:4px}
+.lib-fav-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.lib-fav-cat{
+  display:inline-flex;align-items:center;padding:1px 6px;border-radius:3px;
+  font-size:10px;font-weight:600;line-height:1.4;
+}
+.lib-fav-cat.industry{background:#E3F2FD;color:#1565C0}
+.lib-fav-cat.market{background:#E8F5E9;color:#2E7D32}
+.lib-fav-cat.competitor{background:#FFF3E0;color:#E65100}
+.lib-fav-date{font-size:11px;color:var(--color-text-tertiary)}
+.lib-fav-summary{font-size:11px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:6px}
+.lib-fav-actions{display:flex;gap:6px;flex-wrap:wrap}
+.lib-fav-actions button{font-size:10px;padding:3px 8px;border-radius:4px;font-weight:500}
+
+/* 关注 tab */
+.lib-settings-section{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:8px;padding:12px 14px;margin-bottom:12px;
+}
+.lib-settings-title{font-size:12px;font-weight:700;color:var(--color-text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.lib-checkbox-group{display:flex;flex-wrap:wrap;gap:6px}
+.lib-checkbox-item{
+  display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;
+  border:1px solid var(--color-border);font-size:11px;font-weight:500;
+  color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast);
+  user-select:none;
+}
+.lib-checkbox-item:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.lib-checkbox-item.checked{
+  background:var(--color-primary-light);border-color:var(--color-primary);
+  color:var(--color-primary);font-weight:600;
+}
+.lib-checkbox-item input{display:none}
+
+.lib-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:30px 16px;gap:6px;color:var(--color-text-tertiary);
+}
+.lib-empty .lib-empty-title{font-size:13px;font-weight:600;color:var(--color-text-secondary)}
+.lib-empty .lib-empty-desc{font-size:11px;color:var(--color-text-tertiary);max-width:280px;line-height:1.6}
+
+</style>
+<div id="library-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center">
+  <div class="lib-modal-box">
+    <div class="lib-modal-header">
+      <span class="lib-modal-title">📚 个人素材库</span>
+      <button class="lib-modal-close" onclick="closeLibraryModal()">&times;</button>
+    </div>
+    <div class="lib-modal-tabs">
+      <div class="lib-modal-tab active" data-tab="favorites" onclick="switchLibModalTab('favorites')">我的收藏</div>
+      <div class="lib-modal-tab" data-tab="following" onclick="switchLibModalTab('following')">我的关注</div>
+    </div>
+    <div class="lib-modal-body">
+      <!-- 我的收藏 Tab -->
+      <div id="lib-tab-favorites">
+        <div class="lib-modal-search">
+          <input type="text" id="lib-search-input" placeholder="搜索收藏的新闻..." oninput="renderLibFavorites()">
+          <span class="lib-modal-count" id="lib-fav-count">共 0 条</span>
+        </div>
+        <div class="lib-modal-filter">
+          <div class="lib-filter-chip active" data-cat="all" onclick="setLibFilter('all')">全部</div>
+          <div class="lib-filter-chip" data-cat="industry" onclick="setLibFilter('industry')">行业趋势</div>
+          <div class="lib-filter-chip" data-cat="market" onclick="setLibFilter('market')">市场动态</div>
+          <div class="lib-filter-chip" data-cat="competitor" onclick="setLibFilter('competitor')">同行新闻</div>
+        </div>
+        <div class="lib-modal-list" id="lib-fav-list">
+          <!-- JS 动态渲染 -->
+        </div>
+      </div>
+      <!-- 我的关注 Tab -->
+      <div id="lib-tab-following" style="display:none">
+        <div class="lib-settings-section">
+          <div class="lib-settings-title">📍 关注的区域市场</div>
+          <div class="lib-checkbox-group" id="lib-pref-regions"></div>
+        </div>
+        <div class="lib-settings-section">
+          <div class="lib-settings-title">🔧 关注的产品线</div>
+          <div class="lib-checkbox-group" id="lib-pref-products"></div>
+        </div>
+        <div class="lib-settings-section">
+          <div class="lib-settings-title">🏥 关注的客户类型</div>
+          <div class="lib-checkbox-group" id="lib-pref-customers"></div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary btn-sm" onclick="saveLibPreferences()">保存设置</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -405,20 +554,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 
 /* ===== 个人素材库 ===== */
 var selectedMaterialIds=[];
-var RHC_INSIGHT_DATA=[
-  {id:'ins-001',category:'industry',categoryLabel:'行业趋势',categoryColor:'industry',title:'AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增',summary:'Digitail融资2300万美元、Lupa Pets融资2000万美元，AI X光判读30秒内完成',date:'2026-08-19',url:'https://ceo.ca/@GlobeNewswire/ai-is-reshaping-veterinary-medicine-investment-surges',regions:['global'],products:[]},
-  {id:'ins-002',category:'industry',categoryLabel:'行业趋势',categoryColor:'industry',title:'全球兽医医疗器械市场预计2030年达91亿美元',summary:'CAGR 6.1%，北美占55.9%，AI诊断和POC检测驱动行业增长',date:'2026-08-25',url:'https://www.globenewswire.com/news-release/2026/08/25/3350843/0/en/global-veterinary-medical-devices-market-to-reach-9-1-billion-by-2030.html',regions:['global','north-america'],products:[]},
-  {id:'ins-003',category:'industry',categoryLabel:'行业趋势',categoryColor:'industry',title:'IDEXX推出犬猫双物种心脏生物标志物检测',summary:'首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市',date:'2026-08-12',url:'https://animalhealthnews.com/2026/08/12/idexx-launches-dual-species-point-of-care-cardiac-biomarker-test/',regions:['north-america'],products:[]},
-  {id:'ins-004',category:'industry',categoryLabel:'行业趋势',categoryColor:'industry',title:'兽医影像数字化与AI辅助诊断加速，北美设备进入替换窗口',summary:'北美诊所设备平均更新周期约7年，2019年采购潮设备集中进入替换期',date:'2026-08-31',url:'',regions:['north-america'],products:[]},
-  {id:'ins-005',category:'market',categoryLabel:'市场动态',categoryColor:'market',title:'中东、东南亚兽医诊所扩容，基础设备批量需求上升',summary:'新院开业带动麻醉机、注射泵整套采购，适合以「新院配置清单」话题开发客户',date:'2026-08-31',url:'',regions:['middle-east','southeast-asia'],products:['anesthesia-workstation']},
-  {id:'ins-006',category:'market',categoryLabel:'市场动态',categoryColor:'market',title:'巴西宠物医疗市场持续增长，INMETRO认证新规即将实施',summary:'巴西将于2027年起要求所有进口兽用麻醉设备通过INMETRO认证，提前合规的企业将获得竞争优势',date:'2026-08-28',url:'',regions:['brazil'],products:['anesthesia-workstation','ventilator']},
-  {id:'ins-007',category:'market',categoryLabel:'市场动态',categoryColor:'market',title:'非洲 veterinary equipment 需求年增15%，中小型设备最受欢迎',summary:'撒哈拉以南非洲宠物医疗市场快速崛起，便携、性价比高的设备需求旺盛',date:'2026-08-22',url:'',regions:['africa'],products:['portable-anesthesia','monitor']},
-  {id:'ins-008',category:'market',categoryLabel:'市场动态',categoryColor:'market',title:'VMX/WVC 2026：麻醉与监护一体化成主流展示方向',summary:'单品设备关注度下降，建议主推V5 Plus等麻醉监护一体化工作站方案',date:'2026-08-31',url:'',regions:['global','north-america'],products:['v5-plus']},
-  {id:'ins-009',category:'competitor',categoryLabel:'同行新闻',categoryColor:'competitor',title:'中宠兽与日本尼普洛（NIPRO）达成全面战略合作',summary:'品牌授权、进口器械渠道运营、宠物医药联合研发、高端耗材国产化五大方向',date:'2026-08-01',url:'',regions:['global','asia'],products:[]},
-  {id:'ins-010',category:'competitor',categoryLabel:'同行新闻',categoryColor:'competitor',title:'Zoetis Portela猫骨关节炎止痛药在英国获批',summary:'首个长效抗NGF单克隆抗体，一次注射缓解猫OA疼痛长达3个月',date:'2026-07-30',url:'https://news.zoetis.com/',regions:['europe'],products:[]},
-  {id:'ins-011',category:'competitor',categoryLabel:'同行新闻',categoryColor:'competitor',title:'睿视医疗与晓闻科技合作推进宠物CT智能化升级',summary:'融合AI影像辅助诊断模型，提升宠物CT临床诊疗能力',date:'2026-08-06',url:'https://www.petdhw.com/show-52837.html',regions:['china'],products:[]},
-  {id:'ins-012',category:'competitor',categoryLabel:'同行新闻',categoryColor:'competitor',title:'Mindray发布新款兽用麻醉工作站 VetAnesthesia Pro',summary:'集成触摸屏操控与低流量麻醉设计，瞄准中大型动物医院市场',date:'2026-08-15',url:'',regions:['global','china'],products:['anesthesia-workstation']}
-];
+var RHC_INSIGHT_DATA=[ // 行业趋势 { id: 'ins-001', category: 'industry', categoryLabel: '行业趋势', categoryColor: 'industry', title: 'AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增', summary: 'Digitail融资2300万美元、Lupa Pets融资2000万美元，AI X光判读30秒内完成', date: '2026-08-19', url: 'https://ceo.ca/@GlobeNewswire/ai-is-reshaping-veterinary-medicine-investment-surges', regions: ['global'], products: [] }, { id: 'ins-002', category: 'industry', categoryLabel: '行业趋势', categoryColor: 'industry', title: '全球兽医医疗器械市场预计2030年达91亿美元', summary: 'CAGR 6.1%，北美占55.9%，AI诊断和POC检测驱动行业增长', date: '2026-08-25', url: 'https://www.globenewswire.com/news-release/2026/08/25/3350843/0/en/global-veterinary-medical-devices-market-to-reach-9-1-billion-by-2030.html', regions: ['global', 'north-america'], products: [] }, { id: 'ins-003', category: 'industry', categoryLabel: '行业趋势', categoryColor: 'industry', title: 'IDEXX推出犬猫双物种心脏生物标志物检测', summary: '首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市', date: '2026-08-12', url: 'https://animalhealthnews.com/2026/08/12/idexx-launches-dual-species-point-of-care-cardiac-biomarker-test/', regions: ['north-america'], products: [] }, { id: 'ins-004', category: 'industry', categoryLabel: '行业趋势', categoryColor: 'industry', title: '兽医影像数字化与AI辅助诊断加速，北美设备进入替换窗口', summary: '北美诊所设备平均更新周期约7年，2019年采购潮设备集中进入替换期', date: '2026-08-31', url: '', regions: ['north-america'], products: [] }, // 市场动态 { id: 'ins-005', category: 'market', categoryLabel: '市场动态', categoryColor: 'market', title: '中东、东南亚兽医诊所扩容，基础设备批量需求上升', summary: '新院开业带动麻醉机、注射泵整套采购，适合以「新院配置清单」话题开发客户', date: '2026-08-31', url: '', regions: ['middle-east', 'southeast-asia'], products: ['anesthesia-workstation'] }, { id: 'ins-006', category: 'market', categoryLabel: '市场动态', categoryColor: 'market', title: '巴西宠物医疗市场持续增长，INMETRO认证新规即将实施', summary: '巴西将于2027年起要求所有进口兽用麻醉设备通过INMETRO认证，提前合规的企业将获得竞争优势', date: '2026-08-28', url: '', regions: ['brazil'], products: ['anesthesia-workstation', 'ventilator'] }, { id: 'ins-007', category: 'market', categoryLabel: '市场动态', categoryColor: 'market', title: '非洲 veterinary equipment 需求年增15%，中小型设备最受欢迎', summary: '撒哈拉以南非洲宠物医疗市场快速崛起，便携、性价比高的设备需求旺盛', date: '2026-08-22', url: '', regions: ['africa'], products: ['portable-anesthesia', 'monitor'] }, { id: 'ins-008', category: 'market', categoryLabel: '市场动态', categoryColor: 'market', title: 'VMX/WVC 2026：麻醉与监护一体化成主流展示方向', summary: '单品设备关注度下降，建议主推V5 Plus等麻醉监护一体化工作站方案', date: '2026-08-31', url: '', regions: ['global', 'north-america'], products: ['v5-plus'] }, // 同行新闻 { id: 'ins-009', category: 'competitor', categoryLabel: '同行新闻', categoryColor: 'competitor', title: '中宠兽与日本尼普洛（NIPRO）达成全面战略合作', summary: '品牌授权、进口器械渠道运营、宠物医药联合研发、高端耗材国产化五大方向', date: '2026-08-01', url: '', regions: ['global', 'asia'], products: [] }, { id: 'ins-010', category: 'competitor', categoryLabel: '同行新闻', categoryColor: 'competitor', title: 'Zoetis Portela猫骨关节炎止痛药在英国获批', summary: '首个长效抗NGF单克隆抗体，一次注射缓解猫OA疼痛长达3个月', date: '2026-07-30', url: 'https://news.zoetis.com/', regions: ['europe'], products: [] }, { id: 'ins-011', category: 'competitor', categoryLabel: '同行新闻', categoryColor: 'competitor', title: '睿视医疗与晓闻科技合作推进宠物CT智能化升级', summary: '融合AI影像辅助诊断模型，提升宠物CT临床诊疗能力', date: '2026-08-06', url: 'https://www.petdhw.com/show-52837.html', regions: ['china'], products: [] }, { id: 'ins-012', category: 'competitor', categoryLabel: '同行新闻', categoryColor: 'competitor', title: 'Mindray发布新款兽用麻醉工作站 VetAnesthesia Pro', summary: '集成触摸屏操控与低流量麻醉设计，瞄准中大型动物医院市场', date: '2026-08-15', url: '', regions: ['global', 'china'], products: ['anesthesia-workstation'] } ];
 var MATERIAL_CAT_STYLES={
   industry:{bg:'#E3F2FD',color:'#1565C0'},
   market:{bg:'#E8F5E9',color:'#2E7D32'},
@@ -787,7 +923,7 @@ var GRADING_DEMO_LEADS=[
   {客户名称:'Dubai Falcon Veterinary Clinic',国家地区:'阿联酋',跟进状态:'询盘谈判',来源渠道:'展会名录',来源链接:'',来源链接说明:'VMX Dubai 名片转化（正式版关联名片扫描件）',主营产品:'X35VET兽用麻醉机、SA Series注射泵',备注:'迪拜兽医诊所，询单台麻醉机与注射泵，价格协商中',最近跟进:'2026-09-01 客户回函询价',demo:true},
   {客户名称:'Clínica VetSur',国家地区:'智利',跟进状态:'初步接触',来源渠道:'B2B平台',来源链接:'https://www.made-in-china.com/products-search/hot-china-products/Veterinary_Anesthesia_Machine.html',来源链接说明:'B2B平台询盘页（演示链接）',主营产品:'X35VET兽用麻醉机',备注:'智利单体宠物诊所，求购单台麻醉机，预算敏感',最近跟进:'2026-08-10 首封开发信已发',demo:true}
 ];
-/* 分级规则从规则配置中心读取/* 分级规则从规则配置中心读取（assets/rhc-config.js），不再写死在本页面 */
+/* 分级规则从规则配置中心读取（assets/rhc-config.js），不再写死在本页面 */
 function getGradingRules(){
   var d=RHC_CONFIG.DEFAULT.grading;
   try{var g=RHC_CONFIG.get().grading;return g||d}catch(e){return d}
@@ -917,8 +1053,203 @@ fetch('data/snapshot.json',{cache:'no-store'})
     renderGrading([]);
     showToast('客户数据加载失败，请通过本地 HTTP 服务访问本页面','error');
   });
-function openLibraryModal(){document.getElementById('library-modal').style.display='flex'}
-function closeLibraryModal(){document.getElementById('library-modal').style.display='none'}
+
+/* ===== 素材库弹窗（内嵌式）逻辑 ===== */
+var libModalCurrentTab = 'favorites';
+var libModalFilter = 'all';
+var LIB_REGION_OPTIONS = [
+  {value:'brazil',label:'巴西'},{value:'africa',label:'非洲'},{value:'southeast-asia',label:'东南亚'},
+  {value:'middle-east',label:'中东'},{value:'north-america',label:'北美'},{value:'europe',label:'欧洲'},
+  {value:'china',label:'国内'},{value:'asia',label:'亚太'}
+];
+var LIB_PRODUCT_OPTIONS = [
+  {value:'anesthesia-workstation',label:'麻醉工作站'},{value:'ventilator',label:'呼吸机'},
+  {value:'v5-plus',label:'V5 Plus'},{value:'x35vet',label:'X35VET'},
+  {value:'portable-anesthesia',label:'便携麻醉设备'},{value:'monitor',label:'监护仪'},
+  {value:'infusion-pump',label:'注射泵/输液泵'}
+];
+var LIB_CUSTOMER_OPTIONS = [
+  {value:'animal-hospital',label:'动物医院'},{value:'clinic',label:'兽医诊所'},
+  {value:'research',label:'科研院所'},{value:'education',label:'教育机构'},
+  {value:'distributor',label:'经销商'},{value:'government',label:'政府采购'}
+];
+
+function openLibraryModal(){
+  var modal=document.getElementById('library-modal');
+  modal.style.display='flex';
+  switchLibModalTab('favorites');
+  renderLibFavorites();
+  renderLibPreferences();
+}
+function closeLibraryModal(){
+  document.getElementById('library-modal').style.display='none';
+}
+function switchLibModalTab(tab){
+  libModalCurrentTab=tab;
+  document.getElementById('lib-tab-favorites').style.display=tab==='favorites'?'':'none';
+  document.getElementById('lib-tab-following').style.display=tab==='following'?'':'none';
+  document.querySelectorAll('.lib-modal-tab').forEach(function(t){
+    t.classList.toggle('active',t.getAttribute('data-tab')===tab);
+  });
+}
+
+/* 收藏列表 */
+function getLibSavedIds(){
+  try{return JSON.parse(localStorage.getItem('rhc_saved_insights')||'[]')}catch(e){return[]}
+}
+function saveLibSavedIds(ids){localStorage.setItem('rhc_saved_insights',JSON.stringify(ids))}
+
+function setLibFilter(cat){
+  libModalFilter=cat;
+  document.querySelectorAll('.lib-filter-chip').forEach(function(c){
+    c.classList.toggle('active',c.getAttribute('data-cat')===cat);
+  });
+  renderLibFavorites();
+}
+
+function renderLibFavorites(){
+  var savedIds=getLibSavedIds();
+  var items=RHC_INSIGHT_DATA.filter(function(item){return savedIds.indexOf(item.id)>=0});
+  if(libModalFilter!=='all'){
+    items=items.filter(function(item){return item.category===libModalFilter});
+  }
+  var keyword='';
+  var searchEl=document.getElementById('lib-search-input');
+  if(searchEl)keyword=(searchEl.value||'').trim().toLowerCase();
+  if(keyword){
+    items=items.filter(function(item){
+      return item.title.toLowerCase().indexOf(keyword)>=0||
+             item.summary.toLowerCase().indexOf(keyword)>=0;
+    });
+  }
+  items.sort(function(a,b){return b.date.localeCompare(a.date)});
+  var countEl=document.getElementById('lib-fav-count');
+  if(countEl)countEl.textContent='共 '+items.length+' 条';
+  var container=document.getElementById('lib-fav-list');
+  if(!container)return;
+  if(items.length===0){
+    var savedTotal=getLibSavedIds().length;
+    if(savedTotal===0){
+      container.innerHTML='<div class="lib-empty">'+
+        '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>'+
+        '<div class="lib-empty-title">还没有收藏任何资讯</div>'+
+        '<div class="lib-empty-desc">前往首页「市场洞察」，点击新闻卡片上的收藏按钮，感兴趣的资讯会自动收集到这里</div>'+
+      '</div>';
+    }else{
+      container.innerHTML='<div class="lib-empty">'+
+        '<div class="lib-empty-title">当前分类下没有收藏</div>'+
+        '<div class="lib-empty-desc">试试切换到「全部」查看所有收藏</div>'+
+      '</div>';
+    }
+    return;
+  }
+  var html='';
+  items.forEach(function(item){
+    var catClass=item.category;
+    var actions='';
+    if(item.url){
+      actions+='<a href="'+item.url+'" target="_blank" rel="noopener" class="btn btn-outline btn-sm">查看原文 ↗</a>';
+    }
+    actions+='<button class="btn btn-outline btn-sm" onclick="useLibInMail(''+item.id+'')">✉️ 用于写邮件</button>';
+    actions+='<button class="btn btn-outline btn-sm" style="border-color:#ffcdd2;color:#e53935" onclick="removeLibFav(''+item.id+'')">移除</button>';
+    html+='<div class="lib-fav-card">'+
+      '<div class="lib-fav-title">'+escHtml(item.title)+'</div>'+
+      '<div class="lib-fav-meta">'+
+        '<span class="lib-fav-cat '+catClass+'">'+escHtml(item.categoryLabel)+'</span>'+
+        '<span class="lib-fav-date">'+escHtml(item.date)+'</span>'+
+      '</div>'+
+      '<div class="lib-fav-summary">'+escHtml(item.summary)+'</div>'+
+      '<div class="lib-fav-actions">'+actions+'</div>'+
+    '</div>';
+  });
+  container.innerHTML=html;
+}
+
+function removeLibFav(id){
+  var ids=getLibSavedIds();
+  ids=ids.filter(function(i){return i!==id});
+  saveLibSavedIds(ids);
+  renderLibFavorites();
+  renderMailMaterials();
+  showToast('已从素材库移除','success');
+}
+
+function useLibInMail(id){
+  closeLibraryModal();
+  // 切换到邮件助手页并选中素材
+  var mailNav=document.querySelector('[data-page=mail]');
+  if(mailNav)switchPage('mail',mailNav);
+  // 自动勾选该素材
+  if(selectedMaterialIds.indexOf(id)<0){
+    if(selectedMaterialIds.length>=2){
+      showToast('最多选择2条素材','warning');
+      return;
+    }
+    selectedMaterialIds.push(id);
+  }
+  renderMailMaterials();
+  showToast('已添加到邮件素材','success');
+}
+
+/* 关注设置 */
+function getLibPreferences(){
+  try{return JSON.parse(localStorage.getItem('rhc_user_preferences')||'{}')}catch(e){return{}}
+}
+
+function renderLibPreferences(){
+  var prefs=getLibPreferences();
+  var prefRegions=prefs.regions||[];
+  var prefProducts=prefs.products||[];
+  var prefCustomers=prefs.customers||[];
+  renderLibCheckboxGroup('lib-pref-regions',LIB_REGION_OPTIONS,prefRegions);
+  renderLibCheckboxGroup('lib-pref-products',LIB_PRODUCT_OPTIONS,prefProducts);
+  renderLibCheckboxGroup('lib-pref-customers',LIB_CUSTOMER_OPTIONS,prefCustomers);
+}
+
+function renderLibCheckboxGroup(containerId,options,selected){
+  var container=document.getElementById(containerId);
+  if(!container)return;
+  var html='';
+  options.forEach(function(opt){
+    var checked=selected.indexOf(opt.value)>=0;
+    html+='<label class="lib-checkbox-item'+(checked?' checked':'')+'" onclick="toggleLibCheckbox(this)">'+
+      '<input type="checkbox" value="'+opt.value+'"'+(checked?' checked':'')+'>'+
+      escHtml(opt.label)+
+    '</label>';
+  });
+  container.innerHTML=html;
+}
+
+function toggleLibCheckbox(el){
+  var input=el.querySelector('input');
+  input.checked=!input.checked;
+  el.classList.toggle('checked',input.checked);
+}
+
+function saveLibPreferences(){
+  var prefs={};
+  prefs.regions=getLibCheckedValues('lib-pref-regions');
+  prefs.products=getLibCheckedValues('lib-pref-products');
+  prefs.customers=getLibCheckedValues('lib-pref-customers');
+  localStorage.setItem('rhc_user_preferences',JSON.stringify(prefs));
+  showToast('设置已保存','success');
+}
+
+function getLibCheckedValues(containerId){
+  var vals=[];
+  var container=document.getElementById(containerId);
+  if(container){
+    container.querySelectorAll('input:checked').forEach(function(input){vals.push(input.value)});
+  }
+  return vals;
+}
+
+function escHtml(s){
+  var d=document.createElement('div');
+  d.textContent=s;
+  return d.innerHTML;
+}
+
 </script>
 <script src="assets/rhc-widget.js?v=20260831jw"></script>
 </body>
