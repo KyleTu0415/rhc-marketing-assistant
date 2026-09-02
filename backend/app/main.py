@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Optional, Any
 import os
 import sys
+import threading
 import uvicorn
 from datetime import datetime
 
@@ -448,8 +449,27 @@ async def api_insights_list():
 
 @app.post("/api/insights/refresh")
 async def api_insights_refresh():
+    """手动刷新：后台线程执行抓取+翻译（20s~2min），立即返回受理状态，
+    前端轮询 /api/insights 等待数据更新；避免长请求阻塞事件循环。"""
     from app import insights_store
-    return insights_store.refresh(force=False)
+
+    if insights_store.status().get("refreshing"):
+        return {"accepted": False, "reason": "refreshing"}
+    # 限频检查（在发起线程前快速判定）
+    import time as _time
+    if _time.time() - insights_store._state.get("last_refresh_ts", 0) < insights_store.REFRESH_MIN_INTERVAL:
+        remain = int(insights_store.REFRESH_MIN_INTERVAL -
+                     (_time.time() - insights_store._state.get("last_refresh_ts", 0)))
+        return {"accepted": False, "reason": "rate_limited", "remain_seconds": remain}
+
+    def _run():
+        try:
+            insights_store.refresh(force=True)
+        except Exception as e:
+            print(f"[insights] 后台刷新失败: {e}")
+
+    threading.Thread(target=_run, daemon=True).start()
+    return {"accepted": True}
 
 @app.get("/api/insights/status")
 async def api_insights_status():
