@@ -31,14 +31,18 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 /* ===== 顶部导航 ===== */
 .topbar{
   position:sticky;top:0;z-index:100;
-  background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);
+  background:var(--color-surface);
   border-bottom:1px solid var(--color-border);
   display:flex;align-items:center;gap:16px;
-  padding:0 28px;height:60px;
+  padding:0 32px;height:60px;
 }
-.topbar-logo{display:flex;align-items:center;gap:12px;cursor:pointer}
-.topbar-logo img{height:40px;width:auto;object-fit:contain}
-.topbar-logo .brand-sub{font-size:15px;font-weight:600;color:var(--color-text);margin-top:1px;letter-spacing:0.5px}
+/* 品牌区：DOM 结构与样式与门户首页 panel.html 完全一致 */
+.topnav-brand{display:flex;align-items:center;gap:12px;cursor:pointer;flex:0 0 auto}
+.topnav-brand .logo-mark{
+  height:40px;width:auto;
+  display:flex;align-items:center;justify-content:center;
+}
+.topnav-brand .brand-sub{font-size:15px;font-weight:600;color:var(--color-text);margin-top:1px;letter-spacing:0.5px}
 .topbar-title{font-size:14px;color:var(--color-text-secondary);border-left:1px solid var(--color-border);padding-left:16px}
 .topbar-back{
   margin-left:auto;display:inline-flex;align-items:center;gap:6px;
@@ -147,9 +151,13 @@ a.news-card-title:hover,.news-card:hover .news-card-title{color:var(--color-prim
 <body>
 
 <div class="topbar">
-  <div class="topbar-logo" onclick="location.href='panel.html'">
-    <img src="assets/rhc-logo-mark.png?v=20260903" alt="RHC" onerror="this.style.display='none'">
-    <span class="brand-sub">智能工作平台</span>
+  <div class="topnav-brand" onclick="location.href='panel.html'">
+    <div class="logo-mark">
+      <img src="assets/rhc-logo-mark.png?v=20260903" alt="RHC" style="height:40px;width:auto;object-fit:contain;">
+    </div>
+    <div>
+      <div class="brand-sub">智能工作平台</div>
+    </div>
   </div>
   <span class="topbar-title">新闻中心</span>
   <button class="topbar-back" onclick="location.href='panel.html'">← 返回门户</button>
