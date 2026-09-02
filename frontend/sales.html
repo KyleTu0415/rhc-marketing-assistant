@@ -123,23 +123,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .mail-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
 .mail-footnote{margin-top:14px;font-size:11px;color:var(--color-text-tertiary);background:var(--color-bg);border-radius:var(--radius-sm);padding:10px 14px;line-height:1.7}
 
-/* ===== 市场情报 ===== */
-.intel-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
-.intel-point{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--color-border-light);font-size:13px;line-height:1.7}
-.intel-point:last-child{border-bottom:none}
-.intel-point .ip-tag{flex-shrink:0;font-size:11px;font-weight:700;color:var(--color-primary);background:var(--color-primary-light);border-radius:var(--radius-sm);padding:2px 8px;height:fit-content;margin-top:2px}
-.intel-item{border:1px solid var(--color-border-light);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px}
-.intel-item:last-child{margin-bottom:0}
-.intel-item .ii-title{font-size:13px;font-weight:700;margin-bottom:4px}
-.intel-item .ii-desc{font-size:12.5px;color:var(--color-text-secondary);line-height:1.7}
-.intel-item .ii-hint{font-size:12px;color:var(--color-primary-dark);background:var(--color-primary-xlight);border-radius:var(--radius-sm);padding:8px 10px;margin-top:8px;line-height:1.6}
-.intel-item .ii-hint strong{color:var(--color-primary)}
-.intel-item .ii-source{margin-top:8px;font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.intel-item .ii-source a{color:var(--color-primary);font-weight:600;white-space:nowrap}
-.intel-item .ii-source a:hover{text-decoration:underline}
-.intel-item .ii-source .src-icon{width:12px;height:12px;flex-shrink:0}
-@media(max-width:860px){.intel-grid{grid-template-columns:1fr}}
-
 /* ===== PI 工作台 ===== */
 .quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
 
@@ -214,7 +197,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <div class="nav-section">销售智能助手</div>
     <div class="nav-item active" data-page="signals" onclick="switchPage('signals',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg><span>商机信号</span></div>
     <div class="nav-item" data-page="grading" onclick="switchPage('grading',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>客户分级</span></div>
-    <div class="nav-item" data-page="intel" onclick="switchPage('intel',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>市场情报</span></div>
     <div class="nav-item" data-page="mail" onclick="switchPage('mail',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>邮件助手</span></div>
     <div class="nav-item" data-page="pi" onclick="switchPage('pi',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><span>PI工作台</span></div>
     <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
@@ -318,7 +300,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
             <div class="form-group">
               <label style="display:flex;align-items:center;justify-content:space-between">
                 <span>📚 个人素材库</span>
-                <a href="library.html" style="font-size:12px;color:var(--color-primary);font-weight:normal" target="_blank">管理素材库 →</a>
+                <a href="javascript:void(0)" onclick="openLibraryModal()" style="font-size:12px;color:var(--color-primary);font-weight:normal">管理素材库 →</a>
               </label>
               <div id="mail-material-pool" style="display:flex;flex-wrap:wrap;gap:8px;min-height:40px">
                 <!-- JS 动态渲染收藏的新闻列表 -->
@@ -391,64 +373,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     </div>
     </section>
 
-    <section class="page" id="page-intel">
-    <div class="page-header">
-      <div><h2>市场情报</h2><p>行业动态、竞品动向与客户谈资，每周一更新</p></div>
-    </div>
-    <div class="intel-grid">
-      <div class="card">
-        <div class="card-header"><h3>市场情报周报</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span>　第 12 期 · 2026-08-31</span></div>
-        <div class="card-body">
-          <div class="intel-point"><span class="ip-tag">行业趋势</span><div>兽医影像设备向数字化、AI 辅助诊断方向加速演进；北美兽医诊所设备平均更新周期约 7 年，2019 年采购潮的设备正集中进入替换窗口，询盘将以「整机更新 + 数字化升级」为主。</div></div>
-          <div class="intel-point"><span class="ip-tag">监管动态</span><div>美国 FDA 对兽医电气设备的注册与上市前合规要求持续收紧；欧盟 CE MDR 法规下麻醉与监护类设备的临床评价要求提高，出口欧洲需更早准备技术文档与认证周期。</div></div>
-          <div class="intel-point"><span class="ip-tag">展会风向</span><div>VMX、WVC 2026 展会上，麻醉机与监护模块一体化、工作站集成化成为主流展示方向，单一功能设备的关注度明显下降。</div></div>
-          <div class="intel-point"><span class="ip-tag">区域市场</span><div>中东与东南亚兽医诊所数量保持较快增长，当地连锁医院扩店带来麻醉机、注射泵等基础设备的批量采购需求，对性价比与售后响应敏感。</div></div>
-        </div>
-      </div>
-      <div>
-        <div class="card" style="margin-bottom:20px">
-          <div class="card-header"><h3>竞品动态</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span></span></div>
-          <div class="card-body">
-            <div class="intel-item">
-              <div class="ii-title">迈瑞动物医疗（Mindray Animal）</div>
-              <div class="ii-desc">推出新款一体化麻醉监护工作站，主打麻醉机与多参数监护深度集成，在北美展会重点推广。</div>
-              <div class="ii-hint"><strong>销售切入点：</strong>客户关注一体化方案时，可强调我方 V5 Plus 工作站 12.1 寸翻转触摸屏与监护扩展能力，并以 ISO 13485 体系与本地化售后响应作差异。</div>
-              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
-            </div>
-            <div class="intel-item">
-              <div class="ii-title">DRE Veterinary</div>
-              <div class="ii-desc">在北美渠道开展季度促销，主力麻醉机型以价格折扣争夺中小诊所客户。</div>
-              <div class="ii-hint"><strong>销售切入点：</strong>客户关注价格时，可强调我方 X35VET 麻醉机与监护模块的集成方案在同配置下的总体拥有成本优势，以及电动电控涡轮无需驱动气带来的使用成本节约。</div>
-              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
-            </div>
-            <div class="intel-item">
-              <div class="ii-title">瑞沃德（RWD）</div>
-              <div class="ii-desc">加速东南亚市场扩张，通过本地代理网络推广实验室与临床麻醉设备。</div>
-              <div class="ii-hint"><strong>销售切入点：</strong>面对东南亚客户时，可主动提供 M800 大动物工作站等差异化机型与 CE 认证清单，用齐全产品线覆盖其代理尚未深耕的大动物场景。</div>
-              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3>客户谈资</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span></span></div>
-          <div class="card-body">
-            <div class="intel-item">
-              <div class="ii-title">北美设备替换窗口</div>
-              <div class="ii-desc">美国兽医诊所平均设备更新周期约 7 年，2026 年正值 2019 年采购潮的替换窗口，可作为开发信与跟进邮件的寒暄切入。</div>
-              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
-            </div>
-            <div class="intel-item">
-              <div class="ii-title">新兴市场诊所增长</div>
-              <div class="ii-desc">中东、东南亚连锁兽医诊所扩张提速，新院开业普遍需要麻醉机、注射泵的整套配置，适合在开发信中以「新院配置清单」话题切入。</div>
-              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="showToast('正式版将自动插入邮件助手','success')">引用到邮件</button></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </section>
   </main>
 </div>
+</div>
+<div id="library-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;width:90%;max-width:800px;height:80vh;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <button onclick="closeLibraryModal()" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;z-index:10">&times;</button>
+    <iframe src="library.html" style="width:100%;height:100%;border:none;border-radius:12px"></iframe>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 <script src="assets/rhc-config.js"></script>
@@ -474,18 +406,18 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 /* ===== 个人素材库 ===== */
 var selectedMaterialIds=[];
 var RHC_INSIGHT_DATA=[
-  {id:'ins_01',category:'industry',categoryLabel:'行业趋势',title:'AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增',summary:'AI技术正在加速重塑兽医行业，诊断影像AI、临床文档自动化和远程监护系统成为投资热点。全球多家兽医科技公司完成新一轮融资，AI辅助诊断准确率已接近资深兽医水平，推动行业数字化转型。',date:'2026-08-19'},
-  {id:'ins_02',category:'industry',categoryLabel:'行业趋势',title:'全球兽医医疗器械市场预计2030年达91亿美元',summary:'根据最新市场研究报告，全球兽医医疗器械市场规模预计2030年将达到91亿美元，年复合增长率约6.8%。增长动力主要来自宠物人口增长、慢性病诊疗需求增加以及新兴市场兽医基础设施建设。',date:'2026-08-25'},
-  {id:'ins_03',category:'industry',categoryLabel:'行业趋势',title:'IDEXX推出犬猫双物种心脏生物标志物检测',summary:'IDEXX最新推出可同时检测犬和猫心脏生物标志物的检测试剂盒，覆盖cTnI、NT-proBNP等关键指标，检测时间缩短至15分钟，将显著提升基层诊所心脏疾病筛查效率。',date:'2026-08-12'},
-  {id:'ins_04',category:'industry',categoryLabel:'行业趋势',title:'兽医影像数字化与AI辅助诊断加速，北美设备进入替换窗口',summary:'北美兽医诊所平均设备更新周期约7年，2026年正值2019年采购潮的替换窗口期。数字化DR、超声设备与AI辅助诊断功能成为本轮更新的核心选型指标，设备厂商加速推出智能化升级方案。',date:'2026-08-31'},
-  {id:'ins_05',category:'market',categoryLabel:'市场动态',title:'中东、东南亚兽医诊所扩容，基础设备批量需求上升',summary:'中东及东南亚地区连锁兽医诊所扩张提速，新院开业普遍需要麻醉机、监护仪、DR等整套设备配置，批量采购需求显著上升，当地代理渠道对高性价比中国设备的兴趣持续增长。',date:'2026-08-31'},
-  {id:'ins_06',category:'market',categoryLabel:'市场动态',title:'巴西宠物医疗市场持续增长，INMETRO认证新规即将实施',summary:'巴西宠物医疗市场保持两位数增长，INMETRO认证新规将于2027年正式实施，所有进口兽医设备需完成本地注册。提前布局认证的中国厂商将在市场竞争中获得先发优势。',date:'2026-08-28'},
-  {id:'ins_07',category:'market',categoryLabel:'市场动态',title:'非洲 veterinary equipment 需求年增15%',summary:'非洲兽医设备市场需求年增长率约15%，基础诊疗设备和疫苗冷链设备需求最为旺盛。国际援助项目和本土资本共同推动当地兽医基础设施建设，中国设备凭借性价比优势快速渗透。',date:'2026-08-22'},
-  {id:'ins_08',category:'market',categoryLabel:'市场动态',title:'VMX/WVC 2026：麻醉与监护一体化成主流展示方向',summary:'VMX和WVC 2026展会上，麻醉工作站与多参数监护仪的一体化集成方案成为主流展示方向，设备厂商普遍强调智能化、人机协同和操作简化，一体化工作站产品占比显著提升。',date:'2026-08-31'},
-  {id:'ins_09',category:'competitor',categoryLabel:'同行新闻',title:'中宠兽与日本尼普洛（NIPRO）达成全面战略合作',summary:'中宠兽与日本医疗器械巨头尼普洛达成全面战略合作，双方将在兽医输液设备、透析产品等领域展开深度合作，借助尼普洛的渠道和技术资源加速海外市场布局。',date:'2026-08-01'},
-  {id:'ins_10',category:'competitor',categoryLabel:'同行新闻',title:'Zoetis Portela猫骨关节炎止痛药在英国获批',summary:'硕腾（Zoetis）旗下Portela猫骨关节炎口服止痛药在英国获得市场授权，成为欧洲首个获批用于猫长期疼痛管理的口服药物，预计将显著提升伴侣动物疼痛管理市场规模。',date:'2026-07-30'},
-  {id:'ins_11',category:'competitor',categoryLabel:'同行新闻',title:'睿视医疗与晓闻科技合作推进宠物CT智能化升级',summary:'睿视医疗与AI影像公司晓闻科技达成合作，共同推出宠物CT AI智能诊断系统，可自动识别骨骼、软组织异常并生成结构化报告，帮助基层诊所缩短诊断时间、提高诊断准确率。',date:'2026-08-06'},
-  {id:'ins_12',category:'competitor',categoryLabel:'同行新闻',title:'Mindray发布新款兽用麻醉工作站 VetAnesthesia Pro',summary:'迈瑞医疗发布新款兽用麻醉工作站VetAnesthesia Pro，集成多参数监护、智能通气模式和云端数据管理功能，定位中高端市场，将与德尔格、GE等国际品牌直接竞争。',date:'2026-08-15'}
+  {id:'ins-001',category:'industry',categoryLabel:'行业趋势',categoryColor:'industry',title:'AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增',summary:'Digitail融资2300万美元、Lupa Pets融资2000万美元，AI X光判读30秒内完成',date:'2026-08-19',url:'https://ceo.ca/@GlobeNewswire/ai-is-reshaping-veterinary-medicine-investment-surges',regions:['global'],products:[]},
+  {id:'ins-002',category:'industry',categoryLabel:'行业趋势',categoryColor:'industry',title:'全球兽医医疗器械市场预计2030年达91亿美元',summary:'CAGR 6.1%，北美占55.9%，AI诊断和POC检测驱动行业增长',date:'2026-08-25',url:'https://www.globenewswire.com/news-release/2026/08/25/3350843/0/en/global-veterinary-medical-devices-market-to-reach-9-1-billion-by-2030.html',regions:['global','north-america'],products:[]},
+  {id:'ins-003',category:'industry',categoryLabel:'行业趋势',categoryColor:'industry',title:'IDEXX推出犬猫双物种心脏生物标志物检测',summary:'首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市',date:'2026-08-12',url:'https://animalhealthnews.com/2026/08/12/idexx-launches-dual-species-point-of-care-cardiac-biomarker-test/',regions:['north-america'],products:[]},
+  {id:'ins-004',category:'industry',categoryLabel:'行业趋势',categoryColor:'industry',title:'兽医影像数字化与AI辅助诊断加速，北美设备进入替换窗口',summary:'北美诊所设备平均更新周期约7年，2019年采购潮设备集中进入替换期',date:'2026-08-31',url:'',regions:['north-america'],products:[]},
+  {id:'ins-005',category:'market',categoryLabel:'市场动态',categoryColor:'market',title:'中东、东南亚兽医诊所扩容，基础设备批量需求上升',summary:'新院开业带动麻醉机、注射泵整套采购，适合以「新院配置清单」话题开发客户',date:'2026-08-31',url:'',regions:['middle-east','southeast-asia'],products:['anesthesia-workstation']},
+  {id:'ins-006',category:'market',categoryLabel:'市场动态',categoryColor:'market',title:'巴西宠物医疗市场持续增长，INMETRO认证新规即将实施',summary:'巴西将于2027年起要求所有进口兽用麻醉设备通过INMETRO认证，提前合规的企业将获得竞争优势',date:'2026-08-28',url:'',regions:['brazil'],products:['anesthesia-workstation','ventilator']},
+  {id:'ins-007',category:'market',categoryLabel:'市场动态',categoryColor:'market',title:'非洲 veterinary equipment 需求年增15%，中小型设备最受欢迎',summary:'撒哈拉以南非洲宠物医疗市场快速崛起，便携、性价比高的设备需求旺盛',date:'2026-08-22',url:'',regions:['africa'],products:['portable-anesthesia','monitor']},
+  {id:'ins-008',category:'market',categoryLabel:'市场动态',categoryColor:'market',title:'VMX/WVC 2026：麻醉与监护一体化成主流展示方向',summary:'单品设备关注度下降，建议主推V5 Plus等麻醉监护一体化工作站方案',date:'2026-08-31',url:'',regions:['global','north-america'],products:['v5-plus']},
+  {id:'ins-009',category:'competitor',categoryLabel:'同行新闻',categoryColor:'competitor',title:'中宠兽与日本尼普洛（NIPRO）达成全面战略合作',summary:'品牌授权、进口器械渠道运营、宠物医药联合研发、高端耗材国产化五大方向',date:'2026-08-01',url:'',regions:['global','asia'],products:[]},
+  {id:'ins-010',category:'competitor',categoryLabel:'同行新闻',categoryColor:'competitor',title:'Zoetis Portela猫骨关节炎止痛药在英国获批',summary:'首个长效抗NGF单克隆抗体，一次注射缓解猫OA疼痛长达3个月',date:'2026-07-30',url:'https://news.zoetis.com/',regions:['europe'],products:[]},
+  {id:'ins-011',category:'competitor',categoryLabel:'同行新闻',categoryColor:'competitor',title:'睿视医疗与晓闻科技合作推进宠物CT智能化升级',summary:'融合AI影像辅助诊断模型，提升宠物CT临床诊疗能力',date:'2026-08-06',url:'https://www.petdhw.com/show-52837.html',regions:['china'],products:[]},
+  {id:'ins-012',category:'competitor',categoryLabel:'同行新闻',categoryColor:'competitor',title:'Mindray发布新款兽用麻醉工作站 VetAnesthesia Pro',summary:'集成触摸屏操控与低流量麻醉设计，瞄准中大型动物医院市场',date:'2026-08-15',url:'',regions:['global','china'],products:['anesthesia-workstation']}
 ];
 var MATERIAL_CAT_STYLES={
   industry:{bg:'#E3F2FD',color:'#1565C0'},
@@ -985,6 +917,8 @@ fetch('data/snapshot.json',{cache:'no-store'})
     renderGrading([]);
     showToast('客户数据加载失败，请通过本地 HTTP 服务访问本页面','error');
   });
+function openLibraryModal(){document.getElementById('library-modal').style.display='flex'}
+function closeLibraryModal(){document.getElementById('library-modal').style.display='none'}
 </script>
 <script src="assets/rhc-widget.js?v=20260831jw"></script>
 </body>

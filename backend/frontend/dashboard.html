@@ -157,7 +157,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <div class="nav-item active" data-page="overview" onclick="switchPage('overview',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>经营概览</span></div>
     <div class="nav-item" data-page="orders-chart" onclick="switchPage('orders-chart',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>订单状态分布</span></div>
     <div class="nav-item" data-page="customers-chart" onclick="switchPage('customers-chart',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>客户地区分布</span></div>
-    <div class="nav-item" data-page="insight" onclick="switchPage('insight',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span>市场洞察</span></div>
+
     <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
 </nav>
@@ -192,33 +192,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <div class="card" id="chart-customers"><div class="card-body"><div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div></div></div>
     </section>
 
-    <section class="page" id="page-insight">
-    <div class="page-header">
-      <div><h2>市场洞察</h2><p>行业趋势、竞品动态与业务影响判断</p></div>
-    </div>
-    <div class="insight-grid">
-      <div class="card">
-        <div class="card-header"><h3>市场情报周报 · 决策摘要</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span>　第 12 期 · 2026-08-31</span></div>
-        <div class="card-body">
-          <div class="insight-point"><span class="ip-tag">行业趋势</span><div class="ip-title">兽医影像数字化与 AI 辅助诊断加速，北美设备进入 7 年替换窗口</div><div class="ip-impact"><strong>对业务的影响：</strong>北美客户未来 1-2 年询盘将以更新换代为主，建议提前准备 V5 Plus 等工作站的替换方案与以旧换新话术，优先覆盖 2019 年前后采购的老客户。</div></div>
-          <div class="insight-point"><span class="ip-tag">监管动态</span><div class="ip-title">FDA 注册要求趋严，欧盟 CE MDR 抬高临床评价门槛</div><div class="ip-impact"><strong>对业务的影响：</strong>合规已成为欧洲订单的前置条件，认证周期需纳入交付排期；建议市场侧提前备齐 MDR 技术文档清单，销售对欧报价时预留认证时间。</div></div>
-          <div class="insight-point"><span class="ip-tag">展会风向</span><div class="ip-title">VMX / WVC 2026 麻醉与监护一体化成为主流展示方向</div><div class="ip-impact"><strong>对业务的影响：</strong>单品机的展示竞争力下降，展会与画册物料应突出工作站集成方案，销售沟通从「卖麻醉机」转向「卖一体化麻醉监护方案」。</div></div>
-          <div class="insight-point"><span class="ip-tag">区域市场</span><div class="ip-title">中东、东南亚兽医诊所扩容，基础设备批量需求上升</div><div class="ip-impact"><strong>对业务的影响：</strong>新兴市场走量机会明确，适合以 X35VET、SA Series 等成熟机型打包「新院配置清单」，渠道拓展应重点扶持当地代理的售后能力。</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><h3>竞品动态时间线</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span></span></div>
-        <div class="card-body">
-          <ul class="itl">
-            <li><span class="itl-dot"></span><div class="itl-date">2026-08</div><div class="itl-title">迈瑞动物医疗发布一体化麻醉监护工作站<span class="itl-tag tag-warn">竞争加剧</span></div><div class="itl-note">北美展会主推集成方案，与我方 V5 Plus 定位正面重叠，需强化差异化卖点。</div></li>
-            <li><span class="itl-dot"></span><div class="itl-date">2026-07</div><div class="itl-title">DRE Veterinary 北美渠道季度促销<span class="itl-tag tag-warn">价格压力</span></div><div class="itl-note">主力机型折扣争夺中小诊所，报价场景需准备总体拥有成本对比材料。</div></li>
-            <li><span class="itl-dot"></span><div class="itl-date">2026-06</div><div class="itl-title">瑞沃德（RWD）加码东南亚代理网络<span class="itl-tag tag-opp">机会</span></div><div class="itl-note">其大动物与工作站产品线薄弱，正是 M800 等机型切入当地连锁医院的空档。</div></li>
-            <li><span class="itl-dot"></span><div class="itl-date">2026-03</div><div class="itl-title">全球兽医医疗器械市场维持 6% 以上增速<span class="itl-tag tag-opp">大盘向好</span></div><div class="itl-note">AI 诊断与 POCT 驱动扩容，麻醉通气类基础设备需求同步抬升。</div></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    </section>
   </main>
 </div>
 </div>
