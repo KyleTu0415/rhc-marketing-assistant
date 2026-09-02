@@ -106,6 +106,7 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   font-size:13px;font-weight:600;color:var(--color-text);line-height:1.55;
   margin:6px 0 9px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:3.1em;
   transition:color var(--transition-fast);
 }
 a.news-card-title:hover{color:var(--color-primary)}
@@ -326,9 +327,15 @@ function allDone() {
   return CATS.every(function(c){ return _colLoaded[c.key] >= _colData[c.key].length; });
 }
 
-function loadMore(reset) {
+function nearBottom() {
+  var status = document.getElementById('load-status');
+  var rect = status.getBoundingClientRect();
+  return rect.top < window.innerHeight + 120;
+}
+
+function loadMore(reset, cb) {
   if (_loading) return;
-  if (!reset && allDone()) return;
+  if (!reset && allDone()) { if (cb) cb(); return; }
   _loading = true;
   var status = document.getElementById('load-status');
   status.innerHTML = '<span class="spinner"></span>加载中...';
@@ -341,17 +348,29 @@ function loadMore(reset) {
       status.textContent = '下滑加载更多（已加载 ' + totalLoaded() + '/' + RHC_INSIGHT_DATA.length + '）';
     }
     _loading = false;
+    // 首屏未满时自动继续加载（数据少、页面无滚动条时，scroll 事件不会触发）
+    if (!allDone() && nearBottom()) {
+      loadMore(false, cb);
+    } else if (cb) {
+      cb();
+    }
   }, reset ? 400 : 300);
 }
 
 function refreshBoard() {
   var btn = document.getElementById('refresh-btn');
   btn.classList.add('spinning');
-  // 后期接 RSS/后端：此处先重新拉取最新数据，再 buildData() + loadMore(true)
+  // 即时清空四列，给出明确的重载反馈
+  CATS.forEach(function(c){ document.getElementById('col-' + c.key).innerHTML = ''; });
+  _colData = {}; _colLoaded = {};
+  document.getElementById('load-status').innerHTML = '<span class="spinner"></span>正在刷新...';
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  loadMore(true);
-  setTimeout(function(){ btn.classList.remove('spinning'); }, 800);
-  showToast('新闻已刷新', 'success');
+  // 后期接 RSS/后端：此处先重新拉取最新数据更新 RHC_INSIGHT_DATA，再 buildData() + loadMore(true)
+  buildData();
+  loadMore(true, function(){
+    btn.classList.remove('spinning');
+    showToast('新闻已刷新，共 ' + RHC_INSIGHT_DATA.length + ' 条', 'success');
+  });
 }
 
 function toggleSave(id) {
@@ -369,17 +388,23 @@ function toggleSave(id) {
   });
 }
 
+var _resizeTimer = null;
 function onScroll() {
   if (_loading || allDone()) return;
-  var status = document.getElementById('load-status');
-  var rect = status.getBoundingClientRect();
-  if (rect.top < window.innerHeight + 120) loadMore(false);
+  if (nearBottom()) loadMore(false);
 }
 
 document.addEventListener('DOMContentLoaded', function(){
   buildData();
   loadMore(true);
   window.addEventListener('scroll', onScroll);
+  // 窗口变大（如旋转、外接显示器）导致首屏变空时，自动补载填满
+  window.addEventListener('resize', function(){
+    if (_resizeTimer) clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(function(){
+      if (!_loading && !allDone() && nearBottom()) loadMore(false);
+    }, 250);
+  });
 });
 </script>
 <script src="assets/rhc-widget.js?v=20260831hv"></script>
