@@ -43,7 +43,8 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
   display:flex;align-items:center;justify-content:center;
 }
 .topnav-brand .brand-sub{font-size:15px;font-weight:600;color:var(--color-text);margin-top:1px;letter-spacing:0.5px}
-.topbar-title{font-size:14px;color:var(--color-text-secondary);border-left:1px solid var(--color-border);padding-left:16px}
+.topbar-divider{width:1px;height:16px;background:var(--color-border);flex-shrink:0;margin-top:1px}
+.topbar-title{font-size:14px;color:var(--color-text-secondary);margin-top:1px}
 .topbar-back{
   margin-left:auto;display:inline-flex;align-items:center;gap:6px;
   font-size:13px;font-weight:600;color:var(--color-primary);
@@ -159,6 +160,7 @@ a.news-card-title:hover,.news-card:hover .news-card-title{color:var(--color-prim
       <div class="brand-sub">智能工作平台</div>
     </div>
   </div>
+  <div class="topbar-divider"></div>
   <span class="topbar-title">新闻中心</span>
   <button class="topbar-back" onclick="location.href='panel.html'">← 返回门户</button>
 </div>
