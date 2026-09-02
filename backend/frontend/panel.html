@@ -189,6 +189,111 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
 .news-tag-beta{background:#FFF3E0;color:#E65100}
 .news-tag-news{background:#F3F4F6;color:#6B7280}
 
+/* ===== Market Insight Section ===== */
+.insight-tabs{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.insight-tab{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:500;color:var(--color-text-secondary);
+  border:1px solid var(--color-border);background:var(--color-surface);
+  transition:all var(--transition-fast);
+  white-space:nowrap;
+}
+.insight-tab:hover{
+  border-color:var(--color-primary);
+  color:var(--color-primary);
+}
+.insight-tab.active{
+  background:var(--color-primary);
+  border-color:var(--color-primary);
+  color:#fff;
+}
+
+.insight-card{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+  padding:16px 20px;
+  margin-bottom:12px;
+  transition:all var(--transition-fast);
+  display:flex;flex-direction:column;gap:8px;
+}
+.insight-card:hover{
+  border-color:var(--color-primary);
+  box-shadow:var(--shadow-md);
+}
+.insight-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;
+}
+.insight-card-title{
+  font-size:14px;font-weight:600;color:var(--color-text);
+  line-height:1.5;flex:1;min-width:0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;
+  transition:color var(--transition-fast);
+}
+.insight-card:hover .insight-card-title{
+  color:var(--color-primary);
+}
+.insight-card-body{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;
+}
+.insight-card-summary{
+  font-size:12px;color:var(--color-text-secondary);
+  line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;
+  flex:1;min-width:200px;
+}
+.insight-card-meta{
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.insight-card-date{
+  font-size:12px;color:var(--color-text-tertiary);
+  white-space:nowrap;
+}
+
+.news-bookmark-btn{
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:6px;
+  color:var(--color-text-tertiary);
+  transition:all var(--transition-fast);
+  flex-shrink:0;
+}
+.news-bookmark-btn:hover{
+  color:var(--color-primary);
+  background:var(--color-primary-xlight);
+}
+.news-bookmark-btn.saved{
+  color:var(--color-primary);
+}
+.news-bookmark-btn.saved svg{
+  fill:var(--color-primary);
+}
+.news-bookmark-btn svg{
+  width:16px;height:16px;
+  fill:none;stroke:currentColor;stroke-width:2;
+  transition:fill var(--transition-fast);
+}
+
+/* Insight category tags */
+.insight-cat-tag{
+  display:inline-flex;align-items:center;
+  padding:2px 10px;border-radius:4px;
+  font-size:11px;font-weight:600;
+  flex-shrink:0;line-height:1.5;
+  white-space:nowrap;
+}
+.insight-cat-tag.industry{background:#E3F2FD;color:#1565C0}
+.insight-cat-tag.market{background:#E8F5E9;color:#2E7D32}
+.insight-cat-tag.competitor{background:#FFF3E0;color:#E65100}
+
 /* ===== Modal ===== */
 .modal-overlay{
   position:fixed;inset:0;
@@ -389,140 +494,18 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;f
     <p class="welcome-subtitle">欢迎回到 Real Healthcare 智能工作平台</p>
   </section>
 
-  <!-- News Section -->
+  <!-- News Section / 市场洞察 -->
   <section class="news-section">
-    <h2 class="section-title">新闻动态</h2>
-    <div class="news-grid">
-      <!-- 行业动态 -->
-      <div class="news-card">
-        <div class="news-card-header">
-          <div class="news-card-title">行业动态</div>
-          <span class="news-card-more" onclick="openModal('industry')">
-            更多
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </span>
-        </div>
-        <ul class="news-list">
-          <li class="news-item">
-            <a class="news-item-link" href="https://ceo.ca/@GlobeNewswire/ai-is-reshaping-veterinary-medicine-investment-surges" target="_blank" rel="noopener">
-              <div class="news-item-top">
-                <div class="news-item-title">AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增</div>
-                <span class="news-item-date">2026-08-19</span>
-              </div>
-              <p class="news-item-summary">Digitail融资2300万美元、Lupa Pets融资2000万美元，AI X光判读30秒内完成</p>
-            </a>
-          </li>
-          <li class="news-item">
-            <a class="news-item-link" href="https://www.globenewswire.com/news-release/2026/08/25/3350843/0/en/global-veterinary-medical-devices-market-to-reach-9-1-billion-by-2030.html" target="_blank" rel="noopener">
-              <div class="news-item-top">
-                <div class="news-item-title">全球兽医医疗器械市场预计2030年达91亿美元</div>
-                <span class="news-item-date">2026-08-25</span>
-              </div>
-              <p class="news-item-summary">CAGR 6.1%，北美占55.9%，AI诊断和POC检测驱动行业增长</p>
-            </a>
-          </li>
-          <li class="news-item">
-            <a class="news-item-link" href="https://animalhealthnews.com/2026/08/12/idexx-launches-dual-species-point-of-care-cardiac-biomarker-test/" target="_blank" rel="noopener">
-              <div class="news-item-top">
-                <div class="news-item-title">IDEXX推出犬猫双物种心脏生物标志物检测</div>
-                <span class="news-item-date">2026-08-12</span>
-              </div>
-              <p class="news-item-summary">首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市</p>
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <!-- 公司新闻 -->
-      <div class="news-card">
-        <div class="news-card-header">
-          <div class="news-card-title">公司新闻</div>
-          <span class="news-card-more" onclick="openModal('company')">
-            更多
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </span>
-        </div>
-        <ul class="news-list">
-          <li class="news-item">
-            <a class="news-item-link" href="#">
-              <div class="news-item-top">
-                <div class="news-item-title-wrap">
-                  <span class="news-tag news-tag-new">new</span>
-                  <div class="news-item-title">智能工作平台V1.2上线：经营仪表盘模块发布</div>
-                </div>
-                <span class="news-item-date">2026-08-25</span>
-              </div>
-              <p class="news-item-summary">新增实时业绩看板、多维度数据分析和决策支持功能，管理层可一屏掌握全局经营状况。</p>
-            </a>
-          </li>
-          <li class="news-item">
-            <a class="news-item-link" href="#">
-              <div class="news-item-top">
-                <div class="news-item-title-wrap">
-                  <span class="news-tag news-tag-upgrade">upgrade</span>
-                  <div class="news-item-title">营销中心升级：AI社媒内容生成支持多平台一键发布</div>
-                </div>
-                <span class="news-item-date">2026-08-20</span>
-              </div>
-              <p class="news-item-summary">新增LinkedIn、Facebook、Instagram多平台适配，AI自动生成本地化文案和图片，发布效率提升3倍。</p>
-            </a>
-          </li>
-          <li class="news-item">
-            <a class="news-item-link" href="#">
-              <div class="news-item-top">
-                <div class="news-item-title-wrap">
-                  <span class="news-tag news-tag-beta">beta</span>
-                  <div class="news-item-title">销售智能助手开放内测：产品知识库+竞品对比</div>
-                </div>
-                <span class="news-item-date">2026-08-15</span>
-              </div>
-              <p class="news-item-summary">接入全产品线知识库，支持自然语言问答、竞品参数对比和场景化推荐，帮助销售团队快速响应客户。</p>
-            </a>
-          </li>
-        </ul>
-      </div>
-      </div>
-
-      <!-- 本周市场情报（演示示例） -->
-      <div class="news-card" style="margin-top:20px">
-        <div class="news-card-header">
-          <div class="news-card-title">本周市场情报 <span style="font-size:11px;font-weight:600;background:#F0F2F3;color:#637089;border-radius:20px;padding:2px 10px;white-space:nowrap">演示示例</span></div>
-          <a class="news-card-more" href="dashboard.html">
-            查看全文
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </a>
-        </div>
-        <ul class="news-list">
-          <li class="news-item">
-            <div class="news-item-top">
-              <div class="news-item-title">兽医影像数字化与 AI 辅助诊断加速，北美设备进入替换窗口</div>
-              <span class="news-item-date">2026-08-31</span>
-            </div>
-            <p class="news-item-summary">北美诊所设备平均更新周期约 7 年，2019 年采购潮设备集中进入替换期，询盘以整机更新为主。</p>
-          </li>
-          <li class="news-item">
-            <div class="news-item-top">
-              <div class="news-item-title">VMX / WVC 2026：麻醉与监护一体化成主流展示方向</div>
-              <span class="news-item-date">2026-08-31</span>
-            </div>
-            <p class="news-item-summary">单品设备关注度下降，建议主推 V5 Plus 等麻醉监护一体化工作站方案。</p>
-          </li>
-          <li class="news-item">
-            <div class="news-item-top">
-              <div class="news-item-title">中东、东南亚兽医诊所扩容，基础设备批量需求上升</div>
-              <span class="news-item-date">2026-08-31</span>
-            </div>
-            <p class="news-item-summary">新院开业带动麻醉机、注射泵整套采购，适合以「新院配置清单」话题开发客户。</p>
-          </li>
-        </ul>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <h2 class="section-title" style="margin-bottom:0">市场洞察</h2>
+      <div class="insight-tabs" id="insight-tabs">
+        <button class="insight-tab active" data-cat="all" onclick="filterInsight('all')">全部</button>
+        <button class="insight-tab" data-cat="industry" onclick="filterInsight('industry')">🔵 行业趋势</button>
+        <button class="insight-tab" data-cat="market" onclick="filterInsight('market')">🟢 市场动态</button>
+        <button class="insight-tab" data-cat="competitor" onclick="filterInsight('competitor')">🟠 同行新闻</button>
       </div>
     </div>
+    <div id="insight-list"><!-- JS 动态渲染 --></div>
   </section>
 
   <h2 class="section-title">选择工作台</h2>
@@ -858,6 +841,294 @@ document.addEventListener('keydown', function(e) {
     });
     document.body.style.overflow = '';
   }
+});
+
+/* ===== Market Insight Data ===== */
+var RHC_INSIGHT_DATA = [
+  // 行业趋势
+  {
+    id: 'ins-001',
+    category: 'industry',
+    categoryLabel: '行业趋势',
+    categoryColor: 'industry',
+    title: 'AI重塑兽医行业：诊断影像、临床文档和远程监护技术投资激增',
+    summary: 'Digitail融资2300万美元、Lupa Pets融资2000万美元，AI X光判读30秒内完成',
+    date: '2026-08-19',
+    url: 'https://ceo.ca/@GlobeNewswire/ai-is-reshaping-veterinary-medicine-investment-surges',
+    regions: ['global'],
+    products: []
+  },
+  {
+    id: 'ins-002',
+    category: 'industry',
+    categoryLabel: '行业趋势',
+    categoryColor: 'industry',
+    title: '全球兽医医疗器械市场预计2030年达91亿美元',
+    summary: 'CAGR 6.1%，北美占55.9%，AI诊断和POC检测驱动行业增长',
+    date: '2026-08-25',
+    url: 'https://www.globenewswire.com/news-release/2026/08/25/3350843/0/en/global-veterinary-medical-devices-market-to-reach-9-1-billion-by-2030.html',
+    regions: ['global', 'north-america'],
+    products: []
+  },
+  {
+    id: 'ins-003',
+    category: 'industry',
+    categoryLabel: '行业趋势',
+    categoryColor: 'industry',
+    title: 'IDEXX推出犬猫双物种心脏生物标志物检测',
+    summary: '首个院内NT-proBNP快速检测，全球8万台Catalyst分析仪可用，10月北美上市',
+    date: '2026-08-12',
+    url: 'https://animalhealthnews.com/2026/08/12/idexx-launches-dual-species-point-of-care-cardiac-biomarker-test/',
+    regions: ['north-america'],
+    products: []
+  },
+  {
+    id: 'ins-004',
+    category: 'industry',
+    categoryLabel: '行业趋势',
+    categoryColor: 'industry',
+    title: '兽医影像数字化与AI辅助诊断加速，北美设备进入替换窗口',
+    summary: '北美诊所设备平均更新周期约7年，2019年采购潮设备集中进入替换期',
+    date: '2026-08-31',
+    url: '',
+    regions: ['north-america'],
+    products: []
+  },
+  // 市场动态
+  {
+    id: 'ins-005',
+    category: 'market',
+    categoryLabel: '市场动态',
+    categoryColor: 'market',
+    title: '中东、东南亚兽医诊所扩容，基础设备批量需求上升',
+    summary: '新院开业带动麻醉机、注射泵整套采购，适合以「新院配置清单」话题开发客户',
+    date: '2026-08-31',
+    url: '',
+    regions: ['middle-east', 'southeast-asia'],
+    products: ['anesthesia-workstation']
+  },
+  {
+    id: 'ins-006',
+    category: 'market',
+    categoryLabel: '市场动态',
+    categoryColor: 'market',
+    title: '巴西宠物医疗市场持续增长，INMETRO认证新规即将实施',
+    summary: '巴西将于2027年起要求所有进口兽用麻醉设备通过INMETRO认证，提前合规的企业将获得竞争优势',
+    date: '2026-08-28',
+    url: '',
+    regions: ['brazil'],
+    products: ['anesthesia-workstation', 'ventilator']
+  },
+  {
+    id: 'ins-007',
+    category: 'market',
+    categoryLabel: '市场动态',
+    categoryColor: 'market',
+    title: '非洲 veterinary equipment 需求年增15%，中小型设备最受欢迎',
+    summary: '撒哈拉以南非洲宠物医疗市场快速崛起，便携、性价比高的设备需求旺盛',
+    date: '2026-08-22',
+    url: '',
+    regions: ['africa'],
+    products: ['portable-anesthesia', 'monitor']
+  },
+  {
+    id: 'ins-008',
+    category: 'market',
+    categoryLabel: '市场动态',
+    categoryColor: 'market',
+    title: 'VMX/WVC 2026：麻醉与监护一体化成主流展示方向',
+    summary: '单品设备关注度下降，建议主推V5 Plus等麻醉监护一体化工作站方案',
+    date: '2026-08-31',
+    url: '',
+    regions: ['global', 'north-america'],
+    products: ['v5-plus']
+  },
+  // 同行新闻
+  {
+    id: 'ins-009',
+    category: 'competitor',
+    categoryLabel: '同行新闻',
+    categoryColor: 'competitor',
+    title: '中宠兽与日本尼普洛（NIPRO）达成全面战略合作',
+    summary: '品牌授权、进口器械渠道运营、宠物医药联合研发、高端耗材国产化五大方向',
+    date: '2026-08-01',
+    url: '',
+    regions: ['global', 'asia'],
+    products: []
+  },
+  {
+    id: 'ins-010',
+    category: 'competitor',
+    categoryLabel: '同行新闻',
+    categoryColor: 'competitor',
+    title: 'Zoetis Portela猫骨关节炎止痛药在英国获批',
+    summary: '首个长效抗NGF单克隆抗体，一次注射缓解猫OA疼痛长达3个月',
+    date: '2026-07-30',
+    url: 'https://news.zoetis.com/',
+    regions: ['europe'],
+    products: []
+  },
+  {
+    id: 'ins-011',
+    category: 'competitor',
+    categoryLabel: '同行新闻',
+    categoryColor: 'competitor',
+    title: '睿视医疗与晓闻科技合作推进宠物CT智能化升级',
+    summary: '融合AI影像辅助诊断模型，提升宠物CT临床诊疗能力',
+    date: '2026-08-06',
+    url: 'https://www.petdhw.com/show-52837.html',
+    regions: ['china'],
+    products: []
+  },
+  {
+    id: 'ins-012',
+    category: 'competitor',
+    categoryLabel: '同行新闻',
+    categoryColor: 'competitor',
+    title: 'Mindray发布新款兽用麻醉工作站 VetAnesthesia Pro',
+    summary: '集成触摸屏操控与低流量麻醉设计，瞄准中大型动物医院市场',
+    date: '2026-08-15',
+    url: '',
+    regions: ['global', 'china'],
+    products: ['anesthesia-workstation']
+  }
+];
+
+var _currentInsightCat = 'all';
+
+function _getUserPreferences() {
+  try {
+    var prefs = localStorage.getItem('rhc_user_preferences');
+    if (prefs) return JSON.parse(prefs);
+  } catch(e) {}
+  return { regions: [], products: [] };
+}
+
+function _getSavedInsights() {
+  try {
+    var saved = localStorage.getItem('rhc_saved_insights');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return [];
+}
+
+function _setSavedInsights(arr) {
+  localStorage.setItem('rhc_saved_insights', JSON.stringify(arr));
+}
+
+function _matchPreferenceScore(item, prefs) {
+  var score = 0;
+  if (prefs.regions && prefs.regions.length) {
+    for (var i = 0; i < item.regions.length; i++) {
+      if (prefs.regions.indexOf(item.regions[i]) !== -1) {
+        score += 2;
+      }
+    }
+  }
+  if (prefs.products && prefs.products.length) {
+    for (var j = 0; j < item.products.length; j++) {
+      if (prefs.products.indexOf(item.products[j]) !== -1) {
+        score += 1;
+      }
+    }
+  }
+  return score;
+}
+
+function renderInsightList(filterCat) {
+  var list = document.getElementById('insight-list');
+  if (!list) return;
+
+  var prefs = _getUserPreferences();
+  var savedIds = _getSavedInsights();
+
+  var items = RHC_INSIGHT_DATA.slice();
+
+  // 按类别筛选
+  if (filterCat && filterCat !== 'all') {
+    items = items.filter(function(it) { return it.category === filterCat; });
+  } else {
+    // 全部模式下按用户偏好排序
+    items.sort(function(a, b) {
+      var sa = _matchPreferenceScore(a, prefs);
+      var sb = _matchPreferenceScore(b, prefs);
+      if (sb !== sa) return sb - sa;
+      return b.date.localeCompare(a.date);
+    });
+  }
+
+  // 非全部模式按日期倒序
+  if (filterCat && filterCat !== 'all') {
+    items.sort(function(a, b) {
+      return b.date.localeCompare(a.date);
+    });
+  }
+
+  if (items.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--color-text-tertiary);font-size:13px">暂无相关内容</div>';
+    return;
+  }
+
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var isSaved = savedIds.indexOf(item.id) !== -1;
+    var titleHtml = item.url
+      ? '<a href="' + item.url + '" target="_blank" rel="noopener" style="text-decoration:none;color:inherit" class="insight-card-title">' + item.title + '</a>'
+      : '<div class="insight-card-title">' + item.title + '</div>';
+
+    html += ''
+      + '<div class="insight-card">'
+      +   '<div class="insight-card-header">'
+      +     '<span class="insight-cat-tag ' + item.categoryColor + '">' + item.categoryLabel + '</span>'
+      +     '<button class="news-bookmark-btn' + (isSaved ? ' saved' : '') + '" onclick="toggleInsightSave(\'' + item.id + '\')" title="' + (isSaved ? '取消收藏' : '收藏') + '" aria-label="' + (isSaved ? '取消收藏' : '收藏') + '">'
+      +       '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>'
+      +     '</button>'
+      +   '</div>'
+      +   titleHtml
+      +   '<div class="insight-card-body">'
+      +     '<p class="insight-card-summary">' + item.summary + '</p>'
+      +     '<div class="insight-card-meta">'
+      +       '<span class="insight-card-date">' + item.date + '</span>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+  }
+
+  list.innerHTML = html;
+}
+
+function filterInsight(cat) {
+  _currentInsightCat = cat;
+  // 更新 tabs active 状态
+  var tabs = document.querySelectorAll('#insight-tabs .insight-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    if (tabs[i].getAttribute('data-cat') === cat) {
+      tabs[i].classList.add('active');
+    } else {
+      tabs[i].classList.remove('active');
+    }
+  }
+  renderInsightList(cat);
+}
+
+function toggleInsightSave(id) {
+  var saved = _getSavedInsights();
+  var idx = saved.indexOf(id);
+  if (idx !== -1) {
+    saved.splice(idx, 1);
+    showToast('已取消收藏');
+  } else {
+    saved.push(id);
+    showToast('已收藏到个人素材库', 'success');
+  }
+  _setSavedInsights(saved);
+  renderInsightList(_currentInsightCat);
+}
+
+// 初始化渲染
+document.addEventListener('DOMContentLoaded', function() {
+  renderInsightList('all');
 });
 </script>
 <script src="assets/rhc-widget.js?v=20260831hv"></script>
