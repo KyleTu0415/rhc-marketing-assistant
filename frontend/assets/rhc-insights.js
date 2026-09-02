@@ -162,3 +162,46 @@ var RHC_INSIGHT_DATA = [
     products: []
   }
 ];
+
+/* ============================================================
+ * RSS 实时数据引导（panel/library/sales 三页共享）
+ * 页面先用上方 12 条本地快照秒开，随后异步拉后端 /api/insights
+ * 覆盖为 RSS 最新数据；后端不可用时静默保留快照，不白屏。
+ * 新闻中心 insights.html 自带四列看板引导，不重复拉取。
+ * 数据变化时自动重渲染当前页面；每 10 分钟静默轮询。
+ * ============================================================ */
+(function () {
+  if (location.pathname.indexOf('insights.html') !== -1) return;
+
+  var POLL_INTERVAL = 10 * 60 * 1000;   // 10 分钟轮询
+  var _lastSig = null;                  // 数据签名：条数|后端刷新时间
+
+  function rerender() {
+    try {
+      if (typeof renderInsightList === 'function') renderInsightList(_currentInsightCat || 'all');
+    } catch (e) {}
+    try { if (typeof renderMaterials === 'function') renderMaterials(); } catch (e) {}
+    try { if (typeof renderLibFavorites === 'function') renderLibFavorites(); } catch (e) {}
+  }
+
+  function applyApiItems(items, lastRefresh) {
+    if (!items || !items.length) return;
+    // 条数与后端刷新时间都没变则跳过，避免无谓重渲染
+    var sig = items.length + '|' + (lastRefresh && lastRefresh.time ? lastRefresh.time : '');
+    if (sig === _lastSig) return;
+    _lastSig = sig;
+    window.RHC_INSIGHT_DATA = items;
+    rerender();
+  }
+
+  function pull() {
+    fetch('/api/insights')
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (res) { applyApiItems(res.items, res.last_refresh); })
+      .catch(function () { /* 离线/后端未部署：保留本地快照 */ });
+  }
+
+  // 脚本在 body 末尾加载，页面渲染函数已就绪
+  setTimeout(pull, 300);
+  setInterval(pull, POLL_INTERVAL);
+})();

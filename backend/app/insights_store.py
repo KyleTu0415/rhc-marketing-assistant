@@ -23,7 +23,7 @@ DATA_FILE = os.path.join(DATA_DIR, "insights.json")
 SEED_JS = os.path.join(BASE_DIR, "frontend", "assets", "rhc-insights.js")
 
 REFRESH_MIN_INTERVAL = 600        # 手动刷新限频 10 分钟
-AUTO_REFRESH_INTERVAL = 6 * 3600  # 自动抓取间隔 6 小时
+AUTO_REFRESH_INTERVAL = 12 * 3600  # 自动抓取间隔 12 小时（一天 2 次）
 MAX_ITEMS = 500                   # 最多保留 500 条
 
 _lock = threading.Lock()

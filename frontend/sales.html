@@ -537,7 +537,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 </div>
 <div class="toast" id="toast"></div>
 <script src="assets/rhc-config.js"></script>
-<script src="assets/rhc-insights.js?v=20260902a"></script>
+<script src="assets/rhc-insights.js?v=20260903a"></script>
 <script>
 function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');var ca=document.querySelector('.content-area');if(ca)ca.scrollTop=0}
 document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
