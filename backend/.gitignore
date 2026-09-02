@@ -13,3 +13,6 @@ uploads/
 *.swp
 *.swo
 *~
+
+# Runtime data (RSS insights store, auto-rebuilt from seed)
+data/

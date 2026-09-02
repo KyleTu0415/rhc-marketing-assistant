@@ -429,6 +429,35 @@ async def api_products_list():
     except Exception as e:
         return {"items":[],"error":str(e)}
 
+# ============================================================
+# 市场洞察 / 新闻中心 API
+# ============================================================
+@app.get("/api/insights")
+async def api_insights_list():
+    from app import insights_store
+    items = insights_store.get_items()
+    return {
+        "items": items,
+        "total": len(items),
+        "last_refresh": insights_store.status().get("last_refresh"),
+    }
+
+@app.post("/api/insights/refresh")
+async def api_insights_refresh():
+    from app import insights_store
+    return insights_store.refresh(force=False)
+
+@app.get("/api/insights/status")
+async def api_insights_status():
+    from app import insights_store
+    return insights_store.status()
+
+try:
+    from app import insights_store
+    insights_store.start_scheduler()
+except Exception as _e:
+    print(f"[insights] 模块初始化失败: {_e}")
+
 # Serve frontend - try multiple possible locations
 _candidate_dirs = [
     os.path.join(os.path.dirname(__file__), "frontend"),                              # Railway root=backend/: /app/frontend

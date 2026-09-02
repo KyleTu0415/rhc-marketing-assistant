@@ -229,11 +229,39 @@ a.news-card-title:hover{color:var(--color-primary)}
 <script>
 /* ============================================================
  * 新闻中心：四列资讯看板 + 滚动分批加载 + 手动刷新
- * 数据来源：assets/rhc-insights.js（RHC_INSIGHT_DATA，四页共享）
- * 后期接入 RSS/后端接口时：
- *   1. refreshBoard() 中替换为真实数据拉取，更新 RHC_INSIGHT_DATA
- *   2. _colData 重建后调 loadMore(true) 即可，渲染逻辑无需改动
+ * 数据来源：后端 /api/insights（RSS 定时抓取 + LLM 翻译分类）
+ *   后端不可用时自动降级到 assets/rhc-insights.js 本地数据
+ * 手动刷新：POST /api/insights/refresh（后端立即抓一轮 RSS，
+ *   10 分钟限频，新增新闻 LLM 翻译分类后入库返回）
  * ============================================================ */
+var API = {
+  list: '/api/insights',
+  refresh: '/api/insights/refresh'
+};
+var _dataSource = 'api';   // 'api' | 'local'
+
+function apiFetch(url, opts) {
+  return fetch(url, opts).then(function(r){
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  });
+}
+
+function applyData(items) {
+  window.RHC_INSIGHT_DATA = items;
+  buildData();
+  loadMore(true);
+}
+
+function loadLocalData(cb) {
+  _dataSource = 'local';
+  // rhc-insights.js 已通过 <script> 加载，RHC_INSIGHT_DATA 为本地快照
+  if (window.RHC_INSIGHT_DATA && RHC_INSIGHT_DATA.length) {
+    applyData(RHC_INSIGHT_DATA);
+  }
+  if (cb) cb();
+}
+
 var CATS = [
   { key:'industry',   label:'行业趋势' },
   { key:'market',     label:'市场动态' },
@@ -360,17 +388,51 @@ function loadMore(reset, cb) {
 function refreshBoard() {
   var btn = document.getElementById('refresh-btn');
   btn.classList.add('spinning');
-  // 即时清空四列，给出明确的重载反馈
-  CATS.forEach(function(c){ document.getElementById('col-' + c.key).innerHTML = ''; });
-  _colData = {}; _colLoaded = {};
-  document.getElementById('load-status').innerHTML = '<span class="spinner"></span>正在刷新...';
+  document.getElementById('load-status').innerHTML = '<span class="spinner"></span>正在抓取最新新闻...';
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  // 后期接 RSS/后端：此处先重新拉取最新数据更新 RHC_INSIGHT_DATA，再 buildData() + loadMore(true)
-  buildData();
-  loadMore(true, function(){
-    btn.classList.remove('spinning');
-    showToast('新闻已刷新，共 ' + RHC_INSIGHT_DATA.length + ' 条', 'success');
-  });
+
+  if (_dataSource === 'local') {
+    // 本地降级模式：重载本地快照
+    setTimeout(function(){
+      buildData();
+      loadMore(true, function(){
+        btn.classList.remove('spinning');
+        showToast('离线模式：已加载本地新闻快照', 'warning');
+      });
+    }, 400);
+    return;
+  }
+
+  // 触发后端抓取一轮 RSS（10 分钟限频；新新闻经 LLM 翻译分类后入库）
+  apiFetch(API.refresh, { method: 'POST' })
+    .then(function(res){
+      if (res.limited && res.reason === 'rate_limited') {
+        var mins = Math.ceil(res.remain_seconds / 60);
+        showToast('刷新过于频繁，请 ' + mins + ' 分钟后再试（已自动获取最新列表）', 'warning');
+        return apiFetch(API.list);
+      }
+      if (res.limited && res.reason === 'refreshing') {
+        showToast('正在刷新中，请稍候...', 'warning');
+        return apiFetch(API.list);
+      }
+      // 限频时 res 不含 items；正常刷新时直接返回新数据
+      if (res && res.items) {
+        var added = res.added;
+        applyData(res.items);
+        if (added > 0) showToast('刷新完成，新增 ' + added + ' 条新闻，共 ' + res.total + ' 条', 'success');
+        else showToast('已是最新，共 ' + res.total + ' 条', 'success');
+        return null;
+      }
+      return apiFetch(API.list);
+    })
+    .then(function(res){
+      if (res && res.items) applyData(res.items);
+    })
+    .catch(function(){
+      showToast('刷新失败，显示本地新闻', 'warning');
+      loadLocalData();
+    })
+    .finally(function(){ btn.classList.remove('spinning'); });
 }
 
 function toggleSave(id) {
@@ -395,6 +457,7 @@ function onScroll() {
 }
 
 document.addEventListener('DOMContentLoaded', function(){
+  // 先本地快照秒开（rhc-insights.js 已随 <script> 加载），再尝试后端最新数据
   buildData();
   loadMore(true);
   window.addEventListener('scroll', onScroll);
@@ -405,6 +468,27 @@ document.addEventListener('DOMContentLoaded', function(){
       if (!_loading && !allDone() && nearBottom()) loadMore(false);
     }, 250);
   });
+
+  // 拉取后端最新数据（RSS 抓取入库），失败则保持本地快照
+  apiFetch(API.list).then(function(res){
+    if (res && res.items && res.items.length) {
+      _dataSource = 'api';
+      applyData(res.items);
+    }
+  }).catch(function(){
+    _dataSource = 'local';
+  });
+
+  // 自动刷新：每 10 分钟静默检查一次后端是否有新内容
+  setInterval(function(){
+    if (_dataSource !== 'api') return;
+    apiFetch(API.list).then(function(res){
+      if (res && res.items && res.items.length !== RHC_INSIGHT_DATA.length) {
+        applyData(res.items);
+        showToast('已自动更新 ' + res.items.length + ' 条新闻', 'success');
+      }
+    }).catch(function(){});
+  }, 10 * 60 * 1000);
 });
 </script>
 <script src="assets/rhc-widget.js?v=20260831hv"></script>
