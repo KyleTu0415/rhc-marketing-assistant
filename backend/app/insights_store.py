@@ -12,7 +12,7 @@ import os
 import re
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from . import rss_sources
 from . import insights_llm
@@ -169,7 +169,7 @@ def _do_refresh() -> dict:
 
         _state["last_refresh_ts"] = time.time()
         info = {
-            "time": datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M"),
+            "time": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M"),
             "fetched": len(raw),
             "new_candidates": len(new_raw),
             "added": len(added),

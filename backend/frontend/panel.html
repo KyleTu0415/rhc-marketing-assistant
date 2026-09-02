@@ -959,7 +959,13 @@ function renderInsightList(filterCat) {
   }
 
   if (displayItems.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--color-text-tertiary);font-size:13px">暂无相关内容</div>';
+    if (window.__INSIGHTS_OFFLINE) {
+      list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--color-text-tertiary);font-size:13px">新闻服务暂时不可用，请稍后刷新重试</div>';
+    } else if (!RHC_INSIGHT_DATA || !RHC_INSIGHT_DATA.length) {
+      list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--color-text-tertiary);font-size:13px">正在加载新闻...</div>';
+    } else {
+      list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--color-text-tertiary);font-size:13px">暂无相关内容</div>';
+    }
     return;
   }
 
@@ -990,7 +996,7 @@ function renderInsightList(filterCat) {
   }
 
   if (items.length > INSIGHT_PREVIEW_COUNT) {
-    html += '<a href="insights.html" class="insight-toggle-btn">查看更多，进入新闻中心 →</a>';
+    html += '<a href="insights.html" class="insight-toggle-btn">查看更多 →</a>';
   }
 
   list.innerHTML = html;

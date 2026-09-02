@@ -169,15 +169,14 @@ a.news-card-title:hover{color:var(--color-primary)}
     </div>
   </div>
   <div class="topbar-divider"></div>
-  <span class="topbar-title">新闻中心</span>
+  <span class="topbar-title">市场洞察</span>
   <button class="topbar-back" onclick="location.href='panel.html'">← 返回门户</button>
 </div>
 
 <div class="page">
   <div class="board-toolbar">
     <div class="board-meta">
-      <span class="board-dot"></span>
-      <span>市场洞察<strong id="board-count"></strong> · 更新至<strong id="board-latest"></strong></span>
+      <span>共 <strong id="board-count"></strong> 条 · 最近更新 <strong id="board-latest"></strong></span>
     </div>
     <button class="refresh-btn" id="refresh-btn" onclick="refreshBoard()">
       <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -247,19 +246,23 @@ function apiFetch(url, opts) {
   });
 }
 
-function applyData(items) {
+function applyData(items, lastRefresh) {
   window.RHC_INSIGHT_DATA = items;
+  if (lastRefresh) window.__LAST_REFRESH = lastRefresh;
   buildData();
   loadMore(true);
 }
 
-function loadLocalData(cb) {
+function showOffline() {
   _dataSource = 'local';
-  // rhc-insights.js 已通过 <script> 加载，RHC_INSIGHT_DATA 为本地快照
-  if (window.RHC_INSIGHT_DATA && RHC_INSIGHT_DATA.length) {
-    applyData(RHC_INSIGHT_DATA);
-  }
-  if (cb) cb();
+  document.getElementById('load-status').innerHTML =
+    '<span style="color:var(--color-warning,#E65100)">新闻服务暂时不可用，请稍后点击右上角「刷新」重试</span>';
+}
+
+// 后端刷新时间（北京时间 "YYYY-MM-DD HH:MM"）→ "MM/DD HH:MM"
+function formatRefreshTime(lr) {
+  if (lr && lr.time) return lr.time.slice(5).replace('-', '/');
+  return '';
 }
 
 var CATS = [
@@ -309,9 +312,9 @@ function buildData() {
     document.getElementById('col-count-' + c.key).textContent = items.length;
   });
   var total = RHC_INSIGHT_DATA.length;
-  var latest = RHC_INSIGHT_DATA.map(function(it){ return it.date; }).sort().pop();
-  document.getElementById('board-count').textContent = ' · 共 ' + total + ' 条';
-  document.getElementById('board-latest').textContent = latest ? latest.slice(5).replace('-', '/') : '';
+  document.getElementById('board-count').textContent = total;
+  var t = formatRefreshTime(window.__LAST_REFRESH);
+  document.getElementById('board-latest').textContent = t || '—';
 }
 
 function cardHtml(item) {
@@ -392,15 +395,8 @@ function refreshBoard() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (_dataSource === 'local') {
-    // 本地降级模式：重载本地快照
-    setTimeout(function(){
-      buildData();
-      loadMore(true, function(){
-        btn.classList.remove('spinning');
-        showToast('离线模式：已加载本地新闻快照', 'warning');
-      });
-    }, 400);
-    return;
+    // 离线模式下点刷新：重新尝试连接后端
+    _dataSource = 'api';
   }
 
   // 触发后端抓取一轮 RSS（10 分钟限频；新新闻经 LLM 翻译分类后入库）
@@ -418,7 +414,7 @@ function refreshBoard() {
       // 限频时 res 不含 items；正常刷新时直接返回新数据
       if (res && res.items) {
         var added = res.added;
-        applyData(res.items);
+        applyData(res.items, res.last_refresh);
         if (added > 0) showToast('刷新完成，新增 ' + added + ' 条新闻，共 ' + res.total + ' 条', 'success');
         else showToast('已是最新，共 ' + res.total + ' 条', 'success');
         return null;
@@ -426,11 +422,11 @@ function refreshBoard() {
       return apiFetch(API.list);
     })
     .then(function(res){
-      if (res && res.items) applyData(res.items);
+      if (res && res.items) { applyData(res.items, res.last_refresh); _dataSource = 'api'; }
     })
     .catch(function(){
-      showToast('刷新失败，显示本地新闻', 'warning');
-      loadLocalData();
+      showToast('刷新失败，新闻服务暂不可用', 'warning');
+      showOffline();
     })
     .finally(function(){ btn.classList.remove('spinning'); });
 }
@@ -457,9 +453,8 @@ function onScroll() {
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-  // 先本地快照秒开（rhc-insights.js 已随 <script> 加载），再尝试后端最新数据
-  buildData();
-  loadMore(true);
+  // 数据唯一来源为后端 /api/insights；加载期间显示 loading，不用本地快照
+  document.getElementById('load-status').innerHTML = '<span class="spinner"></span>正在加载新闻...';
   window.addEventListener('scroll', onScroll);
   // 窗口变大（如旋转、外接显示器）导致首屏变空时，自动补载填满
   window.addEventListener('resize', function(){
@@ -469,23 +464,35 @@ document.addEventListener('DOMContentLoaded', function(){
     }, 250);
   });
 
-  // 拉取后端最新数据（RSS 抓取入库），失败则保持本地快照
-  apiFetch(API.list).then(function(res){
-    if (res && res.items && res.items.length) {
-      _dataSource = 'api';
-      applyData(res.items);
-    }
-  }).catch(function(){
-    _dataSource = 'local';
-  });
+  // 拉取后端数据（RSS 抓取入库 + LLM 翻译分类）
+  // 服务刚启动时首轮抓取约需 1-2 分钟，期间返回空列表，自动重试覆盖
+  (function initLoad(retries) {
+    apiFetch(API.list).then(function(res){
+      if (res && res.items && res.items.length) {
+        _dataSource = 'api';
+        applyData(res.items, res.last_refresh);
+      } else if (retries > 0) {
+        setTimeout(function(){ initLoad(retries - 1); }, 5000);
+      } else {
+        showOffline();
+      }
+    }).catch(function(){
+      if (retries > 0) setTimeout(function(){ initLoad(retries - 1); }, 5000);
+      else showOffline();
+    });
+  })(20);
 
-  // 自动刷新：每 10 分钟静默检查一次后端是否有新内容
+  // 自动更新：每 10 分钟静默检查一次后端是否有新内容
   setInterval(function(){
     if (_dataSource !== 'api') return;
     apiFetch(API.list).then(function(res){
-      if (res && res.items && res.items.length !== RHC_INSIGHT_DATA.length) {
-        applyData(res.items);
-        showToast('已自动更新 ' + res.items.length + ' 条新闻', 'success');
+      if (res && res.items && res.items.length) {
+        var sig = res.items.length + '|' + (res.last_refresh && res.last_refresh.time ? res.last_refresh.time : '');
+        var oldSig = RHC_INSIGHT_DATA.length + '|' + (window.__LAST_REFRESH && window.__LAST_REFRESH.time ? window.__LAST_REFRESH.time : '');
+        if (sig !== oldSig) {
+          applyData(res.items, res.last_refresh);
+          showToast('已自动更新，共 ' + res.items.length + ' 条新闻', 'success');
+        }
       }
     }).catch(function(){});
   }, 10 * 60 * 1000);
