@@ -2,9 +2,14 @@
 RHC Marketing Assistant - Main Application
 """
 import json
+import hmac
+import hashlib
+import base64
+import time
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Dict, Optional, Any
 import os
@@ -82,6 +87,105 @@ except ImportError:
     settings = Settings()
 
 app = FastAPI(title="RHC Marketing Assistant", version="1.0.0")
+
+# ============================================================
+# 认证系统 (Auth)
+# ============================================================
+SECRET_KEY = os.getenv("RHC_SECRET_KEY", "rhc-marketing-secret-2026")
+TOKEN_EXPIRY = 24 * 60 * 60  # 24 hours
+
+USERS = {
+    "admin": {"password": "rhc2026", "role": "admin", "name": "管理员"},
+    "sales1": {"password": "demo123", "role": "sales", "name": "销售演示"},
+    "viewer": {"password": "view123", "role": "viewer", "name": "访客"},
+}
+
+def _create_token(username: str) -> str:
+    """Create a simple signed token: base64(json(payload)).signature"""
+    payload = {
+        "user": username,
+        "exp": int(time.time()) + TOKEN_EXPIRY,
+    }
+    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
+    sig = hmac.new(SECRET_KEY.encode(), payload_b64.encode(), hashlib.sha256).hexdigest()
+    return f"{payload_b64}.{sig}"
+
+def _verify_token(token: str) -> Optional[dict]:
+    """Verify token and return user info, or None if invalid/expired."""
+    try:
+        parts = token.split(".")
+        if len(parts) != 2:
+            return None
+        payload_b64, sig = parts
+        expected_sig = hmac.new(SECRET_KEY.encode(), payload_b64.encode(), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected_sig):
+            return None
+        payload = json.loads(base64.urlsafe_b64decode(payload_b64))
+        if payload.get("exp", 0) < time.time():
+            return None
+        username = payload.get("user")
+        if username and username in USERS:
+            u = USERS[username]
+            return {"username": username, "role": u["role"], "name": u["name"]}
+        return None
+    except Exception:
+        return None
+
+def _get_token_from_request(request: Request) -> Optional[str]:
+    """Extract token from Authorization header or cookie."""
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        return auth_header[7:]
+    # Check cookie
+    cookie_token = request.cookies.get("rhc_auth_token")
+    if cookie_token:
+        return cookie_token
+    return None
+
+class LoginRequest(BaseModel):
+    username: str = ""
+    password: str = ""
+
+@app.post("/api/auth/login")
+async def api_auth_login(req: LoginRequest):
+    username = req.username.strip()
+    password = req.password.strip()
+    if not username or not password:
+        return JSONResponse({"ok": False, "message": "请输入用户名和密码"})
+    user = USERS.get(username)
+    if not user or user["password"] != password:
+        return JSONResponse({"ok": False, "message": "用户名或密码错误"})
+    token = _create_token(username)
+    resp = JSONResponse({
+        "ok": True,
+        "token": token,
+        "user": {"username": username, "role": user["role"], "name": user["name"]},
+    })
+    # Also set cookie for convenience
+    resp.set_cookie(
+        key="rhc_auth_token",
+        value=token,
+        max_age=TOKEN_EXPIRY,
+        httponly=False,
+        samesite="lax",
+    )
+    return resp
+
+@app.get("/api/auth/me")
+async def api_auth_me(request: Request):
+    token = _get_token_from_request(request)
+    if not token:
+        return JSONResponse({"ok": False, "message": "未登录"}, status_code=401)
+    user_info = _verify_token(token)
+    if not user_info:
+        return JSONResponse({"ok": False, "message": "登录已过期"}, status_code=401)
+    return {"ok": True, "user": user_info}
+
+@app.post("/api/auth/logout")
+async def api_auth_logout():
+    resp = JSONResponse({"ok": True})
+    resp.delete_cookie("rhc_auth_token")
+    return resp
 
 @app.middleware("http")
 async def no_cache_middleware(request, call_next):

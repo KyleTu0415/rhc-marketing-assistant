@@ -3,9 +3,8 @@
 <head>
 <script>
 (function(){
-  if (!localStorage.getItem('rhc_logged_in')) {
-    location.href = 'login.html';
-  }
+  var token = localStorage.getItem('rhc_auth_token');
+  if(!token) { window.location.href = 'login.html'; return; }
 })();
 </script>
 <meta charset="UTF-8">
@@ -838,7 +837,10 @@ function enterModule(page) {
 
 function handleLogout() {
   if (confirm('确定要退出登录吗？')) {
-    localStorage.removeItem('rhc_logged_in');
+    localStorage.removeItem('rhc_auth_token');
+    localStorage.removeItem('rhc_user_info');
+    // Clear cookie too
+    document.cookie = 'rhc_auth_token=; max-age=0; path=/';
     window.location.href = 'login.html';
   }
 }
@@ -1080,6 +1082,22 @@ function toggleInsightSave(id) {
 // 初始化渲染
 document.addEventListener('DOMContentLoaded', function() {
   renderInsightList('all');
+  // 动态加载用户信息
+  try {
+    var info = JSON.parse(localStorage.getItem('rhc_user_info') || '{}');
+    if (info.name) {
+      var nameEls = document.querySelectorAll('.user-name');
+      for (var i = 0; i < nameEls.length; i++) nameEls[i].textContent = info.name;
+      var roleEls = document.querySelectorAll('.user-role');
+      var roleMap = {admin:'管理员', sales:'销售部', viewer:'访客'};
+      for (var j = 0; j < roleEls.length; j++) roleEls[j].textContent = roleMap[info.role] || info.role || '';
+      var avatarEls = document.querySelectorAll('.user-avatar');
+      for (var k = 0; k < avatarEls.length; k++) avatarEls[k].textContent = info.name.charAt(0);
+      // 欢迎语
+      var greetEl = document.querySelector('.welcome-greeting');
+      if (greetEl) greetEl.innerHTML = '你好，' + info.name + ' <span class="wave">👋</span>';
+    }
+  } catch(e) {}
 });
 </script>
 <script src="assets/rhc-config.js?v=20260903b"></script>

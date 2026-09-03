@@ -3,9 +3,8 @@
 <head>
 <script>
 (function(){
-  if (!localStorage.getItem('rhc_logged_in')) {
-    location.href = 'login.html';
-  }
+  var token = localStorage.getItem('rhc_auth_token');
+  if(!token) { window.location.href = 'login.html'; return; }
 })();
 </script>
 <meta charset="UTF-8">
