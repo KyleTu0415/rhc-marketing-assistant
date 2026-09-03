@@ -32,6 +32,14 @@
       development:'全文约120词；价值前置，不用冗长自我介绍；针对客户业务定制、避免群发感；只给一个明确行动号召；首封不带附件',
       followup:'按报价后3天/7天/14天节奏；每次跟进带来新价值（新案例、新认证、库存或促销信息）；不催促施压；顺带回应客户此前未答问题',
       quotation:'注明PI编号、总金额与报价有效期；重申贸易条款（FOB/CIF等）与付款方式；明确下一步（回签PI/支付定金）；说明PI附件内容'
+    },
+    news:{
+      label:'新闻偏好',
+      categories:['industry','market','competitor','product'],
+      focusKeywords:'',
+      blockKeywords:'',
+      pageSize:12,
+      sortBy:'date'
     }
   };
 

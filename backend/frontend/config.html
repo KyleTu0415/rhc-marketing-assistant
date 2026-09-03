@@ -108,6 +108,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .perm-notice{display:flex;align-items:flex-start;gap:10px;background:var(--color-primary-xlight);border:1px solid var(--color-primary-light);border-radius:var(--radius-md);padding:12px 14px;font-size:12.5px;color:var(--color-primary-dark);line-height:1.7;margin-bottom:20px}
 .perm-notice svg{width:16px;height:16px;flex-shrink:0;margin-top:1px}
 .perm-notice strong{color:var(--color-primary)}
+
+/* ===== 新闻偏好 · 分类复选框 ===== */
+.news-cat-grid{display:flex;flex-wrap:wrap;gap:10px;padding:2px 0}
+.news-cat-check{display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--color-border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all var(--transition-fast);user-select:none}
+.news-cat-check:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.news-cat-check.checked{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+.news-cat-check input{display:none}
+.news-cat-check .cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.news-cat-check .cat-dot.industry{background:#1565C0}
+.news-cat-check .cat-dot.market{background:#2E7D32}
+.news-cat-check .cat-dot.competitor{background:#E65100}
+.news-cat-check .cat-dot.product{background:#7C3AED}
+.news-cat-check.checked .cat-dot{background:rgba(255,255,255,0.7)}
+.news-preview-hint{display:flex;align-items:center;gap:6px;margin-top:10px;padding:8px 12px;background:#F0F7FF;border-radius:var(--radius-sm);font-size:12px;color:#1A56C4;line-height:1.6}
+.news-preview-hint svg{width:14px;height:14px;flex-shrink:0}
+
 @media(max-width:860px){
   .sidebar{width:56px;min-width:56px}
   .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section,.sidebar .sidebar-user .user-info{display:none}
@@ -128,6 +144,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <div class="nav-item active" data-page="grading" onclick="switchPage('grading',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>客户分级规则</span></div>
     <div class="nav-item" data-page="signal" onclick="switchPage('signal',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg><span>商机信号规则</span></div>
     <div class="nav-item" data-page="mail" onclick="switchPage('mail',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>邮件写作规范</span></div>
+    <div class="nav-item" data-page="news" onclick="switchPage('news',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg><span>新闻偏好</span></div>
     <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
 </nav>
@@ -144,7 +161,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       </div>
 
       <div class="card">
-        <div class="card-header"><h3>打分维度与权重</h3><span class="card-sub">单位：分　·　建议五个维度满分合计 100</span></div>
+        <div class="card-header"><h3>打分维度与权重</h3><span class="card-sub">单位：分 · 建议五个维度满分合计 100</span></div>
         <div class="card-body">
           <div class="rule-group">
             <div class="rule-group-title">合作状态 <span class="tag tag-primary">满分 30</span></div>
@@ -292,6 +309,91 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       </div>
     </section>
 
+    <section class="page" id="page-news">
+      <div class="page-header">
+        <div><h2>新闻偏好</h2><p>定制市场洞察的新闻展示偏好，保存后新闻列表按个人偏好筛选与排序</p></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>个人新闻偏好设置</h3><span class="card-sub">每位销售可独立配置，保存在本浏览器内</span></div>
+        <div class="card-body">
+
+          <div class="rule-group">
+            <div class="rule-group-title">关注分类</div>
+            <div class="rule-group-desc">勾选想看到的新闻分类，未勾选的分类将被隐藏。至少保留一个分类。</div>
+            <div class="rule-rows">
+              <div class="rule-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+                <div class="news-cat-grid" id="news-cat-grid">
+                  <label class="news-cat-check checked" data-cat="industry" onclick="toggleCatCheck(this)">
+                    <input type="checkbox" value="industry" checked>
+                    <span class="cat-dot industry"></span>行业趋势
+                  </label>
+                  <label class="news-cat-check checked" data-cat="market" onclick="toggleCatCheck(this)">
+                    <input type="checkbox" value="market" checked>
+                    <span class="cat-dot market"></span>市场动态
+                  </label>
+                  <label class="news-cat-check checked" data-cat="competitor" onclick="toggleCatCheck(this)">
+                    <input type="checkbox" value="competitor" checked>
+                    <span class="cat-dot competitor"></span>同行新闻
+                  </label>
+                  <label class="news-cat-check checked" data-cat="product" onclick="toggleCatCheck(this)">
+                    <input type="checkbox" value="product" checked>
+                    <span class="cat-dot product"></span>产品技术
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rule-group">
+            <div class="rule-group-title">关注关键词</div>
+            <div class="rule-group-desc">新闻标题或摘要中包含以下关键词时优先展示（权重更高）。用英文逗号分隔，留空则不按关键词加权。</div>
+            <div class="rule-rows">
+              <div class="rule-row" style="flex-direction:column;align-items:stretch;gap:8px"><textarea id="n-focus-kw" rows="2" placeholder="例如：anesthesia, imaging, veterinary dental"></textarea></div>
+            </div>
+          </div>
+
+          <div class="rule-group">
+            <div class="rule-group-title">屏蔽关键词</div>
+            <div class="rule-group-desc">新闻标题或摘要命中以下关键词时直接隐藏，不再展示。用英文逗号分隔。</div>
+            <div class="rule-rows">
+              <div class="rule-row" style="flex-direction:column;align-items:stretch;gap:8px"><textarea id="n-block-kw" rows="2" placeholder="例如：used, second hand, recruitment"></textarea></div>
+            </div>
+          </div>
+
+          <div class="rule-group">
+            <div class="rule-group-title">显示与排序</div>
+            <div class="rule-rows">
+              <div class="rule-row">
+                <span class="rr-label">每页显示数量<small>新闻看板每批加载的条数</small></span>
+                <input type="number" min="4" max="50" id="n-page-size" value="12">
+                <span class="rr-unit">条</span>
+              </div>
+              <div class="rule-row">
+                <span class="rr-label">默认排序<small>新闻列表的默认排列方式</small></span>
+                <select id="n-sort-by" style="width:140px">
+                  <option value="date">最新优先</option>
+                  <option value="relevance">相关度优先</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="news-preview-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>偏好仅影响当前浏览器的新闻展示，不影响其他销售或后端数据源。修改后在门户首页和市场洞察看板即时生效。</span>
+          </div>
+
+          <div class="save-bar">
+            <span class="sb-hint">保存后市场洞察板块立即按新偏好筛选与排序。</span>
+            <div class="sb-actions">
+              <button class="btn btn-outline" onclick="resetSection('news')">恢复默认</button>
+              <button class="btn btn-primary" onclick="saveNews()">保存偏好</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     </main>
 </div>
 </div>
@@ -322,6 +424,20 @@ function updateTotal(){
   el.style.color=max===100?'var(--color-primary)':'var(--color-warning)';
 }
 
+/* ===== 新闻偏好 · 分类复选框 ===== */
+function toggleCatCheck(label){
+  var cb=label.querySelector('input');
+  /* toggle */
+  cb.checked=!cb.checked;
+  if(cb.checked) label.classList.add('checked');
+  else label.classList.remove('checked');
+  /* 至少保留一个 */
+  var checks=document.querySelectorAll('#news-cat-grid input[type=checkbox]');
+  var anyChecked=false;
+  for(var i=0;i<checks.length;i++){if(checks[i].checked){anyChecked=true;break;}}
+  if(!anyChecked){cb.checked=true;label.classList.add('checked');showToast('至少保留一个分类','error');}
+}
+
 function loadAll(){
   var cfg=RHC_CONFIG.get();
   var g=cfg.grading;
@@ -342,6 +458,20 @@ function loadAll(){
   document.getElementById('m-development').value=m.development||'';
   document.getElementById('m-followup').value=m.followup||'';
   document.getElementById('m-quotation').value=m.quotation||'';
+  /* 新闻偏好 */
+  var n=cfg.news||{};
+  var cats=n.categories||['industry','market','competitor','product'];
+  var checks=document.querySelectorAll('#news-cat-grid input[type=checkbox]');
+  for(var i=0;i<checks.length;i++){
+    var v=checks[i].value;
+    var label=checks[i].closest('.news-cat-check');
+    if(cats.indexOf(v)!==-1){checks[i].checked=true;label.classList.add('checked');}
+    else{checks[i].checked=false;label.classList.remove('checked');}
+  }
+  document.getElementById('n-focus-kw').value=n.focusKeywords||'';
+  document.getElementById('n-block-kw').value=n.blockKeywords||'';
+  setNum('n-page-size',n.pageSize||12);
+  document.getElementById('n-sort-by').value=n.sortBy||'date';
 }
 function persist(section){
   RHC_CONFIG.save(buildConfig());
@@ -349,6 +479,10 @@ function persist(section){
   showToast(section+'已保存，相关模块即时生效','success');
 }
 function buildConfig(){
+  /* 收集新闻分类 */
+  var catChecks=document.querySelectorAll('#news-cat-grid input[type=checkbox]');
+  var selCats=[];
+  for(var i=0;i<catChecks.length;i++){if(catChecks[i].checked)selCats.push(catChecks[i].value);}
   return {
     grading:{
       label:'客户分级规则',
@@ -374,6 +508,14 @@ function buildConfig(){
       development:document.getElementById('m-development').value.trim(),
       followup:document.getElementById('m-followup').value.trim(),
       quotation:document.getElementById('m-quotation').value.trim()
+    },
+    news:{
+      label:'新闻偏好',
+      categories:selCats,
+      focusKeywords:document.getElementById('n-focus-kw').value.trim(),
+      blockKeywords:document.getElementById('n-block-kw').value.trim(),
+      pageSize:num('n-page-size')||12,
+      sortBy:document.getElementById('n-sort-by').value
     }
   };
 }
@@ -387,6 +529,7 @@ function saveSignal(){
   persist('商机信号规则');
 }
 function saveMail(){persist('邮件写作规范')}
+function saveNews(){persist('新闻偏好')}
 function resetSection(sec){
   if(!confirm('恢复该板块为系统默认规则？当前修改将丢失。'))return;
   var def=RHC_CONFIG.DEFAULT;

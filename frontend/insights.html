@@ -224,6 +224,7 @@ a.news-card-title:hover{color:var(--color-primary)}
 
 <div class="toast" id="toast"></div>
 
+<script src="assets/rhc-config.js?v=20260903b"></script>
 <script src="assets/rhc-insights.js?v=20260903a"></script>
 <script>
 /* ============================================================
@@ -303,15 +304,61 @@ function esc(s) {
   });
 }
 
+function _getInsightNewsPrefs() {
+  try {
+    var cfg = (typeof RHC_CONFIG !== 'undefined') ? RHC_CONFIG.get() : {};
+    var n = cfg.news || {};
+    return {
+      categories: n.categories || ['industry','market','competitor','product'],
+      focusKw: (n.focusKeywords || '').toLowerCase().split(/[,，]/).map(function(s){return s.trim()}).filter(Boolean),
+      blockKw: (n.blockKeywords || '').toLowerCase().split(/[,，]/).map(function(s){return s.trim()}).filter(Boolean),
+      pageSize: n.pageSize || 12,
+      sortBy: n.sortBy || 'date'
+    };
+  } catch(e) { return { categories: ['industry','market','competitor','product'], focusKw: [], blockKw: [], pageSize: 12, sortBy: 'date' }; }
+}
+
 function buildData() {
+  var np = _getInsightNewsPrefs();
+  /* 动态调整 COL_BATCH */
+  COL_BATCH = Math.max(2, Math.ceil(np.pageSize / CATS.length));
   CATS.forEach(function(c){
     var items = RHC_INSIGHT_DATA.filter(function(it){ return it.category === c.key; });
-    items.sort(function(a, b){ return b.date.localeCompare(a.date); });
+    /* 屏蔽关键词 */
+    if (np.blockKw.length) {
+      items = items.filter(function(it) {
+        var blob = ((it.title || '') + ' ' + (it.summary || '')).toLowerCase();
+        for (var i = 0; i < np.blockKw.length; i++) {
+          if (blob.indexOf(np.blockKw[i]) !== -1) return false;
+        }
+        return true;
+      });
+    }
+    /* 排序 */
+    if (np.sortBy === 'relevance' && np.focusKw.length) {
+      items.sort(function(a, b) {
+        var blobA = ((a.title || '') + ' ' + (a.summary || '')).toLowerCase();
+        var blobB = ((b.title || '') + ' ' + (b.summary || '')).toLowerCase();
+        var sA = 0, sB = 0;
+        for (var i = 0; i < np.focusKw.length; i++) {
+          if (blobA.indexOf(np.focusKw[i]) !== -1) sA++;
+          if (blobB.indexOf(np.focusKw[i]) !== -1) sB++;
+        }
+        if (sA !== sB) return sB - sA;
+        return b.date.localeCompare(a.date);
+      });
+    } else {
+      items.sort(function(a, b){ return b.date.localeCompare(a.date); });
+    }
     _colData[c.key] = items;
     _colLoaded[c.key] = 0;
-    document.getElementById('col-count-' + c.key).textContent = items.length;
+    /* 分类是否启用：未启用则显示 0 */
+    var catEnabled = np.categories.indexOf(c.key) !== -1;
+    document.getElementById('col-count-' + c.key).textContent = catEnabled ? items.length : 0;
+    if (!catEnabled) _colData[c.key] = [];
   });
-  var total = RHC_INSIGHT_DATA.length;
+  var total = 0;
+  CATS.forEach(function(c){ total += _colData[c.key].length; });
   document.getElementById('board-count').textContent = total;
   var t = formatRefreshTime(window.__LAST_REFRESH);
   document.getElementById('board-latest').textContent = t || '—';
