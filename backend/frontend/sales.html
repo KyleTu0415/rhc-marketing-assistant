@@ -315,6 +315,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
               <textarea id="mail-keypoints" rows="4" placeholder="填写客户关注点、报价要点、特殊条款等关键信息"></textarea>
             </div>
             <div class="form-group">
+              <div class="style-panel" id="mail-style-panel">
+                <div class="style-panel-header">
+                  <label style="margin:0;display:flex;align-items:center;gap:4px">🎯 客户沟通风格 <span>（AI 推荐，可调整）</span></label>
+                  <span class="style-panel-toggle" onclick="toggleStylePanel()" id="style-panel-toggle">收起 ▴</span>
+                </div>
+                <div id="style-rows-container"><!-- JS 动态渲染 --></div>
+              </div>
+            </div>
+            <div class="form-group">
               <label style="display:flex;align-items:center;justify-content:space-between">
                 <span>📚 个人素材库</span>
                 <a href="javascript:void(0)" onclick="openLibraryModal()" style="font-size:12px;color:var(--color-primary);font-weight:normal">管理素材库 →</a>
@@ -499,6 +508,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 }
 .lib-empty .lib-empty-title{font-size:13px;font-weight:600;color:var(--color-text-secondary)}
 .lib-empty .lib-empty-desc{font-size:11px;color:var(--color-text-tertiary);max-width:280px;line-height:1.6}
+
+/* ===== 客户沟通风格面板 ===== */
+.style-panel{background:var(--color-bg-subtle,#f8f9fb);border:1px solid var(--color-border-light);border-radius:8px;padding:12px 14px;margin-bottom:4px;transition:all .2s}
+.style-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.style-panel-header span{font-size:12px;color:var(--color-text-tertiary);font-weight:normal}
+.style-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.style-row:last-child{margin-bottom:0}
+.style-row label{width:82px;font-size:12px;color:var(--color-text-secondary);flex-shrink:0;font-weight:500}
+.style-row select{flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--color-border);border-radius:6px;background:#fff;color:var(--color-text-primary);cursor:pointer;transition:border-color .15s}
+.style-row select:focus{outline:none;border-color:var(--color-primary)}
+.style-badge{font-size:10px;color:#fff;background:var(--color-primary);border-radius:4px;padding:2px 6px;white-space:nowrap;flex-shrink:0;transition:background .15s}
+.style-badge.manual{background:#f59e0b}
+.style-panel-toggle{font-size:12px;color:var(--color-primary);cursor:pointer;font-weight:500;user-select:none}
+.style-panel-toggle:hover{text-decoration:underline}
+.style-panel.collapsed .style-row{display:none}
+.style-panel.collapsed .style-panel-header{margin-bottom:0}
 
 </style>
 <div id="library-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center">
@@ -709,6 +734,129 @@ function piNo(){
   var t=new Date();
   return 'PI-FRAME-'+String(t.getFullYear()).slice(2)+String(t.getMonth()+1).padStart(2,'0')+'-'+String(Math.floor(Math.random()*900)+100);
 }
+
+/* ===== 客户沟通风格维度 ===== */
+var STYLE_DIMENSIONS={
+  tone:{label:'语气正式度',options:[
+    {value:'highly_formal',label:'高度正式（政府/日德/首次联系）'},
+    {value:'business_formal',label:'商务正式（经销商/常规商务）'},
+    {value:'business_friendly',label:'商务友好（已建立关系）'},
+    {value:'casual_warm',label:'轻松亲和（老客户/展会熟客）'}
+  ]},
+  detail:{label:'内容详略度',options:[
+    {value:'concise',label:'精简型（直奔主题）'},
+    {value:'standard',label:'标准型（完整回应）'},
+    {value:'detailed',label:'详细型（逐条展开+数据）'}
+  ]},
+  persuasion:{label:'说服策略',options:[
+    {value:'data_driven',label:'数据驱动（规格/参数/ROI）'},
+    {value:'case_driven',label:'案例驱动（成功案例/客户见证）'},
+    {value:'relationship_driven',label:'关系驱动（长期合作/信任）'},
+    {value:'value_driven',label:'价值驱动（性价比/差异化）'}
+  ]},
+  urgency:{label:'紧迫感',options:[
+    {value:'none',label:'无压力（No rush…）'},
+    {value:'mild',label:'轻微引导（库存/优先发货）'},
+    {value:'moderate',label:'适度紧迫（报价有效期/限时）'}
+  ]},
+  culture:{label:'文化适配',options:[
+    {value:'germanic',label:'德系/北欧（重数据认证/少寒暄）'},
+    {value:'middle_east',label:'中东/南美（重关系/多寒暄）'},
+    {value:'north_american',label:'北美（高效直接/重结果）'},
+    {value:'east_asian',label:'日韩（高度正式/重礼节）'},
+    {value:'southeast_asian',label:'东南亚（友好温和/重性价比）'},
+    {value:'generic',label:'通用'}
+  ]}
+};
+
+var COUNTRY_PRESETS={
+  '德国':{tone:'highly_formal',detail:'detailed',persuasion:'data_driven',urgency:'none',culture:'germanic'},
+  '奥地利':{tone:'highly_formal',detail:'detailed',persuasion:'data_driven',urgency:'none',culture:'germanic'},
+  '瑞士':{tone:'highly_formal',detail:'detailed',persuasion:'data_driven',urgency:'none',culture:'germanic'},
+  '英国':{tone:'business_formal',detail:'standard',persuasion:'data_driven',urgency:'mild',culture:'germanic'},
+  '法国':{tone:'business_formal',detail:'standard',persuasion:'data_driven',urgency:'mild',culture:'germanic'},
+  '美国':{tone:'business_friendly',detail:'standard',persuasion:'value_driven',urgency:'mild',culture:'north_american'},
+  '加拿大':{tone:'business_friendly',detail:'standard',persuasion:'value_driven',urgency:'mild',culture:'north_american'},
+  '阿联酋':{tone:'business_formal',detail:'detailed',persuasion:'relationship_driven',urgency:'none',culture:'middle_east'},
+  '沙特':{tone:'business_formal',detail:'detailed',persuasion:'relationship_driven',urgency:'none',culture:'middle_east'},
+  '巴西':{tone:'business_friendly',detail:'standard',persuasion:'relationship_driven',urgency:'mild',culture:'middle_east'},
+  '智利':{tone:'business_friendly',detail:'standard',persuasion:'value_driven',urgency:'mild',culture:'middle_east'},
+  '日本':{tone:'highly_formal',detail:'detailed',persuasion:'data_driven',urgency:'none',culture:'east_asian'},
+  '韩国':{tone:'highly_formal',detail:'detailed',persuasion:'data_driven',urgency:'none',culture:'east_asian'},
+  '泰国':{tone:'business_friendly',detail:'standard',persuasion:'value_driven',urgency:'none',culture:'southeast_asian'},
+  '越南':{tone:'business_friendly',detail:'standard',persuasion:'value_driven',urgency:'none',culture:'southeast_asian'},
+  '印尼':{tone:'business_friendly',detail:'standard',persuasion:'value_driven',urgency:'none',culture:'southeast_asian'},
+  '_default':{tone:'business_formal',detail:'standard',persuasion:'data_driven',urgency:'mild',culture:'generic'}
+};
+
+var styleManualOverrides={};  // key: dimKey, value: true if user manually changed
+
+function getRecommendedStyle(country){
+  if(country){
+    for(var k in COUNTRY_PRESETS){
+      if(k!=='_default'&&country.indexOf(k)>=0)return COUNTRY_PRESETS[k];
+    }
+  }
+  return COUNTRY_PRESETS['_default'];
+}
+
+function renderStylePanel(){
+  var container=document.getElementById('style-rows-container');
+  if(!container)return;
+  var rec=getRecommendedStyle('');
+  var html='';
+  for(var key in STYLE_DIMENSIONS){
+    var dim=STYLE_DIMENSIONS[key];
+    html+='<div class="style-row"><label>'+dim.label+'</label>';
+    html+='<select id="style-'+key+'" onchange="onStyleChange(\''+key+'\',this)">';
+    dim.options.forEach(function(opt){
+      html+='<option value="'+opt.value+'"'+(opt.value===rec[key]?' selected':'')+'>'+opt.label+'</option>';
+    });
+    html+='</select>';
+    html+='<span class="style-badge" id="badge-'+key+'">AI推荐</span>';
+    html+='</div>';
+  }
+  container.innerHTML=html;
+}
+
+function onStyleChange(key,sel){
+  styleManualOverrides[key]=true;
+  var badge=document.getElementById('badge-'+key);
+  if(badge){badge.textContent='手动';badge.className='style-badge manual';}
+}
+
+function updateStyleRecommendation(country){
+  var rec=getRecommendedStyle(country);
+  for(var key in STYLE_DIMENSIONS){
+    var sel=document.getElementById('style-'+key);
+    if(!sel)continue;
+    if(!styleManualOverrides[key]){
+      sel.value=rec[key]||COUNTRY_PRESETS['_default'][key];
+      var badge=document.getElementById('badge-'+key);
+      if(badge){badge.textContent='AI推荐';badge.className='style-badge';}
+    }
+  }
+}
+
+function toggleStylePanel(){
+  var panel=document.getElementById('mail-style-panel');
+  var toggle=document.getElementById('style-panel-toggle');
+  if(!panel||!toggle)return;
+  panel.classList.toggle('collapsed');
+  toggle.textContent=panel.classList.contains('collapsed')?'展开 ▾':'收起 ▴';
+}
+
+function getStylePromptText(){
+  var parts=[];
+  for(var key in STYLE_DIMENSIONS){
+    var sel=document.getElementById('style-'+key);
+    if(!sel)continue;
+    var opt=sel.options[sel.selectedIndex];
+    parts.push(STYLE_DIMENSIONS[key].label+'：'+opt.label);
+  }
+  return parts.join('；');
+}
+
 function switchMailTab(type){
   mailType=type;
   var tabs=document.querySelectorAll('#mail-tabs .mail-tab');
@@ -719,6 +867,14 @@ function onMailCustomerChange(){
   var sel=document.getElementById('mail-customer');
   var manual=document.getElementById('mail-customer-manual');
   manual.style.display=(sel.value==='__manual__')?'block':'none';
+  // 切换客户时重置手动覆盖，按新客户的国家推荐风格
+  styleManualOverrides={};
+  var country='';
+  if(sel.value&&sel.value!=='__manual__'){
+    var c=(snapshotData.customers||[]).filter(function(x){return x['客户名称']===sel.value})[0]||{};
+    country=c['国家/地区']||c['国家地区']||'';
+  }
+  updateStyleRecommendation(country);
 }
 /* ===== 多选下拉通用交互 ===== */
 function toggleMs(btn){
@@ -814,6 +970,7 @@ function generateMail(){
   if(selectedMaterials.length>0){
     materialText='[参考素材]\n'+selectedMaterials.map(function(m,i){return (i+1)+'. '+m.title+' —— '+m.summary}).join('\n')+'\n';
   }
+  var styleText=getStylePromptText();
   var prompt='你是 RHC Medical（兽用医疗设备制造商）的外贸销售。'+MAIL_TYPES[mailType].prompt+'\n'+
     '邮件类型：'+MAIL_TYPES[mailType].label+'\n'+
     '客户名称：'+ctx.customerName+'\n'+
@@ -821,6 +978,7 @@ function generateMail(){
     '相关产品：'+prodText+'\n'+
     '关键要点：'+(keyPoints||'（客户未补充要点，请按通用专业表述处理）')+'\n'+
     (materialText?materialText:'')+
+    (styleText?'沟通风格偏好（请严格遵循）：'+styleText+'\n':'')+
     '写作规范（必须遵守）：'+MAIL_TYPES[mailType].rule+'\n'+
     '请输出一封专业英文商务邮件：第一行为 "Subject: 邮件主题"，空一行后为正文；落款统一使用 "Sales Team, RHC Medical"，不要写具体人名；不要输出任何中文或解释说明。';
 
@@ -1046,6 +1204,7 @@ switchMailTab('inquiry');
 renderProductPick();
 renderMailProducts(PRODUCTS);
 renderMailMaterials();
+renderStylePanel();
 fetch('/api/products',{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('products '+r.status);return r.json()})
   .then(function(d){
