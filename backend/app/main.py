@@ -1059,22 +1059,29 @@ _EMAIL_BAD_DOMAIN_KEYWORDS = ("schema", "wordpress", "w3.org", "sentry")
 _EMAIL_IMAGE_SUFFIXES = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp", ".ico")
 
 
-def _http_get(url: str, timeout: int = _EMAIL_FETCH_TIMEOUT) -> str:
-    """带浏览器 UA 的 GET，返回解码后的 HTML 文本；任何异常抛出由调用方吞掉。"""
-    import urllib.request as _ur
-    req = _ur.Request(url, headers={
-        "User-Agent": _FIND_UA,
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8",
-    })
-    with _ur.urlopen(req, timeout=timeout) as r:
+# 带 CookieJar 的全局 opener：跟随 302/301 并保存 cookie，
+# 应对 Bing 等搜索引擎在数据中心 IP 上的「302 挑战 + Set-Cookie」反爬
+import urllib.request as _ur_mod
+import http.cookiejar as _cookiejar_mod
+_web_cookiejar = _cookiejar_mod.CookieJar()
+_web_opener = _ur_mod.build_opener(_ur_mod.HTTPCookieProcessor(_web_cookiejar))
+_web_opener.addheaders = [
+    ("User-Agent", _FIND_UA),
+    ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
+    ("Accept-Language", "en-US,en;q=0.9,zh-CN;q=0.8"),
+]
+
+
+def _http_fetch(url: str, timeout: int = _EMAIL_FETCH_TIMEOUT):
+    """带浏览器 UA + cookie 的 GET，跟随重定向。
+    返回 (final_url, html_text)；非 HTML/异常时返回 (url, "") 或抛出由调用方处理。"""
+    with _web_opener.open(url, timeout=timeout) as r:
         ctype = r.headers.get("Content-Type", "")
+        final_url = r.geturl()
         if "text/html" not in ctype and "application/xhtml" not in ctype and \
-           "text/plain" not in ctype and not url.endswith((".html", ".htm", "/")):
-            # 非 HTML 资源（PDF/图片/下载件）不抓取
-            return ""
-        raw = r.read(2_000_000)  # 最多读 2MB，避免大文件拖慢
-    # 尝试按 charset 解码，失败回退 utf-8
+           "text/plain" not in ctype and not final_url.endswith((".html", ".htm", "/")):
+            return final_url, ""
+        raw = r.read(2_000_000)
     enc = "utf-8"
     try:
         m = re.search(r"charset=([\w-]+)", ctype, re.I)
@@ -1082,7 +1089,83 @@ def _http_get(url: str, timeout: int = _EMAIL_FETCH_TIMEOUT) -> str:
             enc = m.group(1)
     except Exception:
         pass
-    return raw.decode(enc, "ignore")
+    return final_url, raw.decode(enc, "ignore")
+
+
+def _http_get(url: str, timeout: int = _EMAIL_FETCH_TIMEOUT) -> str:
+    """带浏览器 UA 的 GET，返回解码后的 HTML 文本；任何异常抛出由调用方吞掉。"""
+    return _http_fetch(url, timeout)[1]
+
+
+def _company_slug(company: str) -> str:
+    """公司名 -> 域名 slug：去法律后缀（Inc/Ltd/LLC...）、去空格标点、小写。"""
+    c = (company or "").lower()
+    # 法律/公司后缀（先长后短，避免 Inc 误伤）
+    for suf in ("limited", "company", "co.,ltd", "co. ltd", "corporation",
+                "incorporated", "holdings", "group", "technologies",
+                "technology", "solutions", "medical", "healthcare",
+                "vet", "veterinary", "animal health", "pharmaceuticals",
+                "pharma", "l.l.c", "llc", "ltd", "inc", "corp", "co.", "co",
+                "gmbh", "pvt", "pte", "s.a.", "s.a", "s.r.l"):
+        c = re.sub(r"[\s\.\-,]?" + re.escape(suf) + r"\.?$", "", c.strip())
+    c = re.sub(r"[^a-z0-9]", "", c)
+    return c
+
+
+def _company_keywords(company: str) -> list:
+    """公司名关键词（用于首页内容匹配）：去掉常见通用词与过短词。"""
+    stop = {"the", "and", "of", "inc", "ltd", "llc", "corp", "co", "company",
+            "group", "limited", "gmbh", "medical", "health", "healthcare",
+            "vet", "veterinary", "animal", "pharmaceuticals", "pharma",
+            "international", "global", "new", "usa", "us"}
+    words = re.findall(r"[a-zA-Z0-9]+", (company or "").lower())
+    return [w for w in words if len(w) >= 4 and w not in stop]
+
+
+def _homepage_matches_company(html_text: str, company: str, slug: str) -> bool:
+    """首页 title/正文包含公司关键词或 slug 即认定为该公司官网。"""
+    if not html_text:
+        return False
+    m = re.search(r"<title[^>]*>(.*?)</title>", html_text, re.I | re.S)
+    head = ((m.group(1) if m else "") + " " + html_text[:40000]).lower()
+    slug = (slug or "").lower()
+    if len(slug) >= 4 and slug in head:
+        return True
+    for kw in _company_keywords(company):
+        if kw in head:
+            return True
+    return False
+
+
+def _validate_candidate_urls(urls: list, company: str, logs: list,
+                             tag: str, deadline: float, limit: int = 2) -> list:
+    """对候选 URL 取首页，验证是否为目标公司官网；返回命中的 host 列表（按注册域去重）。"""
+    hosts = []
+    seen_reg = set()
+    for u in urls:
+        if time.time() >= deadline or len(hosts) >= limit:
+            break
+        try:
+            u = u.strip()
+            if not u or not u.lower().startswith("http"):
+                continue
+            if u.lower().endswith(".pdf"):
+                continue
+            netloc = _host_of(u)
+            if not netloc or _is_skippable_host(netloc):
+                continue
+            final_url, html_text = _http_fetch(u)
+            final_host = _host_of(final_url) or netloc
+            reg = _reg_host(final_host)
+            if reg in seen_reg:
+                continue
+            if _homepage_matches_company(html_text, company, _company_slug(company)):
+                seen_reg.add(reg)
+                hosts.append(final_host)
+        except Exception as e:
+            logs.append(f"{tag} 校验 {_host_of(u) or u[:40]} 失败:{type(e).__name__}")
+            continue
+    return hosts
 
 
 def _ddg_real_url(href: str) -> str:
@@ -1119,15 +1202,12 @@ def _search_ddg(company: str) -> list:
 
 
 def _search_bing(company: str) -> list:
-    """Bing 备用搜索，从结果 <a href="http..."> 提取外链。"""
+    """Bing 搜索（末级降级）：用 CookieJar opener 跟随 302 挑战/重定向后解析外链。"""
     import urllib.parse as _up
-    import urllib.request as _ur
     from urllib.parse import urlparse
     q = _up.urlencode({"q": company + " contact email"})
     url = "https://www.bing.com/search?" + q
-    req = _ur.Request(url, headers={"User-Agent": _FIND_UA,
-                                    "Accept-Language": "en-US,en;q=0.9"})
-    with _ur.urlopen(req, timeout=_EMAIL_FETCH_TIMEOUT) as r:
+    with _web_opener.open(url, timeout=_EMAIL_FETCH_TIMEOUT) as r:
         html_text = r.read(1_500_000).decode("utf-8", "ignore")
     out = []
     for m in re.finditer(r'<a[^>]+href="(https?://[^"]+)"', html_text):
@@ -1136,11 +1216,153 @@ def _search_bing(company: str) -> list:
             host = urlparse(u).netloc.lower()
         except Exception:
             continue
-        if not host or "bing.com" in host or "microsoft.com" in host:
+        if not host or "bing.com" in host or "microsoft.com" in host or \
+           "baidu.com" in host or "zhihu.com" in host or "sogou.com" in host:
             continue
         if u not in out:
             out.append(u)
     return out
+
+
+def _discover_by_guess(company: str, logs: list, deadline: float) -> list:
+    """第 1 级：直猜域名（slug.com/.org + http 兜底），首页内容匹配即认定官网。"""
+    tag = "直猜域名"
+    slug = _company_slug(company)
+    if len(slug) < 4:
+        logs.append(f"{tag}:公司名过短跳过")
+        return []
+    candidates = [
+        f"https://www.{slug}.com/",
+        f"https://{slug}.com/",
+        f"https://www.{slug}.org/",
+        f"https://{slug}.org/",
+        f"http://www.{slug}.com/",
+        f"http://{slug}.com/",
+    ]
+    return _validate_candidate_urls(candidates, company, logs, tag, deadline, limit=1)
+
+
+def _search_ddg_ia(company: str) -> list:
+    """第 2 级：DuckDuckGo Instant Answer API（机房友好），收集 Abstract/Results/Related 中的 URL。"""
+    import urllib.parse as _up
+    import urllib.request as _ur
+    q = _up.urlencode({"q": company, "format": "json",
+                       "no_html": "1", "no_redirect": "1"})
+    url = "https://api.duckduckgo.com/?" + q
+    req = _ur.Request(url, headers={"User-Agent": _FIND_UA})
+    with _ur.urlopen(req, timeout=_EMAIL_FETCH_TIMEOUT) as r:
+        data = json.loads(r.read(500_000).decode("utf-8", "ignore"))
+    urls = []
+
+    def collect(node):
+        if isinstance(node, dict):
+            for k in ("AbstractURL", "FirstURL", "OfficialSiteURL"):
+                v = node.get(k)
+                if isinstance(v, str) and v.startswith("http") and v not in urls:
+                    urls.append(v)
+            # Results / RelatedTopics 可能嵌套
+            for v in node.values():
+                if isinstance(v, (list, dict)):
+                    collect(v)
+        elif isinstance(node, list):
+            for it in node:
+                collect(it)
+    collect(data)
+    return urls
+
+
+def _discover_by_ddg_ia(company: str, logs: list, deadline: float) -> list:
+    try:
+        urls = _search_ddg_ia(company)
+        if not urls:
+            logs.append("DDG-IA:无结果")
+            return []
+        return _validate_candidate_urls(urls, company, logs, "DDG-IA", deadline)
+    except Exception as e:
+        logs.append(f"DDG-IA:{type(e).__name__}")
+        return []
+
+
+def _search_wikipedia(company: str) -> list:
+    """第 3 级：Wikipedia API（机房友好）。搜索词条 -> parse externlinks 取官网外链。"""
+    import urllib.parse as _up
+    import urllib.request as _ur
+    base = "https://en.wikipedia.org/w/api.php?"
+    # 1) 搜索词条
+    q = _up.urlencode({"action": "query", "list": "search",
+                       "srsearch": company, "format": "json", "srlimit": "1"})
+    req = _ur.Request(base + q, headers={"User-Agent": _FIND_UA})
+    with _ur.urlopen(req, timeout=_EMAIL_FETCH_TIMEOUT) as r:
+        data = json.loads(r.read(300_000).decode("utf-8", "ignore"))
+    hits = data.get("query", {}).get("search", [])
+    if not hits:
+        return []
+    title = hits[0].get("title", "")
+    # 2) 取该页外链
+    q2 = _up.urlencode({"action": "parse", "page": title,
+                        "prop": "externlinks", "format": "json",
+                        "limit": "30"})
+    req2 = _ur.Request(base + q2, headers={"User-Agent": _FIND_UA})
+    with _ur.urlopen(req2, timeout=_EMAIL_FETCH_TIMEOUT) as r2:
+        d2 = json.loads(r2.read(500_000).decode("utf-8", "ignore"))
+    urls = []
+    for link in d2.get("parse", {}).get("externlinks", []):
+        for v in link.values():
+            if isinstance(v, str) and v.startswith("http") and v not in urls:
+                urls.append(v)
+    return urls
+
+
+def _discover_by_wikipedia(company: str, logs: list, deadline: float) -> list:
+    try:
+        urls = _search_wikipedia(company)
+        if not urls:
+            logs.append("Wikipedia:无词条或外链")
+            return []
+        return _validate_candidate_urls(urls, company, logs, "Wikipedia", deadline)
+    except Exception as e:
+        logs.append(f"Wikipedia:{type(e).__name__}")
+        return []
+
+
+def _discover_by_search_engines(company: str, logs: list, deadline: float) -> list:
+    """第 4 级（末级）：DDG HTML + Bing（CookieJar 跟随 302），结果链接取首页验证。"""
+    urls = []
+    try:
+        for u in _search_ddg(company):
+            if u not in urls:
+                urls.append(u)
+    except Exception as e:
+        logs.append(f"DDG-HTML:{type(e).__name__}")
+    try:
+        for u in _search_bing(company):
+            if u not in urls:
+                urls.append(u)
+    except Exception as e:
+        logs.append(f"Bing:{type(e).__name__}")
+    if not urls:
+        return []
+    return _validate_candidate_urls(urls, company, logs, "搜索引擎", deadline)
+
+
+def _discover_official_hosts(company: str, deadline: float):
+    """多级降级发现官网域名。返回 (hosts, logs)。
+    顺序：直猜域名 -> DDG Instant Answer -> Wikipedia -> DDG HTML/Bing。
+    任一级命中即返回；各级失败原因记入 logs 供 502 排查。"""
+    logs = []
+    hosts = _discover_by_guess(company, logs, deadline)
+    if hosts or time.time() >= deadline:
+        if not hosts:
+            logs.append("直猜域名无命中")
+        return hosts, logs
+    hosts = _discover_by_ddg_ia(company, logs, deadline)
+    if hosts or time.time() >= deadline:
+        return hosts, logs
+    hosts = _discover_by_wikipedia(company, logs, deadline)
+    if hosts or time.time() >= deadline:
+        return hosts, logs
+    hosts = _discover_by_search_engines(company, logs, deadline)
+    return hosts, logs
 
 
 def _host_of(url: str) -> str:
@@ -1305,32 +1527,11 @@ def find_lead_email_candidates(company: str, signal_url: str = "") -> dict:
     import html as _html
     deadline = time.time() + _FIND_EMAIL_BUDGET
 
-    # 1) 搜索引擎：首选 DDG，失败/不足回退 Bing
-    result_urls = []
-    engines_ok = 0
-    try:
-        r1 = _search_ddg(company)
-        if r1:
-            engines_ok += 1
-            result_urls.extend(r1)
-    except Exception as e:
-        print(f"[find-email] DuckDuckGo 搜索失败: {e}")
-    if len(result_urls) < 2:
-        try:
-            r2 = _search_bing(company)
-            if r2:
-                engines_ok += 1
-                for u in r2:
-                    if u not in result_urls:
-                        result_urls.append(u)
-        except Exception as e:
-            print(f"[find-email] Bing 搜索失败: {e}")
-    if engines_ok == 0:
-        raise RuntimeError("all search engines failed")
-
-    # 2) 候选官网域名（前 4 个）
-    official_hosts = _candidate_official_domains(result_urls)
+    # 1) 多级降级找官网域名：直猜域名 -> DDG-IA -> Wikipedia -> DDG HTML/Bing
+    #    数据中心 IP 常被搜索引擎拦截，直猜与 API 类入口机房友好，故优先。
+    official_hosts, discover_logs = _discover_official_hosts(company, deadline)
     official_regs = {_reg_host(h) for h in official_hosts}
+    print(f"[find-email] 官网发现（{company}）: {official_hosts or '无'} | {' ; '.join(discover_logs)}")
 
     found = []
     seen = set()
@@ -1378,8 +1579,15 @@ def find_lead_email_candidates(company: str, signal_url: str = "") -> dict:
     found.sort(key=lambda x: 0 if x.get("kind") == "官网" else 1)
     candidates = found[:5]
     if not candidates:
-        return {"ok": True, "candidates": [],
-                "message": "未在公开网页自动找到邮箱，可手动搜索或查看原文联系页"}
+        if official_hosts:
+            # 找到了官网但页面未提取到邮箱：属正常空结果
+            return {"ok": True, "candidates": [],
+                    "message": "未在公开网页自动找到邮箱，可手动搜索或查看原文联系页"}
+        # 官网发现链路全失败（数据中心被拦/超时等）：抛错附各级原因，供接口返回 502 排查
+        reason = "；".join(discover_logs) if discover_logs else "全部入口无响应"
+        if len(reason) > 200:
+            reason = reason[:200]
+        raise RuntimeError(f"官网发现失败：{reason}")
     return {"ok": True, "candidates": candidates}
 
 
@@ -1410,9 +1618,14 @@ async def api_leads_find_email(req: LeadFindEmailRequest, request: Request):
     try:
         result = find_lead_email_candidates(company, signal_url)
     except RuntimeError as e:
+        # 官网发现链路全失败：detail 附各级原因（截断 200 字符），便于线上排查
         print(f"[find-email] 搜索服务失败（{company}）: {e}")
-        return JSONResponse({"detail": "搜索服务暂不可用，请稍后重试或手动搜索"},
-                            status_code=502)
+        reason = str(e)
+        if len(reason) > 200:
+            reason = reason[:200]
+        return JSONResponse(
+            {"detail": f"搜索服务暂不可用，请稍后重试或手动搜索（{reason}）"},
+            status_code=502)
     except Exception as e:
         print(f"[find-email] 查找异常（{company}）: {e}")
         return JSONResponse({"detail": "搜索服务暂不可用，请稍后重试或手动搜索"},

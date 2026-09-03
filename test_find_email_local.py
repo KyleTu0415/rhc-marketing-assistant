@@ -133,10 +133,33 @@ bad = ["a@example.com", "x@sentry.io", "logo@2x.png", "y@w3.org", "z@schema.org"
 valid = [e for e in bad if main._is_valid_email(e)]
 check("噪声邮箱过滤", valid == ["good@acmevet.com", "sales@acmevet.com"], str(valid))
 
-# 6) 端到端（官网 host=127.0.0.1，https 失败走 http 兜底）
-main._search_ddg = lambda c: [BASE + "/", BASE + "/contact-us/",
-                              "https://www.facebook.com/x", BASE + "/files/catalog.pdf"]
-main._search_bing = lambda c: [BASE + "/about-us"]
+# 5b) 公司名 -> slug
+check("slug 去 Inc 后缀", main._company_slug("Zoetis Inc.") == "zoetis", main._company_slug("Zoetis Inc."))
+check("slug 多词连写", main._company_slug("Acme Veterinary Supplies Ltd") == "acmeveterinarysupplies")
+check("首页匹配公司关键词", main._homepage_matches_company("<title>Acme Vet Supplies</title>", "Acme Vet", "acmevet") is True)
+check("无关首页不匹配", main._homepage_matches_company("<title>Wikipedia</title>x"*1, "Acme Vet", "acmevet") is False)
+
+# 5c) 多级降级：第 1 级直猜命中即不调用后续级
+_calls = []
+def _lvl_good(c, logs, dl): _calls.append("guess"); return ["www.acmevet.com"]
+def _lvl_bad(c, logs, dl): _calls.append("later"); return ["should-not-be-used"]
+main._discover_by_guess = _lvl_good
+main._discover_by_ddg_ia = _lvl_bad
+main._discover_by_wikipedia = _lvl_bad
+main._discover_by_search_engines = _lvl_bad
+_h, _l = main._discover_official_hosts("Acme", time.time()+35)
+check("直猜命中即短路后续级", _calls == ["guess"] and _h == ["www.acmevet.com"], str(_calls))
+# 前级失败逐级降级
+_calls = []
+main._discover_by_guess = lambda c, logs, dl: (_calls.append("g"), [])[1]
+main._discover_by_ddg_ia = lambda c, logs, dl: (_calls.append("ia"), [])[1]
+main._discover_by_wikipedia = lambda c, logs, dl: (_calls.append("w"), ["wikipedia-found.com"])[1]
+main._discover_by_search_engines = lambda c, logs, dl: (_calls.append("b"), ["x.com"])[1]
+_h, _l = main._discover_official_hosts("Acme", time.time()+35)
+check("逐级降级到 Wikipedia 命中", _calls == ["g", "ia", "w"] and _h == ["wikipedia-found.com"], str(_calls))
+
+# 6) 端到端：mock 官网发现返回本地 mock host（https 失败走 http 兜底）
+main._discover_official_hosts = lambda c, dl: ([f"127.0.0.1:{port}"], ["直猜域名命中"])
 t0 = time.time()
 res = main.find_lead_email_candidates("Acme Vet Supplies", NEWS)
 elapsed = time.time() - t0
@@ -157,35 +180,44 @@ check("每条含 source_url/host/kind",
       all(c.get("source_url") and c.get("host") and c.get("kind") for c in res["candidates"]))
 check(f"耗时 {elapsed:.1f}s < 35s", elapsed < 35)
 
-# 7) 双引擎全失败 -> RuntimeError
-def boom(c): raise Exception("network down")
-main._search_ddg = boom; main._search_bing = boom
+# 7) 官网发现链路全失败（各级返回空/原因入日志）-> RuntimeError 且含原因摘要
+main._discover_official_hosts = lambda c, dl: ([], ["直猜域名无命中", "DDG-IA:URLError",
+                                                    "Wikipedia:URLError", "Bing:302 挑战"])
 try:
     main.find_lead_email_candidates("Nobody Co")
-    check("双引擎失败抛 RuntimeError", False)
-except RuntimeError:
-    check("双引擎失败抛 RuntimeError", True)
+    check("官网发现全失败抛 RuntimeError", False)
+except RuntimeError as e:
+    check("官网发现全失败抛 RuntimeError", "官网发现失败" in str(e) and "Wikipedia" in str(e), str(e)[:100])
 
-# 8) 引擎成功但全是死链 -> 空候选 + message
-main._search_ddg = lambda c: ["https://www.empty-site-xyz123-test.com/"]
-main._search_bing = lambda c: []
+# 8) 发现到官网但页面无邮箱 -> 空候选 + message（不算失败）
+main._discover_official_hosts = lambda c, dl: (["127.0.0.1:%d" % port], ["直猜命中"])
+# mock 官网首页/子页均无邮箱：用一个返回空 body 的路径 —— 复用 /press 含 press@…，故改为空站
+ROUTES["/empty"] = ("text/html; charset=utf-8", "<html><body>welcome no contact info here</body></html>")
+def _empty_discovery(c, dl):
+    # 返回一个 host，其首页与 contact/about 都无邮箱：直接 monkeypatch 抓取
+    return ["127.0.0.1:%d" % port], ["直猜命中"]
+_orig_crawl = main._crawl_official_site
+main._crawl_official_site = lambda host, dl: [{"url": BASE + "/empty", "html": ROUTES["/empty"][1]}]
 res2 = main.find_lead_email_candidates("Empty Co", "")
-check("无结果返回空候选+message",
+main._crawl_official_site = _orig_crawl
+check("官网无邮箱返回空候选+message（非502）",
       res2.get("ok") and res2.get("candidates") == [] and "未在公开网页" in res2.get("message", ""),
       str(res2)[:120])
 
-# 9) 预算耗尽：到点即返回不卡死
-main._search_ddg = lambda c: [BASE + "/", BASE + "/contact-us/"]
-main._search_bing = lambda c: []
+# 9) 预算耗尽：到点即返回不卡死（官网发现前已超时 -> hosts 空 -> RuntimeError 也应快速）
+main._discover_official_hosts = lambda c, dl: ([], ["超时"])
 main._FIND_EMAIL_BUDGET = 0.01
 time.sleep(0.05)
-res3 = main.find_lead_email_candidates("Acme", BASE + "/signal")
-check("超预算安全返回", res3.get("ok") is True, str(res3)[:80])
+t0 = time.time()
+try:
+    res3 = main.find_lead_email_candidates("Acme", BASE + "/signal")
+    check("超预算安全返回", res3.get("ok") is True, str(res3)[:80])
+except RuntimeError:
+    check("超预算安全返回", (time.time() - t0) < 5, "RuntimeError 快速返回")
 main._FIND_EMAIL_BUDGET = 35.0
 
 # 10) 单个页面异常被吞（原文链接 404 不影响官网结果）
-main._search_ddg = lambda c: [BASE + "/"]
-main._search_bing = lambda c: []
+main._discover_official_hosts = lambda c, dl: (["127.0.0.1:%d" % port], ["直猜命中"])
 res4 = main.find_lead_email_candidates("Acme", BASE + "/not-exist-page-404")
 check("原文页404不影响官网抓取", res4.get("ok") and any(
     c["email"] == "info@acmevet.com" for c in res4["candidates"]), str(res4)[:120])
