@@ -140,6 +140,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .toast-success{background:var(--color-success)}
 .toast-error{background:var(--color-danger)}
 .state-message{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 20px;gap:10px;color:var(--color-text-secondary);font-size:13px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 64px;gap:6px}
+.empty-state .es-icon{width:64px;height:64px;border-radius:50%;background:var(--color-primary-xlight);border:1px dashed var(--color-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.empty-state .es-title{font-size:15px;font-weight:700;color:var(--color-text)}
+.empty-state .es-desc{font-size:13px;color:var(--color-text-secondary);max-width:440px;line-height:1.7}
+.empty-state .es-value{font-size:12.5px;color:var(--color-text-tertiary);max-width:440px;line-height:1.7;margin-top:2px}
 .loading-row{display:flex;align-items:center;gap:10px;color:var(--color-text-secondary);font-size:13px;padding:40px 0;justify-content:center}
 .loading-spinner{width:20px;height:20px;border:2.5px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -233,6 +238,14 @@ var snapshotData=null;
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3200)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var ICON_USERS='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+var ICON_FILTER='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>';
+function emptyStateHtml(icon,title,desc,value){
+  return '<div class="empty-state"><div class="es-icon">'+icon+'</div>'+
+    '<div class="es-title">'+esc(title)+'</div>'+
+    '<div class="es-desc">'+esc(desc)+'</div>'+
+    (value?'<div class="es-value">'+esc(value)+'</div>':'')+'</div>';
+}
 function closeModal(id){document.getElementById(id).classList.remove('show')}
 function openModal(id){document.getElementById(id).classList.add('show')}
 function statusTag(s){
@@ -258,7 +271,14 @@ function renderTable(){
   });
   document.getElementById('list-count').textContent='共 '+list.length+' 家客户';
   if(list.length===0){
-    document.getElementById('table-area').innerHTML='<div class="state-message"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><div>没有符合条件的客户，请调整搜索或筛选条件。</div></div>';
+    if(getAllCustomers().length===0){
+      document.getElementById('table-area').innerHTML=emptyStateHtml(ICON_USERS,
+        '暂无客户档案',
+        '客户数据接入飞书多维表后自动汇聚',
+        '询盘客户、成交客户、跟进状态一目了然；支持搜索、按跟进状态筛选、查看客户档案与关联订单');
+    }else{
+      document.getElementById('table-area').innerHTML='<div class="state-message"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><div>没有符合条件的客户，请调整搜索或筛选条件。</div></div>';
+    }
     return;
   }
   document.getElementById('table-area').innerHTML=
@@ -287,6 +307,13 @@ function renderFollow(){
   if(!area)return;
   if(!snapshotData){area.innerHTML='<div class="loading-row"><span class="loading-spinner"></span> 正在加载客户数据…</div>';return}
   var all=getAllCustomers();
+  if(all.length===0){
+    area.innerHTML='<div class="card">'+emptyStateHtml(ICON_FILTER,
+      '暂无跟进记录',
+      '客户档案接入飞书多维表后自动汇聚',
+      '按「初步接触 / 需求沟通 / 报价中 / 已成交 / 复购中」分组展示客户，并自动标记超期未跟进提醒，让每一个客户都不被遗漏')+'</div>';
+    return;
+  }
   var order=['初步接触','需求沟通','报价中','已成交','复购中','沉睡'];
   var groups={};
   all.forEach(function(c){var st=c['跟进状态']||'未标记';(groups[st]=groups[st]||[]).push(c)});

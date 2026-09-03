@@ -107,6 +107,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 
 .state-message{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 20px;gap:10px;color:var(--color-text-secondary);font-size:13px}
 .state-message .state-title{font-size:14px;font-weight:600;color:var(--color-text)}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 64px;gap:6px}
+.empty-state .es-icon{width:64px;height:64px;border-radius:50%;background:var(--color-primary-xlight);border:1px dashed var(--color-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.empty-state .es-title{font-size:15px;font-weight:700;color:var(--color-text)}
+.empty-state .es-desc{font-size:13px;color:var(--color-text-secondary);max-width:440px;line-height:1.7}
+.empty-state .es-value{font-size:12.5px;color:var(--color-text-tertiary);max-width:440px;line-height:1.7;margin-top:2px}
+.dist-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:30px 12px 26px;text-align:center;color:var(--color-text-tertiary);font-size:12.5px;line-height:1.6}
+.dist-empty svg{width:30px;height:30px;opacity:0.55;color:var(--color-text-tertiary)}
 
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.show{display:flex}
@@ -208,6 +215,13 @@ var snapshotData=null;
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3200)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var ICON_HEADSET='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+function emptyStateHtml(icon,title,desc,value){
+  return '<div class="empty-state"><div class="es-icon">'+icon+'</div>'+
+    '<div class="es-title">'+esc(title)+'</div>'+
+    '<div class="es-desc">'+esc(desc)+'</div>'+
+    (value?'<div class="es-value">'+esc(value)+'</div>':'')+'</div>';
+}
 function closeModal(){document.getElementById('new-modal').classList.remove('show')}
 function openModal(){document.getElementById('new-modal').classList.add('show')}
 
@@ -236,7 +250,7 @@ function renderStats(list){
 
 function distBarsHtml(rows,fillClass){
   var max=0;rows.forEach(function(r){if(r.count>max)max=r.count});
-  if(max===0)return '<div style="font-size:12px;color:var(--color-text-tertiary);padding:8px 0">暂无工单数据</div>';
+  if(max===0)return '<div class="dist-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg><span>暂无工单数据，售后工单接入飞书多维表后<br>按状态 / 类型自动统计呈现</span></div>';
   return rows.map(function(r){
     var pct=max>0?Math.round(r.count/max*100):0;
     return '<div class="dist-row" title="'+esc(r.label)+'：'+r.count+'"><div class="dist-label">'+esc(r.label)+'</div><div class="dist-track"><div class="dist-fill '+(fillClass||'')+'" style="width:'+pct+'%"></div></div><div class="dist-val">'+r.count+'</div></div>';
@@ -259,12 +273,10 @@ function renderTable(){
   renderStats(list);
   renderDist(list);
   if(list.length===0){
-    document.getElementById('ticket-area').innerHTML=
-      '<div class="state-message">'+
-        '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><polyline points="9 12 11 14 15 10"/></svg>'+
-        '<div class="state-title">暂无售后工单</div>'+
-        '<div>售后流程在 RHC 正式对接后启用。可点击右上角「新建工单」体验工单提报流程。</div>'+
-      '</div>';
+    document.getElementById('ticket-area').innerHTML=emptyStateHtml(ICON_HEADSET,
+      '暂无工单',
+      '售后工单接入飞书多维表后自动汇聚',
+      '工单受理后自动跟踪处理进度：待处理 / 处理中 / 已完成全程可视，并按问题类型统计，让售后服务有记录、有闭环');
     return;
   }
   document.getElementById('ticket-area').innerHTML=

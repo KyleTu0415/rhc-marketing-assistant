@@ -147,6 +147,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--color-text);color:#fff;padding:12px 24px;border-radius:var(--radius-md);font-size:13px;font-weight:500;z-index:2000;opacity:0;transition:all .3s ease;box-shadow:var(--shadow-lg);pointer-events:none;max-width:80vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .state-message{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 20px;gap:10px;color:var(--color-text-secondary);font-size:13px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 64px;gap:6px}
+.empty-state .es-icon{width:64px;height:64px;border-radius:50%;background:var(--color-primary-xlight);border:1px dashed var(--color-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.empty-state .es-title{font-size:15px;font-weight:700;color:var(--color-text)}
+.empty-state .es-desc{font-size:13px;color:var(--color-text-secondary);max-width:440px;line-height:1.7}
+.empty-state .es-value{font-size:12.5px;color:var(--color-text-tertiary);max-width:440px;line-height:1.7;margin-top:2px}
 .loading-row{display:flex;align-items:center;gap:10px;color:var(--color-text-secondary);font-size:13px;padding:40px 0;justify-content:center}
 .loading-spinner{width:20px;height:20px;border:2.5px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -217,6 +222,14 @@ var snapshotData=null;
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3200)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var ICON_KANBAN='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/><line x1="20" y1="16" x2="20" y2="22"/></svg>';
+var ICON_LIST='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>';
+function emptyStateHtml(icon,title,desc,value){
+  return '<div class="empty-state"><div class="es-icon">'+icon+'</div>'+
+    '<div class="es-title">'+esc(title)+'</div>'+
+    '<div class="es-desc">'+esc(desc)+'</div>'+
+    (value?'<div class="es-value">'+esc(value)+'</div>':'')+'</div>';
+}
 function closeModal(){document.getElementById('detail-modal').classList.remove('show')}
 function openModal(){document.getElementById('detail-modal').classList.add('show')}
 function statusTag(s){
@@ -235,6 +248,14 @@ function render(){
 }
 
 function renderKanban(orders){
+  var ka=document.getElementById('kanban-area');if(!ka)return;
+  if(orders.length===0){
+    ka.innerHTML=emptyStateHtml(ICON_KANBAN,
+      '暂无订单',
+      '订单数据接入飞书多维表后自动汇聚',
+      '可查看 9 大履约节点（已成交 → 单据制作 → 配置校验 → 仓库配货 → 提货 → 报关 → 发运 → 完成）全程跟踪，每笔订单的履约状态与进度一目了然');
+    return;
+  }
   var html='<div class="kanban">'+ORDER_STATUSES.map(function(st){
     var list=orders.filter(function(o){return o['当前状态']===st});
     var isFinal=st==='已完成';
@@ -249,11 +270,18 @@ function renderKanban(orders){
       }).join(''):'<div class="kcol-empty">暂无订单</div>')+
       '</div></div>';
   }).join('')+'</div>';
-  var ka=document.getElementById('kanban-area');if(ka)ka.innerHTML=html;
+  ka.innerHTML=html;
 }
 
 function renderList(orders){
   var la=document.getElementById('list-area');if(!la)return;
+  if(orders.length===0){
+    la.innerHTML='<div class="card">'+emptyStateHtml(ICON_LIST,
+      '暂无订单',
+      '订单数据接入飞书多维表后自动汇聚',
+      '订单号、客户、金额、当前履约节点与负责销售明细自动同步；点击任意订单可查看 9 大节点履约时间线')+'</div>';
+    return;
+  }
   la.innerHTML=
     '<div class="card"><table class="data-table"><thead><tr>'+
       '<th>订单号</th><th>客户</th><th>国家/地区</th><th>订单金额（原币）</th><th>当前状态</th><th>下单日期</th><th>负责销售</th>'+
