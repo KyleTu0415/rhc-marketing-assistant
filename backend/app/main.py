@@ -94,6 +94,8 @@ app = FastAPI(title="RHC Marketing Assistant", version="1.0.0")
 SECRET_KEY = os.getenv("RHC_SECRET_KEY", "rhc-marketing-secret-2026")
 TOKEN_EXPIRY = 24 * 60 * 60  # 24 hours
 
+# 兜底账号：飞书多维表格不可用（网络/凭证/限流）时使用，保证系统不会被锁死。
+# 正常账号数据源为飞书「系统账号」表（见下方 _load_users 相关逻辑）。
 USERS = {
     "ella": {"password": "rhc2026", "role": "admin", "name": "Ella"},
 }
@@ -122,8 +124,13 @@ def _verify_token(token: str) -> Optional[dict]:
         if payload.get("exp", 0) < time.time():
             return None
         username = payload.get("user")
-        if username and username in USERS:
-            u = USERS[username]
+        if not username:
+            return None
+        # 角色/姓名从当前用户源（飞书表优先，失败回退 USERS）取，
+        # 以便在飞书表中修改角色后，已签发的 token 也能拿到最新角色。
+        users = _get_users()
+        u = users.get(username)
+        if u:
             return {"username": username, "role": u["role"], "name": u["name"]}
         return None
     except Exception:
@@ -150,9 +157,18 @@ async def api_auth_login(req: LoginRequest):
     password = req.password.strip()
     if not username or not password:
         return JSONResponse({"ok": False, "message": "请输入用户名和密码"})
-    user = USERS.get(username)
+    # 账号来自飞书「系统账号」表（60秒内存缓存）；飞书故障时回退兜底 USERS
+    users = _get_users()
+    user = users.get(username)
+    if (not user or user["password"] != password):
+        # 登录失败时强制刷新一次账号缓存再判（覆盖「刚在飞书表里新增账号/改密码」
+        # 但缓存尚未过期的场景）；仍失败则返回错误
+        users = _get_users(force_refresh=True)
+        user = users.get(username)
     if not user or user["password"] != password:
         return JSONResponse({"ok": False, "message": "用户名或密码错误"})
+    if not user.get("enabled", True):
+        return JSONResponse({"ok": False, "message": "该账号已停用，请联系管理员"})
     token = _create_token(username)
     resp = JSONResponse({
         "ok": True,
@@ -306,6 +322,147 @@ def _tv(v):
     if isinstance(v, list): return ", ".join(str(x.get("text", x) if isinstance(x, dict) else x) for x in v)
     if isinstance(v, dict): return v.get("text", str(v))
     return str(v)
+
+# ============================================================
+# 系统账号表（飞书多维表格数据源，替代硬编码 USERS）
+# 用户可直接在飞书表「系统账号」中增删账号；表结构不存在时自动建表+种子数据。
+# TODO: 演示阶段密码明文存储，正式版需改为哈希存储（如 bcrypt）。
+# ============================================================
+ACCOUNT_TABLE_NAME = "系统账号"
+_ACCOUNT_CACHE_TTL = 60  # 账号列表内存缓存秒数，避免每次登录都调飞书 API
+
+_account_table_id = None
+_users_cache = {"data": None, "ts": 0.0}
+
+def _feishu_api(method, path, payload=None, timeout=15):
+    """统一的飞书 API 请求（沿用项目现有 urllib 风格，不引入新依赖）。"""
+    import urllib.request as _ur
+    import urllib.error as _ue
+    url = f"https://open.feishu.cn/open-apis{path}"
+    data = json.dumps(payload).encode() if payload is not None else None
+    rq = _ur.Request(url, data=data, headers=_feishu_headers(), method=method)
+    try:
+        with _ur.urlopen(rq, timeout=timeout) as r:
+            return json.loads(r.read())
+    except _ue.HTTPError as e:
+        # 读取错误响应体，便于日志定位（凭证失效/限流/参数错误等）
+        detail = ""
+        try:
+            detail = e.read().decode()[:300]
+        except Exception:
+            pass
+        raise RuntimeError(f"feishu api {method} {path} -> HTTP {e.code}: {detail}")
+
+def _ensure_account_table():
+    """确保多维表中存在「系统账号」表，返回 table_id；不存在则自动创建。"""
+    global _account_table_id
+    if _account_table_id:
+        return _account_table_id
+    if not FEISHU_ATK:
+        raise RuntimeError("FEISHU_APP_TOKEN 未配置")
+    # 1) 列出多维表下所有数据表，按名字查找
+    resp = _feishu_api("GET", f"/bitable/v1/apps/{FEISHU_ATK}/tables?page_size=100")
+    for t in resp.get("data", {}).get("items", []):
+        if t.get("name") == ACCOUNT_TABLE_NAME:
+            _account_table_id = t.get("table_id")
+            return _account_table_id
+    # 2) 不存在则创建（主字段为第一个 field：用户名，文本类型）
+    fields = [
+        {"field_name": "用户名", "type": 1},  # 文本（主字段）
+        {"field_name": "密码", "type": 1},    # 文本；TODO: 正式版改为加密存储
+        {"field_name": "姓名", "type": 1},    # 文本
+        {"field_name": "角色", "type": 3,     # 单选
+         "property": {"options": [
+             {"name": "admin"}, {"name": "sales"}, {"name": "viewer"}]}},
+        {"field_name": "启用", "type": 3,     # 单选：是/否
+         "property": {"options": [{"name": "是"}, {"name": "否"}]}},
+    ]
+    resp = _feishu_api("POST", f"/bitable/v1/apps/{FEISHU_ATK}/tables",
+                       {"table": {"name": ACCOUNT_TABLE_NAME,
+                                  "default_view_name": "账号列表",
+                                  "fields": fields}})
+    _account_table_id = resp.get("data", {}).get("table_id")
+    if not _account_table_id:
+        raise RuntimeError(f"创建「{ACCOUNT_TABLE_NAME}」表失败: {resp}")
+    print(f"[auth] 已创建飞书账号表「{ACCOUNT_TABLE_NAME}」: {_account_table_id}")
+    return _account_table_id
+
+def _seed_accounts_if_empty(tid):
+    """表为空时写入种子账号（与兜底 USERS 一致：ella / rhc2026 / Ella / admin / 启用）。"""
+    resp = _feishu_api(
+        "GET", f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records?page_size=1")
+    if resp.get("data", {}).get("total", 0) > 0 or resp.get("data", {}).get("items"):
+        return
+    fields = {"用户名": "ella", "密码": "rhc2026", "姓名": "Ella",
+              "角色": "admin", "启用": "是"}
+    _feishu_api("POST", f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records",
+                {"fields": fields})
+    print("[auth] 账号表为空，已写入种子账号 ella/admin")
+
+def _fetch_users_from_feishu():
+    """从飞书「系统账号」表读取全部账号，返回 {username: {password,role,name,enabled}}。"""
+    tid = _ensure_account_table()
+    _seed_accounts_if_empty(tid)
+    users = {}
+    page_token = None
+    while True:
+        path = f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records?page_size=100"
+        if page_token:
+            path += f"&page_token={page_token}"
+        resp = _feishu_api("GET", path)
+        data = resp.get("data", {})
+        for it in data.get("items", []):
+            fl = it.get("fields", {})
+            username = _tv(fl.get("用户名")).strip()
+            if not username:
+                continue
+            # 单选字段读取值可能是 {"text": "admin"} 结构，统一用 _tv 归一
+            role = _tv(fl.get("角色")).strip() or "admin"
+            if role not in ("admin", "sales", "viewer"):
+                role = "admin"
+            enabled = _tv(fl.get("启用")).strip()
+            users[username] = {
+                "password": _tv(fl.get("密码")),
+                "role": role,
+                "name": _tv(fl.get("姓名")) or username,
+                # 单选「启用」未填写时默认视为启用；仅明确为「否」才停用
+                "enabled": enabled != "否",
+            }
+        if not data.get("has_more"):
+            break
+        page_token = data.get("page_token")
+    return users
+
+def _get_users(force_refresh=False):
+    """获取账号字典：优先飞书表（60秒缓存），飞书失败时回退硬编码 USERS。
+    force_refresh=True 时跳过缓存强制拉取（登录失败重试场景使用）。"""
+    now = time.time()
+    if not force_refresh and _users_cache["data"] is not None \
+            and now - _users_cache["ts"] < _ACCOUNT_CACHE_TTL:
+        return _users_cache["data"]
+    try:
+        users = _fetch_users_from_feishu()
+        _users_cache["data"] = users
+        _users_cache["ts"] = now
+        return users
+    except Exception as e:
+        # 兜底：飞书故障（网络/凭证/限流）时回退硬编码账号，保证系统不被锁死
+        print(f"[auth] 警告: 读取飞书账号表失败，回退到内置兜底账号: {e}")
+        if _users_cache["data"] is not None:
+            # 有旧缓存则沿用旧数据（可能略有延迟，但不影响登录可用性）
+            return _users_cache["data"]
+        return USERS
+
+def _warmup_account_table():
+    """启动后台预热：尽早建表/写种子，失败不影响服务启动（登录时仍会自动重试/回退）。"""
+    try:
+        _get_users(force_refresh=True)
+        if _users_cache["data"] is not None:
+            print("[auth] 飞书账号表初始化完成")
+        else:
+            print("[auth] 飞书账号表暂不可用，当前使用内置兜底账号（登录时会自动重试）")
+    except Exception as e:
+        print(f"[auth] 飞书账号表初始化失败（登录时将自动重试/回退兜底账号）: {e}")
 
 @app.post("/api/products")
 async def api_product_create(req: ProductUpsertRequest):
@@ -583,6 +740,9 @@ try:
     insights_store.start_scheduler()
 except Exception as _e:
     print(f"[insights] 模块初始化失败: {_e}")
+
+# 启动时后台预热飞书「系统账号」表（建表+种子数据），不阻塞服务启动
+threading.Thread(target=_warmup_account_table, daemon=True).start()
 
 # Serve frontend - try multiple possible locations
 _candidate_dirs = [
