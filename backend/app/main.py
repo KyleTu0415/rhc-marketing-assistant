@@ -987,7 +987,24 @@ async def api_leads_update(record_id: str, req: LeadUpdateRequest, request: Requ
             f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records/{record_id}",
             {"fields": fields})
         _invalidate_leads_cache()
-        return {"ok": True}
+
+        # 状态转为「已转客户」时，自动在客户表建档（同邮箱不重复创建）。
+        # 建档失败不阻断线索状态更新（仅日志记录），客户可在客户分级页补建。
+        customer_created = False
+        if fields.get("状态") == "已转客户":
+            try:
+                from app import business
+                lead = None
+                for ld in _fetch_leads(force_refresh=True):
+                    if ld.get("record_id") == record_id:
+                        lead = ld
+                        break
+                if lead:
+                    _, created = business.ensure_customer_from_lead(lead)
+                    customer_created = created
+            except Exception as ce:
+                print(f"[leads] 转客户自动建档失败（不阻断状态更新）{record_id}: {ce}")
+        return {"ok": True, "customer_created": customer_created}
     except Exception as e:
         print(f"[leads] 更新线索失败（{record_id}）: {e}")
         return JSONResponse({"ok": False, "message": f"更新线索失败：飞书线索服务暂时不可用（{e}）"},
@@ -2018,6 +2035,390 @@ async def api_dashboard_ai_brief(request: Request, refresh: str = "0"):
     except Exception as e:
         print(f"[dashboard] AI 速览接口失败: {e}")
         return JSONResponse({"ok": False, "message": "诊断生成中，请稍后刷新"}, status_code=502)
+
+
+# ============================================================
+# 业务表底座 API：客户档案 / 邮件收发 / PI 订单 / 系统配置
+# 数据源：飞书多维表格（客户表、订单表复用 + 邮件记录表、系统配置表幂等新建）
+# ============================================================
+
+class CustomerUpsertRequest(BaseModel):
+    name: Optional[str] = None
+    region: Optional[str] = None
+    contact: Optional[str] = None
+    email: Optional[str] = None
+    channel: Optional[str] = None
+    products: Optional[str] = None
+    grade: Optional[str] = None        # A / B / C / 未分级
+    cust_status: Optional[str] = None  # 活跃 / 沉睡
+    follow_status: Optional[str] = None  # 初步接触/需求沟通/报价中/已成交/复购中/沉睡
+    note: Optional[str] = None
+    source_lead: Optional[str] = None
+
+
+class MailSendRequest(BaseModel):
+    to: str = ""
+    subject: str = ""
+    body: str = ""
+    lead_id: str = ""
+    customer_id: str = ""
+
+
+class PiUpsertRequest(BaseModel):
+    pi_no: Optional[str] = None
+    customer_name: Optional[str] = None
+    region: Optional[str] = None
+    amount: Optional[str] = None
+    currency: Optional[str] = None
+    status: Optional[str] = None       # 草稿/已发送/已确认/已成交/已取消
+    products: Optional[str] = None
+    sales: Optional[str] = None
+    customer_id: Optional[str] = None
+    note: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+class ConfigUpdateRequest(BaseModel):
+    items: Dict[str, str] = {}
+
+
+_CUSTOMER_GRADES = ("A", "B", "C", "未分级")
+_CUSTOMER_STATUS = ("活跃", "沉睡")
+_CUSTOMER_FOLLOW = ("初步接触", "需求沟通", "报价中", "已成交", "复购中", "沉睡")
+_CUSTOMER_CHANNELS = ("展会", "社媒", "官网询盘", "老客户介绍", "其他")
+
+
+def _business_auth(request: Request):
+    """鉴权并返回 (user_info, JSONResponse)。失败时后者为 401 响应。"""
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return None, JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    return user_info, None
+
+
+@app.get("/api/customers")
+async def api_customers_list(request: Request):
+    """客户档案列表（复用飞书「客户表」，幂等补字段）。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    try:
+        from app import business
+        items = business.fetch_customers(force_refresh=True)
+        return {"ok": True, "items": items, "total": len(items)}
+    except Exception as e:
+        print(f"[customers] 列表读取失败: {e}")
+        return JSONResponse({"ok": False, "message": f"客户档案读取失败：{e}"}, status_code=502)
+
+
+@app.post("/api/customers")
+async def api_customers_create(req: CustomerUpsertRequest, request: Request):
+    """手动新建客户档案。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    name = (req.name or "").strip()
+    if not name:
+        return JSONResponse({"ok": False, "message": "客户名称不能为空"}, status_code=400)
+    try:
+        from app import business
+        if req.grade and req.grade not in _CUSTOMER_GRADES:
+            return JSONResponse({"ok": False, "message": f"分级仅支持：{'/'.join(_CUSTOMER_GRADES)}"},
+                                status_code=400)
+        if req.cust_status and req.cust_status not in _CUSTOMER_STATUS:
+            return JSONResponse({"ok": False, "message": f"客户状态仅支持：{'/'.join(_CUSTOMER_STATUS)}"},
+                                status_code=400)
+        if req.follow_status and req.follow_status not in _CUSTOMER_FOLLOW:
+            return JSONResponse({"ok": False, "message": "跟进状态仅支持：%s" % "/".join(_CUSTOMER_FOLLOW)},
+                                status_code=400)
+        if req.channel and req.channel not in _CUSTOMER_CHANNELS:
+            return JSONResponse({"ok": False, "message": "来源渠道仅支持：%s" % "/".join(_CUSTOMER_CHANNELS)},
+                                status_code=400)
+        now_str = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+        fields = {
+            "客户名称": name,
+            "国家/地区": (req.region or "").strip(),
+            "联系人": (req.contact or "").strip(),
+            "邮箱": (req.email or "").strip(),
+            "主营产品": (req.products or "").strip(),
+            "备注": (req.note or "").strip(),
+            "分级": (req.grade or "未分级"),
+            "客户状态": (req.cust_status or "活跃"),
+            "创建时间": now_str,
+        }
+        if req.follow_status:
+            fields["跟进状态"] = req.follow_status
+        if req.channel:
+            fields["来源渠道"] = req.channel
+        if req.source_lead:
+            fields["来源线索"] = req.source_lead.strip()
+        rec = business.create_customer(fields)
+        return {"ok": True, "customer": rec}
+    except Exception as e:
+        print(f"[customers] 新建失败: {e}")
+        return JSONResponse({"ok": False, "message": f"客户档案创建失败：{e}"}, status_code=502)
+
+
+@app.put("/api/customers/{record_id}")
+async def api_customers_update(record_id: str, req: CustomerUpsertRequest, request: Request):
+    """更新客户档案（分级/状态/跟进状态/备注等白名单字段）。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    try:
+        from app import business
+        fields = {}
+        if req.name is not None:
+            v = req.name.strip()
+            if v:
+                fields["客户名称"] = v
+        if req.region is not None:
+            fields["国家/地区"] = req.region.strip()
+        if req.contact is not None:
+            fields["联系人"] = req.contact.strip()
+        if req.email is not None:
+            fields["邮箱"] = req.email.strip()
+        if req.products is not None:
+            fields["主营产品"] = req.products.strip()
+        if req.note is not None:
+            fields["备注"] = req.note.strip()
+        if req.grade is not None:
+            if req.grade not in _CUSTOMER_GRADES:
+                return JSONResponse({"ok": False, "message": f"分级仅支持：{'/'.join(_CUSTOMER_GRADES)}"},
+                                    status_code=400)
+            fields["分级"] = req.grade
+        if req.cust_status is not None:
+            if req.cust_status not in _CUSTOMER_STATUS:
+                return JSONResponse({"ok": False, "message": f"客户状态仅支持：{'/'.join(_CUSTOMER_STATUS)}"},
+                                    status_code=400)
+            fields["客户状态"] = req.cust_status
+        if req.follow_status is not None:
+            if req.follow_status not in _CUSTOMER_FOLLOW:
+                return JSONResponse({"ok": False, "message": "跟进状态仅支持：%s" % "/".join(_CUSTOMER_FOLLOW)},
+                                    status_code=400)
+            fields["跟进状态"] = req.follow_status
+        if req.channel is not None:
+            if req.channel and req.channel not in _CUSTOMER_CHANNELS:
+                return JSONResponse({"ok": False, "message": "来源渠道仅支持：%s" % "/".join(_CUSTOMER_CHANNELS)},
+                                    status_code=400)
+            fields["来源渠道"] = req.channel
+        if not fields:
+            return {"ok": True, "message": "无需要更新的内容"}
+        business.update_customer(record_id, fields)
+        return {"ok": True}
+    except Exception as e:
+        print(f"[customers] 更新失败（{record_id}）: {e}")
+        return JSONResponse({"ok": False, "message": f"客户档案更新失败：{e}"}, status_code=502)
+
+
+@app.get("/api/mails")
+async def api_mails_list(request: Request, lead_id: str = ""):
+    """邮件记录列表（复用飞书「邮件记录」表）。可按 ?lead_id= 筛选。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    try:
+        from app import business
+        items = business.fetch_mails(force_refresh=True, lead_id=lead_id or None)
+        items.sort(key=lambda m: m.get("time") or "", reverse=True)
+        return {"ok": True, "items": items, "total": len(items)}
+    except Exception as e:
+        print(f"[mails] 列表读取失败: {e}")
+        return JSONResponse({"ok": False, "message": f"邮件记录读取失败：{e}"}, status_code=502)
+
+
+@app.post("/api/mails/send")
+async def api_mails_send(req: MailSendRequest, request: Request):
+    """SMTP SSL 真实发信并落「邮件记录」。
+    邮箱未配置（地址/授权码缺失）返回 503，前端提示去配置中心。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    to_addr = (req.to or "").strip()
+    subject = (req.subject or "").strip()
+    body = (req.body or "").strip()
+    if not to_addr or not subject or not body:
+        return JSONResponse({"ok": False, "message": "收件人、主题、正文均不能为空"}, status_code=400)
+    try:
+        from app import business
+        rec = business.send_email(to_addr, subject, body,
+                                  lead_id=(req.lead_id or "").strip(),
+                                  customer_id=(req.customer_id or "").strip())
+        return {"ok": True, "mail": rec}
+    except business.EmailNotConfigured as e:
+        return JSONResponse(
+            {"ok": False, "message": str(e), "code": "EMAIL_NOT_CONFIGURED"},
+            status_code=503)
+    except Exception as e:
+        print(f"[mails] 发信失败 -> {to_addr}: {e}")
+        return JSONResponse({"ok": False, "message": f"邮件发送失败：{e}"}, status_code=502)
+
+
+@app.post("/api/mails/sync")
+async def api_mails_sync(request: Request):
+    """IMAP 拉取最近 30 天收件箱邮件落库（按邮箱关联线索/客户，消息ID 去重）。
+    邮箱未配置返回 503。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    try:
+        from app import business
+        result = business.sync_inbox()
+        return {"ok": True, **result}
+    except business.EmailNotConfigured as e:
+        return JSONResponse(
+            {"ok": False, "message": str(e), "code": "EMAIL_NOT_CONFIGURED"},
+            status_code=503)
+    except Exception as e:
+        print(f"[mails] 收件同步失败: {e}")
+        return JSONResponse({"ok": False, "message": f"收件同步失败：{e}"}, status_code=502)
+
+
+@app.get("/api/pi")
+async def api_pi_list(request: Request):
+    """PI 订单列表（复用飞书「订单表」，幂等补 PI 字段）。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    try:
+        from app import business
+        items = business.fetch_pi(force_refresh=True)
+        items.sort(key=lambda p: p.get("created_at") or "", reverse=True)
+        return {"ok": True, "items": items, "total": len(items),
+                "status_options": list(business.PI_STATUS_OPTIONS)}
+    except Exception as e:
+        print(f"[pi] 列表读取失败: {e}")
+        return JSONResponse({"ok": False, "message": f"PI 列表读取失败：{e}"}, status_code=502)
+
+
+@app.post("/api/pi")
+async def api_pi_create(req: PiUpsertRequest, request: Request):
+    """新建 PI（落订单表，PI状态=草稿/已发送等）。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    customer_name = (req.customer_name or "").strip()
+    if not customer_name:
+        return JSONResponse({"ok": False, "message": "客户名称不能为空"}, status_code=400)
+    try:
+        from app import business
+        if req.status and req.status not in business.PI_STATUS_OPTIONS:
+            return JSONResponse({"ok": False,
+                                 "message": f"PI状态仅支持：{'/'.join(business.PI_STATUS_OPTIONS)}"},
+                                status_code=400)
+        now_str = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
+        fields = {
+            "订单号": (req.pi_no or "").strip() or f"PI-{now_str.replace('-', '')}",
+            "客户名称": customer_name,
+            "国家/地区": (req.region or "").strip(),
+            "订单金额（原币）": (req.amount or "").strip(),
+            "币种": (req.currency or "USD").strip(),
+            "PI状态": (req.status or "草稿"),
+            "产品明细": (req.products or "").strip(),
+            "负责销售": (req.sales or user_info.get("name") or user_info.get("username", "")).strip(),
+            "备注": (req.note or "").strip(),
+            "下单日期": (req.created_at or now_str),
+        }
+        if req.customer_id:
+            fields["关联客户"] = req.customer_id.strip()
+        rec = business.create_pi(fields)
+        return {"ok": True, "pi": rec}
+    except Exception as e:
+        print(f"[pi] 新建失败: {e}")
+        return JSONResponse({"ok": False, "message": f"PI 创建失败：{e}"}, status_code=502)
+
+
+@app.put("/api/pi/{record_id}")
+async def api_pi_update(record_id: str, req: PiUpsertRequest, request: Request):
+    """更新 PI（状态/金额/币种/备注等白名单）。
+    PI状态=已成交/已取消时同步写履约「当前状态」，兼容订单分布统计。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    try:
+        from app import business
+        fields = {}
+        if req.pi_no is not None and req.pi_no.strip():
+            fields["订单号"] = req.pi_no.strip()
+        if req.customer_name is not None and req.customer_name.strip():
+            fields["客户名称"] = req.customer_name.strip()
+        if req.region is not None:
+            fields["国家/地区"] = req.region.strip()
+        if req.amount is not None:
+            fields["订单金额（原币）"] = req.amount.strip()
+        if req.currency is not None:
+            fields["币种"] = req.currency.strip()
+        if req.products is not None:
+            fields["产品明细"] = req.products.strip()
+        if req.note is not None:
+            fields["备注"] = req.note.strip()
+        if req.sales is not None:
+            fields["负责销售"] = req.sales.strip()
+        if req.status is not None:
+            status = req.status.strip()
+            if status not in business.PI_STATUS_OPTIONS:
+                return JSONResponse({"ok": False,
+                                     "message": f"PI状态仅支持：{'/'.join(business.PI_STATUS_OPTIONS)}"},
+                                    status_code=400)
+            fields["PI状态"] = status
+            if status in ("已成交", "已取消"):
+                fields["当前状态"] = status
+        if not fields:
+            return {"ok": True, "message": "无需要更新的内容"}
+        business.update_pi(record_id, fields)
+        return {"ok": True}
+    except Exception as e:
+        print(f"[pi] 更新失败（{record_id}）: {e}")
+        return JSONResponse({"ok": False, "message": f"PI 更新失败：{e}"}, status_code=502)
+
+
+@app.get("/api/config")
+async def api_config_get(request: Request):
+    """系统配置读取。敏感项（邮箱授权码）仅 admin 返回，
+    非 admin 以 ******** 掩码回显（用于判断是否已配置）。需登录。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    try:
+        from app import business
+        is_admin = user_info.get("role") == "admin"
+        cfg = business.get_config(include_sensitive=is_admin)
+        cfg["is_admin"] = is_admin
+        return {"ok": True, "config": cfg}
+    except Exception as e:
+        print(f"[config] 读取失败: {e}")
+        return JSONResponse({"ok": False, "message": f"配置读取失败：{e}"}, status_code=502)
+
+
+@app.put("/api/config")
+async def api_config_update(req: ConfigUpdateRequest, request: Request):
+    """系统配置写入（仅 admin）。授权码传空串表示不修改（保留原值）。"""
+    user_info, err = _business_auth(request)
+    if err:
+        return err
+    if user_info.get("role") != "admin":
+        return JSONResponse({"ok": False, "message": "仅管理员可修改系统配置"}, status_code=403)
+    try:
+        from app import business
+        items = req.items or {}
+        # 读取现有明文配置：授权码为掩码/空时保留原值，避免被 ******** 覆盖
+        existing = business.get_config(include_sensitive=True)
+        saved = []
+        for k, v in items.items():
+            k = (k or "").strip()
+            if not k:
+                continue
+            v = v if isinstance(v, str) else str(v)
+            if k in business.SENSITIVE_CONFIG_KEYS and (not v or v == "********"):
+                if existing.get(k):
+                    continue  # 保留已存授权码
+            business.set_config_kv(k, v.strip())
+            saved.append(k)
+        return {"ok": True, "saved": saved}
+    except Exception as e:
+        print(f"[config] 写入失败: {e}")
+        return JSONResponse({"ok": False, "message": f"配置保存失败：{e}"}, status_code=502)
 
 
 try:

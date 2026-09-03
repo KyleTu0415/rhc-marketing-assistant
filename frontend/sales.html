@@ -203,7 +203,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px;gap:12px;color:var(--color-text-tertiary);font-size:13px}
 .loading-state .spin{width:28px;height:28px;border:3px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:rhc-spin .8s linear infinite}
 @keyframes rhc-spin{to{transform:rotate(360deg)}}
-.sig-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sig-filter{display:flex;gap:10px 12px;flex-wrap:wrap;margin:2px 0 16px}
 .sig-filter-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;color:var(--color-text-secondary);background:var(--color-surface);border:1px solid var(--color-border);cursor:pointer;transition:all var(--transition-fast)}
 .sig-filter-chip:hover{border-color:var(--color-primary);color:var(--color-primary)}
 .sig-filter-chip.active{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
@@ -211,7 +211,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .opp-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
 .sig-region-tag{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:var(--color-bg);color:var(--color-text-secondary);border:1px solid var(--color-border-light);white-space:nowrap}
 /* ===== 商机信号：公共池/我的线索 子页签 ===== */
-.sig-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sig-subtabs{display:flex;gap:10px 12px;flex-wrap:wrap;margin-bottom:16px}
 .sig-subtab{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;font-size:13px;font-weight:600;color:var(--color-text-secondary);background:var(--color-surface);border:1px solid var(--color-border);cursor:pointer;transition:all var(--transition-fast)}
 .sig-subtab:hover{border-color:var(--color-primary);color:var(--color-primary)}
 .sig-subtab.active{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
@@ -333,7 +333,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       <div class="card-body" id="grading-rules-card"></div>
     </div>
     <div class="card">
-      <div class="card-header"><h3>客户分级看板</h3><span class="card-sub">数据来源：客户主库（飞书多维表格，接入后自动同步）</span></div>
+      <div class="card-header"><h3>客户分级看板</h3><span class="card-sub">数据来源：客户档案（飞书客户表），线索转为客户后自动建档汇聚</span></div>
       <div class="card-body" id="grading-list">
         <div style="padding:20px;text-align:center;color:var(--color-text-tertiary);font-size:13px">客户数据加载中…</div>
       </div>
@@ -360,7 +360,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
               <select id="mail-customer" onchange="onMailCustomerChange()"><option value="">— 选择客户（加载中…）—</option></select>
               <input type="text" id="mail-customer-manual" placeholder="手动输入客户名称" style="margin-top:8px;display:none">
               <div id="mail-lead-hint" style="display:none;margin-top:8px;font-size:12px;line-height:1.7"></div>
-              <div id="mail-customer-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--color-text-tertiary);line-height:1.7">客户主库暂未接入，下拉中暂无已建档客户。可选择「手动输入客户 / 商机客户」直接填写客户名称生成邮件；商机认领跟进并转为客户后，客户将自动出现在此下拉中。</div>
+              <div id="mail-customer-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--color-text-tertiary);line-height:1.7">暂无已建档客户与进行中的线索。可选择「手动输入客户名称」直接填写客户名称生成邮件；商机认领跟进并转为客户后，客户档案将自动出现在此下拉中。</div>
             </div>
             <div class="form-group">
               <label>相关产品（可多选）</label>
@@ -403,21 +403,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
             </div>
             <div class="mail-actions">
               <button class="btn btn-outline btn-sm" id="mail-copy-btn" onclick="copyMail()" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 一键复制</button>
+              <button class="btn btn-primary btn-sm" id="mail-send-btn" onclick="sendMailReal()" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 发送邮件</button>
             </div>
           </div>
         </div>
-        <div class="mail-footnote">AI 生成内容请核对后使用。选择「我的线索」时自动带出收件邮箱；当前请复制正文与邮箱到企业邮箱发送，正式版接通企业邮箱（IMAP/SMTP）后可一键发送并自动归档至线索/客户档案。</div>
+        <div class="mail-footnote">AI 生成内容请核对后使用。选择「我的线索」或客户档案时自动带出收件邮箱；点击「发送邮件」经企业邮箱（SMTP）真实发出并自动归档到对应线索/客户档案（企业邮箱由管理员在规则配置中心填写授权码后启用，未配置时可先「一键复制」到邮箱客户端发送）。</div>
       </div>
     </div>
 
     <div class="card" style="margin-top:14px">
-      <div class="card-header"><h3>客户回函 · 收件箱</h3><span class="card-sub">正式接入企业邮箱后自动拉取回函</span></div>
-      <div class="card-body">
+      <div class="card-header"><h3>客户回函 · 收件箱</h3><span style="display:inline-flex;gap:8px;align-items:center"><span class="card-sub" id="mail-inbox-sub">企业邮箱（IMAP）同步近 30 天回函</span><button type="button" class="btn btn-outline btn-sm" id="mail-sync-btn" onclick="syncInbox()">同步收件箱</button></span></div>
+      <div class="card-body" id="mail-inbox-body">
         <div class="empty-state">
           <div class="es-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
           <div class="es-title">暂无客户回函</div>
-          <div class="es-desc">正式接入企业邮箱后，客户回函自动拉取归档，AI 判定回复类型并可一键生成英文回信。</div>
-          <div class="es-value">回函将按客户归档到对应信号与客户档案，商机信号状态同步更新为「客户已回复」。</div>
+          <div class="es-desc">企业邮箱配置后，点击「同步收件箱」拉取近 30 天回函；回函按发件邮箱自动关联到对应线索/客户档案。</div>
+          <div class="es-value">客户回信后商机漏斗「已回信建档」环节自动点亮。</div>
         </div>
       </div>
     </div>
@@ -447,9 +448,20 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
             <div class="pi-doc pi-placeholder">
               <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               <div style="font-size:13px;font-weight:500;color:var(--color-text-secondary)">尚未生成 PI</div>
-              <div style="font-size:12px">选择客户与产品后，点击「生成 PI 预览」</div>
+              <div style="font-size:12px">选择客户与产品后，点击「生成 PI 预览」，确认后可保存为 PI 草稿</div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-header"><h3>已开 PI 列表</h3><span class="card-sub">数据来源：订单表（飞书多维表格），开出首份 PI 后自动汇聚</span></div>
+      <div class="card-body" id="pi-list-body">
+        <div class="empty-state">
+          <div class="es-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <div class="es-title">暂无 PI</div>
+          <div class="es-desc">开出首份 PI 后自动汇聚到此处，并进入销售漏斗「已出 PI」统计。</div>
         </div>
       </div>
     </div>
@@ -993,7 +1005,8 @@ function getMailCustomer(){
   }
   if(!v)return {name:'',country:'',email:''};
   var c=(snapshotData&&snapshotData.customers||[]).filter(function(x){return x['客户名称']===v})[0]||{};
-  return {name:v,country:c['国家/地区']||c['国家地区']||'',email:c['联系邮箱']||c['邮箱']||''};
+  return {name:v,country:c['国家/地区']||c['国家地区']||'',email:c['联系邮箱']||c['邮箱']||'',
+          customer:c,custId:c['record_id']||''};
 }
 function getSelectedMailProducts(){
   var out=[];
@@ -1031,16 +1044,60 @@ function renderMail(text,source){
     while(bodyStart<lines.length&&lines[bodyStart].trim()==='')bodyStart++;
   }
   var body=lines.slice(bodyStart).join('\n');
+  currentMailSubject=subject;
+  currentMailBody=body;
   var html='';
   if(subject)html+='<div class="mail-subject">Subject: '+esc(subject)+'</div>';
   html+='<div class="mail-body">'+esc(body)+'</div>';
   if(currentMailRecipient){
-    html+='<div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--color-border);font-size:12px;color:var(--color-text-tertiary);line-height:1.7">收件邮箱：'+esc(currentMailRecipient)+'（复制正文与邮箱后，到企业邮箱发送；正式版接入邮箱后可一键发送）</div>';
+    html+='<div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--color-border);font-size:12px;color:var(--color-text-tertiary);line-height:1.7">收件邮箱：'+esc(currentMailRecipient)+'</div>';
   }
   document.getElementById('mail-preview').innerHTML=html;
   var copyBtn=document.getElementById('mail-copy-btn');
   copyBtn.style.display='inline-flex';
+  // 有收件邮箱时显示「发送邮件」（真实 SMTP 发信，落邮件记录）
+  var sendBtn=document.getElementById('mail-send-btn');
+  if(sendBtn)sendBtn.style.display=currentMailRecipient?'inline-flex':'none';
   if(source)showToast(source,'success');
+}
+/* ===== 真实发信：POST /api/mails/send（SMTP SSL，发送前二次确认） ===== */
+var currentMailSubject='';
+var currentMailBody='';
+function sendMailReal(){
+  if(!currentMailText){showToast('请先生成邮件','error');return}
+  var ctx=getMailCustomer();
+  var to=(currentMailRecipient||ctx.email||'').trim();
+  if(!to){showToast('该客户暂无联系邮箱，请先在线索中补充邮箱','error');return}
+  var subject=currentMailSubject||'';
+  var body=currentMailBody||currentMailText;
+  if(!subject){showToast('邮件缺少主题（首行应为 Subject: ...）','error');return}
+  // 发送前确认弹窗：明确展示收件人与主题，确认后真实发出
+  if(!window.confirm('确认发送真实邮件？\n\n收件人：'+to+'\n主题：'+subject+'\n\n邮件将通过企业邮箱（SMTP）立即发出，并自动归档到邮件记录与该线索/客户档案。')){
+    return;
+  }
+  var leadId=(ctx.lead&&ctx.lead.record_id)?ctx.lead.record_id:'';
+  var custId=(ctx.customer&&ctx.customer.record_id)?ctx.customer.record_id:(ctx.custId||'');
+  var btn=document.getElementById('mail-send-btn');
+  if(btn){btn.disabled=true;btn.textContent='发送中…'}
+  fetch('/api/mails/send',{
+    method:'POST',
+    headers:Object.assign({'Content-Type':'application/json'},authHeaders()),
+    body:JSON.stringify({to:to,subject:subject,body:body,lead_id:leadId,customer_id:custId})
+  }).then(function(r){
+    return r.json().then(function(d){return {status:r.status,data:d}});
+  }).then(function(res){
+    if(btn){btn.disabled=false;btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 发送邮件'}
+    if(res.status===200&&res.data.ok){
+      showToast('邮件已发送并归档','success');
+    }else if(res.status===503||(res.data&&res.data.code==='EMAIL_NOT_CONFIGURED')){
+      showToast('邮箱未配置：请管理员在「规则配置中心 → 企业邮箱」填写邮箱地址与授权码','error');
+    }else{
+      showToast((res.data&&res.data.message)||'发送失败，请稍后重试','error');
+    }
+  }).catch(function(e){
+    if(btn){btn.disabled=false;btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 发送邮件'}
+    showToast('发送失败：网络异常，请稍后重试','error');
+  });
 }
 function generateMail(){
   var ctx0=getMailCustomer();
@@ -1142,6 +1199,10 @@ function generatePI(){
   var rows=lines.map(function(l){
     return '<tr><td>'+esc(l.product.name)+'<div style="color:var(--color-text-tertiary);font-size:11px;margin-top:2px">'+esc(l.product.desc)+'</div></td><td class="pi-qty">'+l.qty+'</td><td class="pi-price">待销售填写</td><td class="pi-price">待销售填写</td></tr>';
   }).join('');
+  // 保存草稿所需数据暂存（产品明细汇总）
+  var productsSummary=lines.map(function(l){return l.product.name+' ×'+l.qty}).join('；');
+  window.__lastPiDraft={customer_name:custName,region:cust['国家/地区']||'',
+    customer_id:cust['record_id']||'',products:productsSummary,pi_no:piNoStr,date:dateStr};
   document.getElementById('pi-area').innerHTML=
     '<div class="pi-doc">'+
       '<div class="pi-head"><div class="pi-brand">RHC 安瑞康<small>RHC Medical · Veterinary Equipment</small></div><div class="pi-title">形式发票 PROFORMA INVOICE<small>'+esc(piNoStr)+'</small></div></div>'+
@@ -1154,13 +1215,72 @@ function generatePI(){
         '<div><span>负责销售：</span>—</div>'+
       '</div>'+
       '<table class="pi-table"><thead><tr><th>产品</th><th class="pi-qty">数量</th><th class="pi-price">单价</th><th class="pi-price">金额</th></tr></thead><tbody>'+rows+'</tbody></table>'+
-      '<div class="pi-total-row"><span>合计：</span><strong>待销售填写（价格隔离：正式版价格仅销售可见）</strong></div>'+
-      '<div class="pi-terms"><strong>条款（正式版自动带出）：</strong><br>付款方式：待销售填写　|　贸易术语（Incoterms）：待销售填写　|　交货期：待销售填写<br>质保：按 RHC 标准质保条款执行　|　报价有效期：待销售填写</div>'+
-      '<div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap"><button class="btn btn-outline btn-sm" onclick="showToast(\'框架阶段：正式版支持在线编辑 PI 明细\')">编辑明细</button><button class="btn btn-primary btn-sm" onclick="showToast(\'框架阶段：正式版将生成PDF并推送Ella\',\'success\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 导出 / 发送（正式版）</button></div>'+
-      '<div class="pi-note">注：当前为框架预览，单价与合计在正式版中按销售权限自动填充，框架阶段不展示价格数据。</div>'+
+      '<div class="pi-total-row"><span>合计：</span><strong>待销售填写（价格隔离：单价/合计仅销售角色可见）</strong></div>'+
+      '<div class="pi-terms"><strong>条款：</strong><br>付款方式：待销售填写　|　贸易术语（Incoterms）：待销售填写　|　交货期：待销售填写<br>质保：按 RHC 标准质保条款执行　|　报价有效期：待销售填写</div>'+
+      '<div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="savePiDraft()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> 保存为 PI 草稿</button></div>'+
+      '<div class="pi-note">注：当前为预览，单价与合计由销售按权限填写；保存草稿后进入「已开 PI 列表」，状态推进为已发送/已确认/已成交时漏斗同步点亮。</div>'+
     '</div>';
   showToast('PI 预览已生成','success');
 }
+/* 保存 PI 草稿：POST /api/pi（落订单表，PI状态=草稿） */
+function savePiDraft(){
+  var d=window.__lastPiDraft;
+  if(!d){showToast('请先生成 PI 预览','error');return}
+  if(!d.customer_name){showToast('缺少客户名称','error');return}
+  if(!window.confirm('确认将该 PI 保存为草稿？\n\n客户：'+d.customer_name+'\n编号：'+d.pi_no+'\n\n保存后进入「已开 PI 列表」，可在后续推进状态。')){
+    return;
+  }
+  fetch('/api/pi',{
+    method:'POST',
+    headers:Object.assign({'Content-Type':'application/json'},authHeaders()),
+    body:JSON.stringify({pi_no:d.pi_no,customer_name:d.customer_name,region:d.region,
+      products:d.products,customer_id:d.customer_id,created_at:d.date,status:'草稿'})
+  }).then(function(r){return r.json().then(function(j){return {status:r.status,data:j}})})
+    .then(function(res){
+      if(res.status===200&&res.data.ok){
+        showToast('PI 草稿已保存','success');
+        loadPiList();
+      }else{
+        showToast((res.data&&res.data.message)||'保存失败，请稍后重试','error');
+      }
+    })
+    .catch(function(){showToast('保存失败：网络异常，请稍后重试','error')});
+}
+/* 已开 PI 列表：GET /api/pi（订单表真实数据） */
+var PI_STATUS_TAG={'草稿':'tag-gray','已发送':'tag-info','已确认':'tag-warning','已成交':'tag-success','已取消':'tag-gray'};
+function renderPiList(items){
+  var body=document.getElementById('pi-list-body');
+  if(!body)return;
+  var list=(items||[]);
+  if(!list.length){
+    body.innerHTML='<div class="empty-state">'+
+      '<div class="es-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>'+
+      '<div class="es-title">暂无 PI</div>'+
+      '<div class="es-desc">开出首份 PI 后自动汇聚到此处，并进入销售漏斗「已出 PI」统计。</div></div>';
+    return;
+  }
+  body.innerHTML=list.map(function(p){
+    var st=p.status||'草稿';
+    var tag=PI_STATUS_TAG[st]||'tag-gray';
+    var amt=(p.amount?esc(p.amount)+' '+esc(p.currency||''):'金额待销售填写');
+    return '<div class="intel-item">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+        '<span class="tag '+tag+'">'+esc(st)+'</span>'+
+        '<strong>'+esc(p.pi_no||'（未编号）')+'</strong>'+
+        '<span style="font-size:12px;color:var(--color-text-tertiary)">'+esc(p.created_at||'')+'</span>'+
+      '</div>'+
+      '<div class="ii-desc">'+esc(p.customer_name||'—')+'　·　'+esc(p.region||'—')+'　·　'+amt+'</div>'+
+      (p.products?'<div class="ii-hint" style="margin-top:6px">'+esc(p.products)+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+function loadPiList(){
+  fetch('/api/pi',{headers:authHeaders(),cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+    .then(function(d){renderPiList((d&&d.items)||[])})
+    .catch(function(){/* 未登录或暂不可用：保持空状态 */});
+}
+loadPiList();
 
 /* ===== 商机信号（真实数据：GET /api/signals，公开行业资讯 AI 筛选） ===== */
 var SIGNAL_ICON_RSS='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>';
@@ -1781,8 +1901,8 @@ function renderGrading(customers){
     el.innerHTML='<div class="empty-state"><div class="es-icon">'+
       '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'+
       '<div class="es-title">暂无客户</div>'+
-      '<div class="es-desc">商机认领跟进后可转为客户，客户档案自动建立并按上方 A/B/C 规则打分分级。</div>'+
-      '<div class="es-value">客户主库（飞书多维表格）正式接入后，已建档客户与跟进记录自动同步到此处。</div>'+
+      '<div class="es-desc">线索转为客户后自动建档汇聚到此处，并按上方 A/B/C 规则打分分级。</div>'+
+      '<div class="es-value">在「我的线索」中将跟进成熟的线索状态更新为「已转客户」，客户档案即自动建立。</div>'+
       '<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button type="button" class="btn btn-outline btn-sm" onclick="switchPage(\'signals\',document.querySelector(\'[data-page=signals]\'))">去商机信号</button></div></div>';
     return;
   }
@@ -1802,7 +1922,7 @@ function renderGrading(customers){
     if(stale)followNote+='　<span class="tag tag-warning" style="font-size:10px">跟进超期</span>';
     else if(near)followNote+='　<span class="tag tag-gray" style="font-size:10px">临近超期</span>';
     return '<div class="intel-item">'+
-      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag '+tagCls+'">'+g.grade+' 级 · '+g.total+'分</span><strong>'+esc(c['客户名称'])+'</strong><span class="tag tag-info">客户主库</span></div>'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag '+tagCls+'">'+g.grade+' 级 · '+g.total+'分</span><strong>'+esc(c['客户名称'])+'</strong><span class="tag tag-info">客户档案</span></div>'+
       '<div class="ii-desc">'+esc(c['国家/地区']||c['国家地区']||'—')+'　·　'+esc(c['跟进状态']||'—')+'　·　来源：'+esc(c['来源渠道']||'—')+'<br>主营：'+esc(c['主营产品']||'—')+'</div>'+
       (c['来源链接']
         ? '<div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'+esc(c['来源链接说明']||'查看原始来源')+'<a href="'+esc(c['来源链接'])+'" target="_blank" rel="noopener noreferrer">打开来源链接 →</a></div>'
@@ -1892,8 +2012,9 @@ function renderMailCustomerOptions(){
   }
   var customers=(snapshotData&&snapshotData.customers)||[];
   if(customers.length){
-    opts+='<optgroup label="客户主库（'+customers.length+'）">'+customers.map(function(c){
-      return '<option value="'+esc(c['客户名称'])+'">'+esc(c['客户名称'])+'（'+esc(c['国家/地区']||c['国家地区']||'')+'）</option>';
+    opts+='<optgroup label="客户档案（'+customers.length+'）">'+customers.map(function(c){
+      var email=(c['邮箱']||'').trim();
+      return '<option value="'+esc(c['客户名称'])+'"'+(email?'':' data-no-email="1"')+'>'+esc(c['客户名称'])+'（'+esc(c['国家/地区']||c['国家地区']||'')+'）'+(email?'':'（无邮箱）')+'</option>';
     }).join('')+'</optgroup>';
   }
   opts+='<option value="__manual__">手动输入客户名称</option>';
@@ -1914,25 +2035,108 @@ function refreshCustomerHints(customers){
   var qh=document.getElementById('quote-customer-hint');
   if(qh)qh.style.display=empty?'block':'none';
 }
-fetch('data/snapshot.json',{cache:'no-store'})
-  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
-  .then(function(d){
-    snapshotData=d||{customers:[],orders:[]};
-    var customers=(d&&d.customers)||[];
-    var opts=customerOptionsHtml(customers);
-    document.getElementById('quote-customer').innerHTML=opts;
-    renderMailCustomerOptions();
-    refreshCustomerHints(customers);
-    renderGrading(customers);
-  })
-  .catch(function(){
-    snapshotData={customers:[],orders:[]};
-    var opts=customerOptionsHtml([]);
-    document.getElementById('quote-customer').innerHTML=opts;
-    renderMailCustomerOptions();
-    refreshCustomerHints([]);
-    renderGrading([]);
-  });
+/* 客户档案：GET /api/customers（飞书客户表真实数据，线索转客户自动建档）。
+   归一化为中文 key 结构以复用分级看板/下拉渲染；未登录或接口失败时诚实空状态。 */
+var customersApiList=[];
+function normalizeCustomers(items){
+  return (items||[]).map(function(c){
+    return {
+      'record_id':c.record_id||'',
+      '客户名称':c.name||'',
+      '国家/地区':c.region||'',
+      '联系人':c.contact||'',
+      '邮箱':c.email||'',
+      '跟进状态':c.follow_status||'',
+      '分级':c.grade||'未分级',
+      '客户状态':c.cust_status||'',
+      '来源渠道':c.channel||'',
+      '主营产品':c.products||'',
+      '备注':c.note||'',
+      '创建时间':c.created_at||''
+    };
+  }).filter(function(c){return c['客户名称']});
+}
+function applyCustomers(customers){
+  customersApiList=customers;
+  snapshotData={customers:customers,orders:[]};
+  var opts=customerOptionsHtml(customers);
+  var qsel=document.getElementById('quote-customer');
+  if(qsel)qsel.innerHTML=opts;
+  renderMailCustomerOptions();
+  refreshCustomerHints(customers);
+  renderGrading(customers);
+}
+function loadCustomers(){
+  return fetch('/api/customers',{headers:authHeaders(),cache:'no-store'})
+    .then(function(r){
+      if(r.status===401)throw new Error('unauth');
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      return r.json();
+    })
+    .then(function(d){
+      applyCustomers(normalizeCustomers((d&&d.items)||[]));
+    })
+    .catch(function(e){
+      // 未登录/服务暂不可用：空状态（不编造客户），登录后或下次进入页面重试
+      applyCustomers([]);
+    });
+}
+loadCustomers();
+
+/* ===== 客户回函收件箱：GET /api/mails（收件）+ POST /api/mails/sync（IMAP） ===== */
+function renderInbox(mails){
+  var body=document.getElementById('mail-inbox-body');
+  if(!body)return;
+  var received=(mails||[]).filter(function(m){return (m.direction||'')==='收件'});
+  if(!received.length){
+    body.innerHTML='<div class="empty-state">'+
+      '<div class="es-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>'+
+      '<div class="es-title">暂无客户回函</div>'+
+      '<div class="es-desc">企业邮箱配置后，点击「同步收件箱」拉取近 30 天回函；回函按发件邮箱自动关联到对应线索/客户档案。</div>'+
+      '<div class="es-value">客户回信后商机漏斗「已回信建档」环节自动点亮。</div></div>';
+    return;
+  }
+  body.innerHTML=received.map(function(m){
+    var replied=(m.status||'')==='已回复';
+    return '<div class="intel-item">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+        (replied?'<span class="tag tag-success">客户回信</span>':'<span class="tag tag-info">已收件</span>')+
+        '<strong>'+esc(m.from||'（未知发件人）')+'</strong>'+
+        '<span style="font-size:12px;color:var(--color-text-tertiary)">'+esc(m.time||'')+'</span>'+
+      '</div>'+
+      '<div class="ii-desc"><strong>'+esc(m.subject||'（无主题）')+'</strong></div>'+
+      (m.summary?'<div class="ii-hint" style="margin-top:6px">'+esc(m.summary)+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+function loadInbox(){
+  fetch('/api/mails',{headers:authHeaders(),cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+    .then(function(d){renderInbox((d&&d.items)||[])})
+    .catch(function(){/* 邮件记录表未建或未登录：保持空状态 */});
+}
+function syncInbox(){
+  var btn=document.getElementById('mail-sync-btn');
+  if(btn){btn.disabled=true;btn.textContent='同步中…'}
+  fetch('/api/mails/sync',{method:'POST',headers:authHeaders()})
+    .then(function(r){return r.json().then(function(d){return {status:r.status,data:d}})})
+    .then(function(res){
+      if(btn){btn.disabled=false;btn.textContent='同步收件箱'}
+      if(res.status===200&&res.data.ok){
+        showToast('同步完成：新增 '+((res.data.synced!=null)?res.data.synced:0)+' 封，跳过重复 '+((res.data.skipped!=null)?res.data.skipped:0)+' 封','success');
+        loadInbox();
+      }else if(res.status===503||(res.data&&res.data.code==='EMAIL_NOT_CONFIGURED')){
+        showToast('邮箱未配置：请管理员在「规则配置中心 → 企业邮箱」填写邮箱地址与授权码','error');
+      }else{
+        showToast((res.data&&res.data.message)||'同步失败，请稍后重试','error');
+      }
+    })
+    .catch(function(){
+      if(btn){btn.disabled=false;btn.textContent='同步收件箱'}
+      showToast('同步失败：网络异常，请稍后重试','error');
+    });
+}
+loadInbox();
 
 /* ===== 素材库弹窗（内嵌式）逻辑 ===== */
 var libModalCurrentTab = 'favorites';

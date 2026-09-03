@@ -16,3 +16,6 @@ uploads/
 
 # Runtime data (RSS insights store, auto-rebuilt from seed)
 data/
+
+# Local ops scripts with credentials (not deployed)
+ops/

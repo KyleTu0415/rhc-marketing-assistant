@@ -180,6 +180,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <div class="nav-item active" data-page="grading" onclick="switchPage('grading',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>客户分级规则</span></div>
     <div class="nav-item" data-page="signal" onclick="switchPage('signal',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg><span>商机信号规则</span></div>
     <div class="nav-item" data-page="mail" onclick="switchPage('mail',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>邮件写作规范</span></div>
+    <div class="nav-item" data-page="email" onclick="switchPage('email',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>企业邮箱</span></div>
     <div class="nav-item" data-page="news" onclick="switchPage('news',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg><span>新闻偏好</span></div>
     <div class="nav-item" data-page="accounts" onclick="switchPage('accounts',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>账号管理</span></div>
     <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
@@ -340,6 +341,54 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
             <div class="sb-actions">
               <button class="btn btn-outline" onclick="resetSection('mail')">恢复默认</button>
               <button class="btn btn-primary" onclick="saveMail()">保存规范</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-email">
+      <div class="page-header">
+        <div><h2>企业邮箱</h2><p>配置发信（SMTP）与收件（IMAP）企业邮箱，保存后邮件助手可一键真实发信、自动归档回函</p></div>
+      </div>
+      <div class="perm-notice" id="email-admin-notice" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div><strong>仅管理员可保存：</strong>企业邮箱配置（含授权码）仅管理员可修改；当前账号为非管理员，下方内容只读。</div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>邮箱连接配置</h3><span class="card-sub">QQ 邮箱参数已预填；授权码在邮箱「设置 → 账号 → POP3/IMAP/SMTP」中生成</span></div>
+        <div class="card-body">
+          <div class="rule-group">
+            <div class="rule-group-title">发件账号</div>
+            <div class="rule-rows">
+              <div class="rule-row" style="flex-direction:column;align-items:stretch;gap:8px">
+                <label class="form-label" for="em-address">企业邮箱地址</label>
+                <input type="text" id="em-address" placeholder="例如 sales@rhc-medical.com（QQ 邮箱为 xxx@qq.com）">
+              </div>
+              <div class="rule-row" style="flex-direction:column;align-items:stretch;gap:8px">
+                <label class="form-label" for="em-auth-code">邮箱授权码</label>
+                <input type="password" id="em-auth-code" placeholder="填写邮箱授权码（非登录密码）；已配置时留空表示不修改" autocomplete="new-password">
+              </div>
+            </div>
+          </div>
+          <div class="rule-group">
+            <div class="rule-group-title">SMTP 发信服务器</div>
+            <div class="rule-rows">
+              <div class="rule-row"><span class="rule-label">SMTP 服务器</span><input type="text" id="em-smtp-host" placeholder="smtp.qq.com"></div>
+              <div class="rule-row"><span class="rule-label">端口（SSL）</span><input type="text" id="em-smtp-port" placeholder="465"></div>
+            </div>
+          </div>
+          <div class="rule-group">
+            <div class="rule-group-title">IMAP 收件服务器</div>
+            <div class="rule-rows">
+              <div class="rule-row"><span class="rule-label">IMAP 服务器</span><input type="text" id="em-imap-host" placeholder="imap.qq.com"></div>
+              <div class="rule-row"><span class="rule-label">端口（SSL）</span><input type="text" id="em-imap-port" placeholder="993"></div>
+            </div>
+          </div>
+          <div class="save-bar">
+            <span class="sb-hint" id="email-status-hint">配置保存后，邮件助手「发送邮件」与「同步收件箱」立即生效。</span>
+            <div class="sb-actions">
+              <button class="btn btn-primary" id="btn-save-email" onclick="saveEmailConfig()">保存邮箱配置</button>
             </div>
           </div>
         </div>
@@ -850,7 +899,90 @@ function deleteAccount(recordId){
     .catch(function(){ showToast('网络异常，操作失败','error'); });
 }
 
+/* ============================================================
+ * 企业邮箱配置（数据源：飞书「系统配置」表，经 /api/config 读写）
+ * ============================================================ */
+var EMAIL_CFG_ADMIN = false;
+function setEmailVal(id, v){ var el=document.getElementById(id); if(el) el.value=v||''; }
+function loadEmailConfig(){
+  fetch('/api/config',{headers:accAuthHeaders(),cache:'no-store'})
+    .then(function(r){return r.json()})
+    .then(function(d){
+      if(!d||!d.ok){ return; }
+      var c=d.config||{};
+      EMAIL_CFG_ADMIN=!!c.is_admin;
+      setEmailVal('em-address',c.email_address||'');
+      setEmailVal('em-smtp-host',c.smtp_host||'');
+      setEmailVal('em-smtp-port',c.smtp_port||'');
+      setEmailVal('em-imap-host',c.imap_host||'');
+      setEmailVal('em-imap-port',c.imap_port||'');
+      // 授权码：admin 明文回显；非 admin 掩码，输入框留空
+      var codeEl=document.getElementById('em-auth-code');
+      if(codeEl){
+        if(EMAIL_CFG_ADMIN && c.email_auth_code && c.email_auth_code!=='********'){
+          codeEl.value=c.email_auth_code;
+        }else{
+          codeEl.value='';
+          codeEl.placeholder = c.email_auth_code ? '已配置（********）；留空表示不修改' : '填写邮箱授权码（非登录密码）';
+        }
+      }
+      // 非管理员：只读 + 提示
+      var notice=document.getElementById('email-admin-notice');
+      if(notice) notice.style.display = EMAIL_CFG_ADMIN ? 'none' : 'flex';
+      ['em-address','em-auth-code','em-smtp-host','em-smtp-port','em-imap-host','em-imap-port'].forEach(function(id){
+        var el=document.getElementById(id);
+        if(el) el.disabled = !EMAIL_CFG_ADMIN;
+      });
+      var btn=document.getElementById('btn-save-email');
+      if(btn) btn.style.display = EMAIL_CFG_ADMIN ? 'inline-flex' : 'none';
+      var hint=document.getElementById('email-status-hint');
+      if(hint && (c._configured_keys||[]).indexOf('email_address')>=0 && (c._configured_keys||[]).indexOf('email_auth_code')>=0){
+        hint.textContent='企业邮箱已配置：邮件助手可一键真实发信、同步近 30 天回函。';
+      }
+    })
+    .catch(function(){/* 未登录或服务暂不可用：保留默认值 */});
+}
+function saveEmailConfig(){
+  if(!EMAIL_CFG_ADMIN){ showToast('仅管理员可保存邮箱配置','error'); return; }
+  var get=function(id){ var el=document.getElementById(id); return el?el.value.trim():''; };
+  var address=get('em-address');
+  var authCode=get('em-auth-code');
+  if(!address){ showToast('请填写企业邮箱地址','error'); return; }
+  // 授权码：掩码或空时不提交（后端保留原值）；首次配置必须填写
+  var items={
+    email_address:address,
+    smtp_host:get('em-smtp-host')||'smtp.qq.com',
+    smtp_port:get('em-smtp-port')||'465',
+    imap_host:get('em-imap-host')||'imap.qq.com',
+    imap_port:get('em-imap-port')||'993'
+  };
+  if(authCode && authCode!=='********'){ items.email_auth_code=authCode; }
+  var btn=document.getElementById('btn-save-email');
+  if(btn){ btn.disabled=true; btn.textContent='保存中…'; }
+  fetch('/api/config',{
+    method:'PUT',
+    headers:Object.assign({'Content-Type':'application/json'},accAuthHeaders()),
+    body:JSON.stringify({items:items})
+  }).then(function(r){return r.json().then(function(j){return {status:r.status,data:j}})})
+    .then(function(res){
+      if(btn){ btn.disabled=false; btn.textContent='保存邮箱配置'; }
+      if(res.status===200&&res.data.ok){
+        showToast('邮箱配置已保存','success');
+        loadEmailConfig();
+      }else if(res.status===403){
+        showToast('仅管理员可修改系统配置','error');
+      }else{
+        showToast((res.data&&res.data.message)||'保存失败，请稍后重试','error');
+      }
+    })
+    .catch(function(){
+      if(btn){ btn.disabled=false; btn.textContent='保存邮箱配置'; }
+      showToast('保存失败：网络异常','error');
+    });
+}
+
 initAccounts();
+loadEmailConfig();
 </script>
 </body>
 </html>

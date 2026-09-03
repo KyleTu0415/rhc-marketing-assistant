@@ -246,13 +246,32 @@ def collect_dashboard_stats(user_info=None):
     # 已认领层：线索表可用时用有效线索数（与信号 claimed 标记同口径）；
     # 线索表不可用时该层无法统计，置为未接入（None）。
     claimed_val = leads_active if leads_ok else None
+
+    # 后四层：从邮件记录表 / 订单表（PI）真实统计点亮；
+    # 表不存在或读取失败时对应字段为 None，前端保持灰框架「—」。
+    # 只读路径：不会因为查看仪表盘而自动建空表。
+    emailed_val = replied_val = pi_val = deal_val = None
+    try:
+        from app import business
+        mstat = business.funnel_mail_stats()
+        pstat = business.funnel_pi_stats()
+        emailed_val = mstat.get("sent")
+        replied_val = mstat.get("replied")
+        pi_val = pstat.get("pi")
+        deal_val = pstat.get("won")
+    except Exception as e:
+        print(f"[dashboard] 漏斗后半段统计失败（降级灰框架）: {e}")
+
     funnel = [
         {"key": "signals", "label": "商机信号池", "value": signals_total, "available": True},
         {"key": "claimed", "label": "已认领", "value": claimed_val, "available": leads_ok},
-        {"key": "emailed", "label": "已发开发信", "value": None, "available": False},
-        {"key": "replied", "label": "已回信建档", "value": None, "available": False},
-        {"key": "pi", "label": "已出 PI", "value": None, "available": False},
-        {"key": "deal", "label": "已成交", "value": None, "available": False},
+        {"key": "emailed", "label": "已发开发信", "value": emailed_val,
+         "available": emailed_val is not None},
+        {"key": "replied", "label": "已回信建档", "value": replied_val,
+         "available": replied_val is not None},
+        {"key": "pi", "label": "已出 PI", "value": pi_val, "available": pi_val is not None},
+        {"key": "deal", "label": "已成交", "value": deal_val,
+         "available": deal_val is not None},
     ]
 
     def _rate(a, b):
@@ -264,10 +283,18 @@ def collect_dashboard_stats(user_info=None):
     conversion = [
         {"from": "signals", "to": "claimed",
          "rate": _rate(claimed_val, signals_total), "available": leads_ok},
-        {"from": "claimed", "to": "emailed", "rate": None, "available": False},
-        {"from": "emailed", "to": "replied", "rate": None, "available": False},
-        {"from": "replied", "to": "pi", "rate": None, "available": False},
-        {"from": "pi", "to": "deal", "rate": None, "available": False},
+        {"from": "claimed", "to": "emailed",
+         "rate": _rate(emailed_val, claimed_val),
+         "available": emailed_val is not None and claimed_val is not None},
+        {"from": "emailed", "to": "replied",
+         "rate": _rate(replied_val, emailed_val),
+         "available": emailed_val is not None and replied_val is not None},
+        {"from": "replied", "to": "pi",
+         "rate": _rate(pi_val, replied_val),
+         "available": pi_val is not None and replied_val is not None},
+        {"from": "pi", "to": "deal",
+         "rate": _rate(deal_val, pi_val),
+         "available": pi_val is not None and deal_val is not None},
     ]
 
     # ---- 商机地区分布（信号 regions 字段，可多选，逐 region 计数）----

@@ -53,6 +53,12 @@ from app import insights_store  # noqa: E402
 insights_store.get_items = lambda: mock_signals
 dashboard._collect_leads = lambda: mock_leads
 
+# 漏斗后半段依赖飞书邮件记录表/订单表：离线环境模拟「表未接入」降级，
+# 后四层应为 None（前端灰框架）；同时模拟「已接入但为 0」场景验证点亮。
+from app import business  # noqa: E402
+business.funnel_mail_stats = lambda: {"sent": None, "replied": None}
+business.funnel_pi_stats = lambda: {"pi": None, "won": None}
+
 stats = dashboard.collect_dashboard_stats()
 print(json.dumps(stats, ensure_ascii=False, indent=2))
 
@@ -106,6 +112,24 @@ print("\n==== 断言结果 ====")
 for name, ok in checks:
     print(("PASS " if ok else "FAIL ") + name)
 assert not fails, f"失败: {fails}"
+
+# 漏斗后半段「已接入且有真实数据」：发信2/回信1/PI1/成交1，层间转化率应可算
+business.funnel_mail_stats = lambda: {"sent": 2, "replied": 1}
+business.funnel_pi_stats = lambda: {"pi": 1, "won": 1}
+stats_lit = dashboard.collect_dashboard_stats()
+fmap = {f["key"]: f for f in stats_lit["funnel"]}
+assert fmap["emailed"]["value"] == 2 and fmap["emailed"]["available"] is True
+assert fmap["replied"]["value"] == 1 and fmap["pi"]["value"] == 1 and fmap["deal"]["value"] == 1
+# claimed=4 -> emailed 2/4=0.5；emailed2->replied1 0.5；replied1->pi1 1.0；pi1->deal1 1.0
+cmap = {(c["from"], c["to"]): c for c in stats_lit["conversion"]}
+assert abs(cmap[("claimed", "emailed")]["rate"] - 0.5) < 1e-9
+assert abs(cmap[("emailed", "replied")]["rate"] - 0.5) < 1e-9
+assert abs(cmap[("replied", "pi")]["rate"] - 1.0) < 1e-9
+assert abs(cmap[("pi", "deal")]["rate"] - 1.0) < 1e-9
+print("PASS 漏斗后半段点亮：发信2/回信1/PI1/成交1，层间转化率正确计算")
+# 回到未接入降级态供后续断言
+business.funnel_mail_stats = lambda: {"sent": None, "replied": None}
+business.funnel_pi_stats = lambda: {"pi": None, "won": None}
 
 # 线索表失败降级：线索侧 None、信号侧正常
 dashboard._collect_leads = lambda: (_ for _ in ()).throw(RuntimeError("feishu down"))
