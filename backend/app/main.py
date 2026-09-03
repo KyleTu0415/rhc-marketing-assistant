@@ -95,9 +95,7 @@ SECRET_KEY = os.getenv("RHC_SECRET_KEY", "rhc-marketing-secret-2026")
 TOKEN_EXPIRY = 24 * 60 * 60  # 24 hours
 
 USERS = {
-    "admin": {"password": "rhc2026", "role": "admin", "name": "管理员"},
-    "sales1": {"password": "demo123", "role": "sales", "name": "销售演示"},
-    "viewer": {"password": "view123", "role": "viewer", "name": "访客"},
+    "ella": {"password": "rhc2026", "role": "admin", "name": "Ella"},
 }
 
 def _create_token(username: str) -> str:
