@@ -16,7 +16,7 @@ import os
 import sys
 import threading
 import uvicorn
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 # Optional imports
 try:
@@ -933,6 +933,58 @@ async def api_insights_refresh():
 async def api_insights_status():
     from app import insights_store
     return insights_store.status()
+
+@app.get("/api/signals")
+async def api_signals_list(limit: str = "20", opp_type: Optional[str] = None):
+    """销售商机信号：从洞察存储中筛出 is_opportunity=true 的条目，
+    按日期倒序返回。数据随 /api/insights 刷新管线自动更新，不另建存储。
+    query: limit（默认20，上限100）、opp_type（可选，按商机类型过滤）。"""
+    from app import insights_store
+    from app.insights_llm import OPP_LABELS, OPP_COLORS, OPP_TYPES
+
+    # 与 /api/insights 一致：线上只对外提供 RSS 真新闻；种子快照不混入
+    all_items = insights_store.get_items()
+    rss_items = [it for it in all_items if it.get("source") != "seed"]
+    base_items = rss_items if rss_items else all_items
+
+    sig = [it for it in base_items
+           if it.get("is_opportunity") and it.get("opp_type") in OPP_TYPES]
+    if opp_type:
+        opp_type = opp_type.strip()
+        if opp_type in OPP_TYPES:
+            sig = [it for it in sig if it.get("opp_type") == opp_type]
+    sig.sort(key=lambda x: x.get("date", ""), reverse=True)
+    total = len(sig)
+    try:
+        limit = max(1, min(int(limit), 100))
+    except (TypeError, ValueError):
+        limit = 20
+    sig = sig[:limit]
+
+    items = [{
+        "id": it.get("id", ""),
+        "title": it.get("title", ""),
+        "summary": it.get("summary", ""),
+        "opp_type": it.get("opp_type"),
+        "opp_label": OPP_LABELS.get(it.get("opp_type"), "采购动态"),
+        "opp_color": OPP_COLORS.get(it.get("opp_type"), "#5B21B6"),
+        "date": it.get("date", ""),
+        "source": it.get("source", ""),
+        "url": it.get("url", ""),
+        "regions": it.get("regions") or ["global"],
+        "category": it.get("category", ""),
+        "categoryLabel": it.get("categoryLabel", ""),
+        "lang": it.get("lang", ""),
+    } for it in sig]
+
+    return {
+        "ok": True,
+        "items": items,
+        "total": total,
+        "generated_at": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M"),
+        "opp_types": [{"key": k, "label": OPP_LABELS[k], "color": OPP_COLORS[k]}
+                      for k in OPP_TYPES],
+    }
 
 try:
     from app import insights_store

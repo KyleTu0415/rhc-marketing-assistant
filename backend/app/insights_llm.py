@@ -5,6 +5,7 @@ RHC 市场洞察 —— LLM 加工：英文新闻 -> 中文标题/摘要 + 分�
 """
 import json
 import os
+import re
 import httpx
 
 SYSTEM_PROMPT = """你是兽医医疗器械出口公司（安瑞康 RHC，产品：动物麻醉机、监护仪、影像设备、注射泵等）的市场情报编辑。
@@ -21,9 +22,20 @@ SYSTEM_PROMPT = """你是兽医医疗器械出口公司（安瑞康 RHC，产品
    global 全球 / north-america 北美 / europe 欧洲 / africa 非洲 /
    middle-east 中东 / southeast-asia 东南亚 / brazil 巴西 / china 中国 / asia 亚洲
    新闻未提及具体地区时给 ["global"]。
+5. 商机信号判断（is_opportunity / opp_type）：判断该新闻是否构成可能带来
+   【设备销售机会】的外贸商机事件。只有以下事件才算商机（is_opportunity=true）：
+   - clinic_expansion 诊所扩张：兽医诊所/宠物医院/连锁机构的扩张、融资、新机构开业、新院区
+   - tender 招标采购：设备/医疗器械招标、政府采购、集中采购、设备采购计划、中标
+   - expo 展会活动：兽医/宠物医疗行业展会、行业大会、学术会议的预告或举办
+   - channel 渠道动态：经销商、分销商、代理商的合作签约、渠道布局、授权代理
+   - company_move 采购合作：企业（含同行/养殖集团）的大额采购、战略合作、合资、并购、产能扩张
+   以下情况【不算】商机（is_opportunity=false，opp_type="none"）：纯行业科普、
+   趋势报告/市场规模分析、单纯的产品发布或技术突破、人事任命、财报营收数据
+   （除非伴随融资扩张）、监管政策、动物医学研究结论。拿不准时给 false。
+   opp_type 只能取：clinic_expansion / tender / expo / channel / company_move / none。
 
 严格只输出 JSON 数组，不要任何解释文字。格式：
-[{"id": 0, "relevant": true, "category": "market", "title_zh": "中文标题", "summary_zh": "中文摘要", "regions": ["north-america"]}, ...]
+[{"id": 0, "relevant": true, "category": "market", "title_zh": "中文标题", "summary_zh": "中文摘要", "regions": ["north-america"], "is_opportunity": false, "opp_type": "none"}, ...]
 不相关的新闻输出 {"id": 编号, "relevant": false}，id 必须与输入编号一一对应。"""
 
 
@@ -56,6 +68,7 @@ def process_items(raw_items: list, batch_size: int = 10) -> list:
             p = processed.get(idx)
             if not p or not p.get("relevant"):
                 continue
+            is_opp, opp_type = _norm_opp(p)
             results.append({
                 "category": p.get("category", "market"),
                 "categoryLabel": CATEGORY_LABELS.get(p.get("category"), "市场动态"),
@@ -67,6 +80,8 @@ def process_items(raw_items: list, batch_size: int = 10) -> list:
                 "regions": p.get("regions") or ["global"],
                 "source": item.get("source", ""),
                 "title_en": item["title"],
+                "is_opportunity": is_opp,
+                "opp_type": opp_type,
             })
     return results
 
@@ -77,6 +92,46 @@ CATEGORY_LABELS = {
     "competitor": "同行新闻",
     "product": "产品技术",
 }
+
+# 商机类型 -> 中文标签 / 标签色。
+# 配色复用四列看板色板（industry 蓝 #1565C0 / market 绿 #2E7D32 /
+# competitor 橙 #E65100 / product 紫 #7C3AED）并做同色系扩展：
+#   clinic_expansion 青（success 系 #00796B，机构扩张/正向增长）
+#   tender           红（品牌红 #C8102E，高优先销售机会）
+#   expo             亮蓝（info 系 #1565C0→#0277BD，展会活动）
+#   channel          琥珀（warning 系 #EF6C00，渠道动态，区别于同行橙）
+#   company_move     靛紫（#5B21B6，企业动作，区别于产品紫）
+OPP_LABELS = {
+    "clinic_expansion": "诊所扩张",
+    "tender": "招标采购",
+    "expo": "展会机会",
+    "channel": "渠道动态",
+    "company_move": "采购动态",
+}
+OPP_COLORS = {
+    "clinic_expansion": "#00796B",
+    "tender": "#C8102E",
+    "expo": "#0277BD",
+    "channel": "#EF6C00",
+    "company_move": "#5B21B6",
+}
+OPP_TYPES = tuple(OPP_LABELS.keys())
+
+
+def _norm_opp(p: dict) -> tuple:
+    """归一化商机字段（LLM 路径与降级路径共用）。
+    返回 (is_opportunity: bool, opp_type: str)。
+    以 is_opportunity 布尔为准；opp_type 非法/缺失时按布尔自动修正，
+    保证 is_opportunity 为 True 时一定带有效类型。"""
+    opp_type = str(p.get("opp_type", "") or "").strip().lower()
+    if opp_type not in OPP_TYPES:
+        opp_type = "none"
+    flag = bool(p.get("is_opportunity", False))
+    if flag and opp_type == "none":
+        opp_type = "company_move"  # 模型只给了 true 没给类型：兜底为采购合作
+    if not flag and opp_type != "none":
+        flag = True               # 给了有效类型但漏标布尔：视为商机
+    return flag, opp_type
 
 
 def _call_llm(cfg: dict, batch: list):
@@ -179,12 +234,68 @@ def _fb_classify(text: str) -> str:
     return "market"
 
 
+# 降级商机关键词（无 LLM Key 时用）。按优先级排列：
+# 招标 > 诊所扩张 > 展会 > 渠道 > 企业采购合作；都不命中则 none。
+# 用正则词边界匹配，避免 "expansion"/"expands" 漏匹配（\b 兼容变形词干），
+# 也避免关键词片段误命中。
+_FB_OPP_RULES = [
+    ("tender", [
+        r"\btender\b", r"\btendering\b", r"\bbid (?:for|on)\b", r"\bbidding\b",
+        r"\bprocurement\b", r"\bgovernment (?:bid|purchase)\b",
+        r"\bcontract (?:award|awarded)\b", r"\bawarded .{0,20}(?:contract|supply)\b",
+        r"\bpurchase order\b", r"\brequest for (?:proposal|quotation|tender)\b",
+        r"\brfp\b", r"\brfq\b", r"\bsupply contract\b",
+    ]),
+    ("clinic_expansion", [
+        r"\bnew (?:vet(?:erinary)?|animal|pet) (?:clinic|hospital|practice)\b",
+        r"\b(?:vet(?:erinary)?|animal|pet) (?:clinic|hospital|practice) (?:opens|open|launches|expands|opening)\b",
+        r"\b(?:clinic|hospital) (?:expansion|expands|expanded|chain|group)\b",
+        r"\bvet(?:erinary)? (?:chain|group)\b",
+        r"\b(?:raises|raised|secures?) \$[\d.]+\s*(?:million|m|billion)?",
+        r"\bfunding round\b", r"\bseries [a-d]\b",
+        r"\bexpansion plan\b", r"\bnew location\b", r"\bgrand opening\b",
+    ]),
+    ("expo", [
+        r"\bexp(?:o|os)\b", r"\bexhibition\b", r"\btrade show\b",
+        r"\b(?:vet(?:erinary)?|animal health) (?:conference|congress|meeting|summit|show)\b",
+        r"\bvmx\b", r"\bnavc (?:live|conference)\b", r"\bwestern veterinary conference\b",
+        r"\bwvc\b",
+    ]),
+    ("channel", [
+        r"\bdistributor(?:ship)?\b", r"\bdistribution (?:agreement|deal|partnership|partner|network|rights)\b",
+        r"\bdealership\b", r"\bdealer network\b", r"\bauthorized (?:dealer|reseller|agent)\b",
+        r"\bexclusive (?:distributor|distribution)\b", r"\bvalue[- ]added reseller\b", r"\bvar\b",
+        r"\bsigns .{0,30}(?:distribut|dealer|agent|reseller)",
+    ]),
+    ("company_move", [
+        r"\bstrategic (?:partnership|cooperation|alliance|agreement)\b",
+        r"\bjoint venture\b", r"\bmemorandum of understanding\b", r"\bmou\b",
+        r"\bacquires?\b", r"\bacquisition\b", r"\bmerger\b",
+        r"\bmajor (?:equipment |device )?(?:order|purchase|buy)\b",
+        r"\bpurchase[sd]? .{0,30}(?:equipment|devices?|machines?)",
+        r"\bmanufacturing facility\b", r"\bproduction capacity\b",
+        r"\bnew factory\b", r"\bcapacity expansion\b",
+    ]),
+]
+_FB_OPP_RES = [(ot, [re.compile(p, re.I) for p in pats]) for ot, pats in _FB_OPP_RULES]
+
+
+def _fb_opp(text: str) -> str:
+    """降级路径：关键词启发式判断商机类型，命中返回 opp_type，否则 'none'。"""
+    for ot, pats in _FB_OPP_RES:
+        if any(rx.search(text) for rx in pats):
+            return ot
+    return "none"
+
+
 def _fallback_items(raw_items: list) -> list:
-    """无 LLM Key 时的降级：保留英文原文，用关键词启发式分类到四列。"""
+    """无 LLM Key 时的降级：保留英文原文，用关键词启发式分类到四列，
+    并按关键词启发式标记商机信号（is_opportunity/opp_type）。"""
     out = []
     for it in raw_items:
         text = f"{it['title']} {it.get('summary', '')} {it.get('source', '')}"
         cat = _fb_classify(text)
+        opp_type = _fb_opp(text)
         out.append({
             "category": cat,
             "categoryLabel": CATEGORY_LABELS.get(cat, "市场动态"),
@@ -196,5 +307,7 @@ def _fallback_items(raw_items: list) -> list:
             "regions": ["global"],
             "source": it.get("source", ""),
             "title_en": it["title"],
+            "is_opportunity": opp_type != "none",
+            "opp_type": opp_type,
         })
     return out
