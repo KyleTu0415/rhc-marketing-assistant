@@ -428,6 +428,8 @@ def _fetch_users_from_feishu():
                 "name": _tv(fl.get("姓名")) or username,
                 # 单选「启用」未填写时默认视为启用；仅明确为「否」才停用
                 "enabled": enabled != "否",
+                # 飞书记录 ID，账号管理改/删使用；内部字段，不参与登录比对
+                "_record_id": it.get("record_id", ""),
             }
         if not data.get("has_more"):
             break
@@ -464,6 +466,200 @@ def _warmup_account_table():
             print("[auth] 飞书账号表暂不可用，当前使用内置兜底账号（登录时会自动重试）")
     except Exception as e:
         print(f"[auth] 飞书账号表初始化失败（登录时将自动重试/回退兜底账号）: {e}")
+
+def _invalidate_users_cache():
+    """写操作成功后调用：立即失效账号缓存并强制刷新，保证改完马上生效。
+    刷新失败则置空缓存（下次读取会重新拉取；拉取失败仍回退兜底 USERS）。"""
+    _users_cache["data"] = None
+    _users_cache["ts"] = 0.0
+    try:
+        _get_users(force_refresh=True)
+    except Exception as e:
+        print(f"[admin] 账号缓存刷新失败，下次读取将重试: {e}")
+
+def _find_user_by_record_id(record_id):
+    """按飞书 record_id 找到对应账号：返回 (username, user_dict) 或 (None, None)。
+    管理写操作专用：强制拉取最新数据，避免 60 秒缓存内拿到旧记录。"""
+    users = _get_users(force_refresh=True)
+    for uname, u in users.items():
+        if u.get("_record_id") == record_id:
+            return uname, u
+    return None, None
+
+def _count_active_admins(users):
+    """统计启用中的 admin 数量（用于「最后一个管理员」防呆）。"""
+    return sum(1 for u in users.values()
+               if u.get("role") == "admin" and u.get("enabled", True))
+
+# ============================================================
+# 账号管理 API（配置中心「账号管理」页）
+# 所有接口需登录；写操作（增/改/删）仅限 admin 角色。
+# 数据源：飞书多维表「系统账号」表；写操作成功后立即失效账号缓存。
+# ============================================================
+class AdminAccountCreate(BaseModel):
+    username: str = ""
+    password: str = ""
+    name: str = ""
+    role: str = "viewer"
+
+class AdminAccountUpdate(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+    password: Optional[str] = None
+    enabled: Optional[bool] = None
+
+@app.get("/api/admin/accounts")
+async def api_admin_accounts_list(request: Request):
+    token = _get_token_from_request(request)
+    if not token or not _verify_token(token):
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    try:
+        users = _get_users(force_refresh=True)
+    except Exception as e:
+        print(f"[admin] 读取账号列表失败: {e}")
+        return JSONResponse({"ok": False, "message": f"读取账号列表失败：{e}"}, status_code=502)
+    items = []
+    for uname, u in users.items():
+        items.append({
+            "username": uname,
+            "name": u.get("name", uname),
+            "role": u.get("role", "viewer"),
+            "enabled": u.get("enabled", True),
+            "record_id": u.get("_record_id", ""),
+        })
+    return {"ok": True, "items": items, "total": len(items)}
+
+@app.post("/api/admin/accounts")
+async def api_admin_account_create(req: AdminAccountCreate, request: Request):
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    if user_info.get("role") != "admin":
+        return JSONResponse({"ok": False, "message": "仅管理员可新增账号"}, status_code=403)
+
+    username = (req.username or "").strip()
+    password = req.password or ""
+    name = (req.name or "").strip() or username
+    role = (req.role or "").strip()
+    if not username:
+        return JSONResponse({"ok": False, "message": "用户名不能为空"}, status_code=400)
+    if len(password) < 6:
+        return JSONResponse({"ok": False, "message": "密码至少 6 位"}, status_code=400)
+    if role not in ("admin", "sales", "viewer"):
+        return JSONResponse({"ok": False, "message": "角色仅支持 admin / sales / viewer"}, status_code=400)
+
+    try:
+        users = _get_users(force_refresh=True)
+        if username in users:
+            return JSONResponse({"ok": False, "message": f"用户名「{username}」已存在，请更换"}, status_code=400)
+        tid = _ensure_account_table()
+        fields = {"用户名": username, "密码": password, "姓名": name,
+                  "角色": role, "启用": "是"}
+        resp = _feishu_api(
+            "POST", f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records",
+            {"fields": fields})
+        rec = resp.get("data", {}).get("record", {})
+        _invalidate_users_cache()
+        return {"ok": True, "message": "账号已创建",
+                "record_id": rec.get("record_id", ""),
+                "account": {"username": username, "name": name,
+                            "role": role, "enabled": True,
+                            "record_id": rec.get("record_id", "")}}
+    except Exception as e:
+        print(f"[admin] 新增账号失败（{username}）: {e}")
+        return JSONResponse({"ok": False, "message": f"新增账号失败：{e}"}, status_code=502)
+
+@app.put("/api/admin/accounts/{record_id}")
+async def api_admin_account_update(record_id: str, req: AdminAccountUpdate, request: Request):
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    if user_info.get("role") != "admin":
+        return JSONResponse({"ok": False, "message": "仅管理员可修改账号"}, status_code=403)
+
+    try:
+        target_uname, target_user = _find_user_by_record_id(record_id)
+        if not target_user:
+            return JSONResponse({"ok": False, "message": "账号不存在或已被删除"}, status_code=404)
+
+        fields = {}
+        if req.name is not None:
+            name = req.name.strip() or target_uname
+            fields["姓名"] = name
+        if req.role is not None:
+            role = req.role.strip()
+            if role not in ("admin", "sales", "viewer"):
+                return JSONResponse({"ok": False, "message": "角色仅支持 admin / sales / viewer"}, status_code=400)
+            fields["角色"] = role
+        if req.password is not None and req.password != "":
+            # 空字符串/不传 = 不修改密码
+            if len(req.password) < 6:
+                return JSONResponse({"ok": False, "message": "密码至少 6 位"}, status_code=400)
+            fields["密码"] = req.password
+        if req.enabled is not None:
+            fields["启用"] = "是" if req.enabled else "否"
+
+        # ---- 防呆规则 ----
+        is_self = (target_uname == user_info.get("username"))
+        if is_self and fields.get("启用") == "否":
+            return JSONResponse({"ok": False, "message": "不能停用当前登录账号"}, status_code=400)
+        # 预演变更后的状态：不能让系统失去最后一个启用中的 admin
+        new_role = fields.get("角色", target_user.get("role"))
+        new_enabled = fields.get("启用")
+        new_enabled = True if new_enabled == "是" else (False if new_enabled == "否" else target_user.get("enabled", True))
+        if new_role != "admin" or not new_enabled:
+            # 取最新全量账号模拟变更后统计
+            users_now = _get_users(force_refresh=True)
+            remain = 0
+            for uname, u in users_now.items():
+                r = new_role if uname == target_uname else u.get("role")
+                en = new_enabled if uname == target_uname else u.get("enabled", True)
+                if r == "admin" and en:
+                    remain += 1
+            if remain < 1:
+                return JSONResponse({"ok": False, "message": "系统至少需保留一个启用中的管理员账号"}, status_code=400)
+
+        if not fields:
+            return {"ok": True, "message": "无需要修改的内容"}
+        _feishu_api(
+            "PUT",
+            f"/bitable/v1/apps/{FEISHU_ATK}/tables/{_account_table_id}/records/{record_id}",
+            {"fields": fields})
+        _invalidate_users_cache()
+        return {"ok": True, "message": "账号已更新"}
+    except Exception as e:
+        print(f"[admin] 修改账号失败（{record_id}）: {e}")
+        return JSONResponse({"ok": False, "message": f"修改账号失败：{e}"}, status_code=502)
+
+@app.delete("/api/admin/accounts/{record_id}")
+async def api_admin_account_delete(record_id: str, request: Request):
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    if user_info.get("role") != "admin":
+        return JSONResponse({"ok": False, "message": "仅管理员可删除账号"}, status_code=403)
+
+    try:
+        target_uname, target_user = _find_user_by_record_id(record_id)
+        if not target_user:
+            return JSONResponse({"ok": False, "message": "账号不存在或已被删除"}, status_code=404)
+        if target_uname == user_info.get("username"):
+            return JSONResponse({"ok": False, "message": "不能删除当前登录账号"}, status_code=400)
+        # 不能删除最后一个启用中的 admin
+        if target_user.get("role") == "admin" and target_user.get("enabled", True) \
+                and _count_active_admins(_get_users(force_refresh=True)) <= 1:
+            return JSONResponse({"ok": False, "message": "系统至少需保留一个启用中的管理员账号"}, status_code=400)
+        _feishu_api(
+            "DELETE",
+            f"/bitable/v1/apps/{FEISHU_ATK}/tables/{_account_table_id}/records/{record_id}")
+        _invalidate_users_cache()
+        return {"ok": True, "message": f"账号「{target_uname}」已删除"}
+    except Exception as e:
+        print(f"[admin] 删除账号失败（{record_id}）: {e}")
+        return JSONResponse({"ok": False, "message": f"删除账号失败：{e}"}, status_code=502)
 
 @app.post("/api/products")
 async def api_product_create(req: ProductUpsertRequest):

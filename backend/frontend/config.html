@@ -124,6 +124,42 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .news-preview-hint{display:flex;align-items:center;gap:6px;margin-top:10px;padding:8px 12px;background:#F0F7FF;border-radius:var(--radius-sm);font-size:12px;color:#1A56C4;line-height:1.6}
 .news-preview-hint svg{width:14px;height:14px;flex-shrink:0}
 
+/* ===== 账号管理 ===== */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table thead{background:var(--color-bg)}
+.data-table th{text-align:left;padding:12px 16px;font-weight:600;font-size:12px;color:var(--color-text-secondary);letter-spacing:0.4px;border-bottom:1px solid var(--color-border);white-space:nowrap}
+.data-table td{padding:12px 16px;border-bottom:1px solid var(--color-border-light);vertical-align:middle}
+.data-table tbody tr:last-child td{border-bottom:none}
+.data-table tbody tr:hover{background:var(--color-primary-xlight)}
+.data-table tr.row-self{background:var(--color-primary-xlight)}
+.data-table tr.row-self:hover{background:var(--color-primary-light)}
+.data-table .cell-empty{text-align:center;color:var(--color-text-tertiary);padding:32px 16px}
+.acc-actions{display:flex;gap:4px;align-items:center;justify-content:flex-end}
+.act-btn{padding:5px 10px;font-size:12px;font-weight:600;border-radius:var(--radius-sm);border:none;background:none;color:var(--color-primary);transition:all var(--transition-fast)}
+.act-btn:hover:not(:disabled){background:var(--color-primary-xlight)}
+.act-btn.danger{color:var(--color-danger)}
+.act-btn.danger:hover:not(:disabled){background:#FDECEE}
+.act-btn:disabled{color:var(--color-text-tertiary);cursor:not-allowed}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;visibility:hidden;transition:opacity var(--transition-fast),visibility var(--transition-fast)}
+.modal-overlay.show{opacity:1;visibility:visible}
+.modal-card{background:var(--color-surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:90%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;transform:translateY(20px);transition:transform var(--transition-fast)}
+.modal-overlay.show .modal-card{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--color-border-light);flex-shrink:0}
+.modal-title{font-size:15px;font-weight:700;color:var(--color-text);display:flex;align-items:center;gap:10px}
+.modal-title::before{content:'';width:3px;height:16px;background:var(--color-primary);border-radius:2px;flex-shrink:0}
+.modal-close{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--color-text-tertiary);transition:all var(--transition-fast)}
+.modal-close:hover{background:var(--color-bg);color:var(--color-text)}
+.modal-close svg{width:18px;height:18px}
+.modal-body{padding:20px 22px;overflow-y:auto;flex:1}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--color-border-light);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+.form-group{margin-bottom:16px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.form-label small{font-weight:400;color:var(--color-text-tertiary);margin-left:6px}
+.form-group input,.form-group select{width:100%;padding:9px 12px}
+.form-group input:disabled{background:var(--color-border-light);color:var(--color-text-tertiary);cursor:not-allowed}
+.form-hint{font-size:11.5px;color:var(--color-text-tertiary);margin-top:5px;line-height:1.6}
+
 @media(max-width:860px){
   .sidebar{width:56px;min-width:56px}
   .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section,.sidebar .sidebar-user .user-info{display:none}
@@ -145,6 +181,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <div class="nav-item" data-page="signal" onclick="switchPage('signal',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg><span>商机信号规则</span></div>
     <div class="nav-item" data-page="mail" onclick="switchPage('mail',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>邮件写作规范</span></div>
     <div class="nav-item" data-page="news" onclick="switchPage('news',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg><span>新闻偏好</span></div>
+    <div class="nav-item" data-page="accounts" onclick="switchPage('accounts',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>账号管理</span></div>
     <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
 </nav>
@@ -394,10 +431,76 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       </div>
     </section>
 
+    <section class="page" id="page-accounts">
+      <div class="page-header">
+        <div><h2>账号管理</h2><p>管理可登录系统的账号与角色，新增、修改立即生效（数据存储于飞书「系统账号」表）</p></div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" id="btn-add-account" onclick="openAccountModal()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            新增账号
+          </button>
+        </div>
+      </div>
+
+      <div class="perm-notice" id="accounts-readonly-notice" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div><strong>只读模式：</strong>仅管理员（admin）可新增、修改或删除账号。当前账号可查看列表，如需变更请联系管理员。</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>系统账号</h3><span class="card-sub" id="accounts-count">共 0 个账号</span></div>
+        <table class="data-table">
+          <thead>
+            <tr><th>姓名</th><th>用户名</th><th>角色</th><th>状态</th><th style="text-align:right">操作</th></tr>
+          </thead>
+          <tbody id="accounts-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
     </main>
 </div>
 </div>
 <div class="toast" id="toast"></div>
+
+<!-- 账号新增/编辑弹窗 -->
+<div class="modal-overlay" id="modal-account" onclick="if(event.target===this)closeAccountModal()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title" id="account-modal-title">新增账号</div>
+      <button class="modal-close" onclick="closeAccountModal()" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="acc-username">用户名<small>登录账号，创建后不可修改</small></label>
+        <input type="text" id="acc-username" placeholder="登录用户名" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="acc-name">姓名<small>选填，默认与用户名相同</small></label>
+        <input type="text" id="acc-name" placeholder="成员姓名" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="acc-password">密码<small id="acc-password-hint">至少 6 位</small></label>
+        <input type="text" id="acc-password" placeholder="登录密码" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="acc-role">角色</label>
+        <select id="acc-role">
+          <option value="admin">管理员（admin）— 全部权限，含账号管理</option>
+          <option value="sales" selected>销售（sales）— 日常业务使用</option>
+          <option value="viewer">观察者（viewer）— 只读查看</option>
+        </select>
+        <div class="form-hint">角色修改后，该用户下次请求即按新角色生效。</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAccountModal()">取消</button>
+      <button class="btn btn-primary" id="btn-save-account" onclick="submitAccount()">保存</button>
+    </div>
+  </div>
+</div>
 <script src="assets/rhc-config.js"></script>
 <script>
 var toastTimer=null;
@@ -544,6 +647,210 @@ document.getElementById('g-total')&&['g-status-won','g-status-repeat','g-status-
   document.getElementById(id).addEventListener('input',updateTotal);
 });
 loadAll();
+
+/* ============================================================
+ * 账号管理（数据源：飞书「系统账号」表，经 /api/admin/accounts 读写）
+ * ============================================================ */
+var CURRENT_USER = null;       // {username, role, name}
+var ACCOUNT_LIST = [];         // 最新账号列表
+var ACCOUNT_EDITING = null;    // 正在编辑的 record_id（null=新增）
+
+function accAuthHeaders(){
+  var token = localStorage.getItem('rhc_auth_token');
+  return token ? {'Authorization':'Bearer '+token} : {};
+}
+function escHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function roleTag(role){
+  if(role==='admin') return '<span class="tag tag-primary">管理员</span>';
+  if(role==='sales') return '<span class="tag tag-info">销售</span>';
+  return '<span class="tag tag-gray">观察者</span>';
+}
+
+function initAccounts(){
+  fetch('/api/auth/me',{headers:accAuthHeaders()})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d||!d.ok){ window.location.href='login.html'; return; }
+      CURRENT_USER = d.user;
+      var isAdmin = CURRENT_USER.role==='admin';
+      document.getElementById('btn-add-account').style.display = isAdmin ? 'inline-flex' : 'none';
+      document.getElementById('accounts-readonly-notice').style.display = isAdmin ? 'none' : 'flex';
+      loadAccounts();
+    })
+    .catch(function(){ window.location.href='login.html'; });
+}
+
+function loadAccounts(){
+  var tbody = document.getElementById('accounts-tbody');
+  tbody.innerHTML = '<tr><td class="cell-empty" colspan="5">正在加载账号…</td></tr>';
+  fetch('/api/admin/accounts',{headers:accAuthHeaders()})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d||!d.ok){
+        tbody.innerHTML = '<tr><td class="cell-empty" colspan="5">'+escHtml(d&&d.message?d.message:'账号列表加载失败')+'</td></tr>';
+        return;
+      }
+      ACCOUNT_LIST = d.items||[];
+      renderAccounts();
+    })
+    .catch(function(e){
+      tbody.innerHTML = '<tr><td class="cell-empty" colspan="5">网络异常，账号列表加载失败</td></tr>';
+    });
+}
+
+function renderAccounts(){
+  var isAdmin = CURRENT_USER && CURRENT_USER.role==='admin';
+  var tbody = document.getElementById('accounts-tbody');
+  document.getElementById('accounts-count').textContent = '共 '+ACCOUNT_LIST.length+' 个账号';
+  if(!ACCOUNT_LIST.length){
+    tbody.innerHTML = '<tr><td class="cell-empty" colspan="5">暂无账号</td></tr>';
+    return;
+  }
+  var html='';
+  ACCOUNT_LIST.forEach(function(a){
+    var isSelf = CURRENT_USER && a.username===CURRENT_USER.username;
+    var statusTag = a.enabled
+      ? '<span class="tag tag-success">启用中</span>'
+      : '<span class="tag tag-gray">已停用</span>';
+    var nameCell = escHtml(a.name||a.username) +
+      (isSelf ? ' <span class="tag tag-warning" style="margin-left:6px">当前账号</span>' : '');
+    var actions;
+    if(!isAdmin){
+      actions = '<span style="color:var(--color-text-tertiary);font-size:12px">—</span>';
+    }else{
+      var toggleLabel = a.enabled ? '停用' : '启用';
+      var toggleDisabled = (isSelf && a.enabled) ? ' disabled' : '';
+      var toggleTitle = (isSelf && a.enabled) ? ' title="不能停用当前登录账号"' : '';
+      var delDisabled = isSelf ? ' disabled' : '';
+      var delTitle = isSelf ? ' title="不能删除当前登录账号"' : '';
+      actions =
+        '<div class="acc-actions">'
+        + '<button class="act-btn" onclick="openAccountModal(\''+a.record_id+'\')">编辑</button>'
+        + '<button class="act-btn" onclick="toggleAccount(\''+a.record_id+'\')"'+toggleDisabled+toggleTitle+'>'+toggleLabel+'</button>'
+        + '<button class="act-btn danger" onclick="deleteAccount(\''+a.record_id+'\')"'+delDisabled+delTitle+'>删除</button>'
+        + '</div>';
+    }
+    html += '<tr'+(isSelf?' class="row-self"':'')+'>'
+      + '<td>'+nameCell+'</td>'
+      + '<td>'+escHtml(a.username)+'</td>'
+      + '<td>'+roleTag(a.role)+'</td>'
+      + '<td>'+statusTag+'</td>'
+      + '<td>'+actions+'</td>'
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function openAccountModal(recordId){
+  ACCOUNT_EDITING = recordId||null;
+  var u = null;
+  if(ACCOUNT_EDITING){
+    for(var i=0;i<ACCOUNT_LIST.length;i++){ if(ACCOUNT_LIST[i].record_id===ACCOUNT_EDITING){ u=ACCOUNT_LIST[i]; break; } }
+  }
+  document.getElementById('account-modal-title').textContent = u ? '编辑账号' : '新增账号';
+  var userInput = document.getElementById('acc-username');
+  userInput.value = u ? u.username : '';
+  userInput.disabled = !!u;
+  document.getElementById('acc-name').value = u ? (u.name||'') : '';
+  var pwdInput = document.getElementById('acc-password');
+  pwdInput.value = '';
+  pwdInput.placeholder = u ? '留空表示不修改密码' : '请输入登录密码';
+  document.getElementById('acc-password-hint').textContent = u ? '留空表示不修改；如需修改请输入新密码（至少 6 位）' : '至少 6 位';
+  document.getElementById('acc-role').value = u ? u.role : 'sales';
+  document.getElementById('btn-save-account').disabled = false;
+  document.getElementById('modal-account').classList.add('show');
+  setTimeout(function(){ (u?document.getElementById('acc-name'):userInput).focus(); },50);
+}
+function closeAccountModal(){
+  document.getElementById('modal-account').classList.remove('show');
+  ACCOUNT_EDITING = null;
+}
+
+function submitAccount(){
+  var username = document.getElementById('acc-username').value.trim();
+  var name = document.getElementById('acc-name').value.trim();
+  var password = document.getElementById('acc-password').value;
+  var role = document.getElementById('acc-role').value;
+  if(!ACCOUNT_EDITING){
+    if(!username){ showToast('请输入用户名','error'); return; }
+    if(password.length<6){ showToast('密码至少 6 位','error'); return; }
+  }else{
+    if(password && password.length<6){ showToast('新密码至少 6 位','error'); return; }
+  }
+  var btn = document.getElementById('btn-save-account');
+  btn.disabled = true;
+  var url, method, body;
+  if(ACCOUNT_EDITING){
+    url = '/api/admin/accounts/'+ACCOUNT_EDITING;
+    method = 'PUT';
+    body = {name:name, role:role};
+    if(password) body.password = password;
+  }else{
+    url = '/api/admin/accounts';
+    method = 'POST';
+    body = {username:username, password:password, name:name, role:role};
+  }
+  fetch(url,{
+    method:method,
+    headers:Object.assign({'Content-Type':'application/json'},accAuthHeaders()),
+    body:JSON.stringify(body)
+  })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      btn.disabled = false;
+      if(d&&d.ok){
+        closeAccountModal();
+        showToast(ACCOUNT_EDITING? '账号已更新':'账号已创建','success');
+        loadAccounts();
+      }else{
+        showToast((d&&d.message)||'操作失败','error');
+      }
+    })
+    .catch(function(){
+      btn.disabled = false;
+      showToast('网络异常，操作失败','error');
+    });
+}
+
+function toggleAccount(recordId){
+  var a=null;
+  for(var i=0;i<ACCOUNT_LIST.length;i++){ if(ACCOUNT_LIST[i].record_id===recordId){ a=ACCOUNT_LIST[i]; break; } }
+  if(!a) return;
+  var targetEnabled = !a.enabled;
+  var verb = targetEnabled ? '启用' : '停用';
+  if(!confirm(verb+'账号「'+(a.name||a.username)+'（'+a.username+'）」？'+(targetEnabled?'':'停用后该账号将无法登录。'))) return;
+  fetch('/api/admin/accounts/'+recordId,{
+    method:'PUT',
+    headers:Object.assign({'Content-Type':'application/json'},accAuthHeaders()),
+    body:JSON.stringify({enabled:targetEnabled})
+  })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d&&d.ok){ showToast('账号已'+verb,'success'); loadAccounts(); }
+      else showToast((d&&d.message)||'操作失败','error');
+    })
+    .catch(function(){ showToast('网络异常，操作失败','error'); });
+}
+
+function deleteAccount(recordId){
+  var a=null;
+  for(var i=0;i<ACCOUNT_LIST.length;i++){ if(ACCOUNT_LIST[i].record_id===recordId){ a=ACCOUNT_LIST[i]; break; } }
+  if(!a) return;
+  if(!confirm('确定删除账号「'+(a.name||a.username)+'（'+a.username+'）」？\n删除后该账号将无法登录，此操作不可恢复。')) return;
+  fetch('/api/admin/accounts/'+recordId,{method:'DELETE',headers:accAuthHeaders()})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d&&d.ok){ showToast(d.message||'账号已删除','success'); loadAccounts(); }
+      else showToast((d&&d.message)||'操作失败','error');
+    })
+    .catch(function(){ showToast('网络异常，操作失败','error'); });
+}
+
+initAccounts();
 </script>
 </body>
 </html>
