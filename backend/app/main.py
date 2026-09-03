@@ -605,6 +605,8 @@ async def api_admin_account_update(record_id: str, req: AdminAccountUpdate, requ
         is_self = (target_uname == user_info.get("username"))
         if is_self and fields.get("启用") == "否":
             return JSONResponse({"ok": False, "message": "不能停用当前登录账号"}, status_code=400)
+        if is_self and "角色" in fields:
+            return JSONResponse({"ok": False, "message": "不能修改当前登录账号的角色（如需变更请由其他管理员操作）"}, status_code=400)
         # 预演变更后的状态：不能让系统失去最后一个启用中的 admin
         new_role = fields.get("角色", target_user.get("role"))
         new_enabled = fields.get("启用")
