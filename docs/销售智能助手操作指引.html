@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHC 安瑞康外贸营销助手 · 操作指引</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F6F8FB;
+    --card: #FFFFFF;
+    --brand: #2F6BFF;
+    --brand-light: #EBF1FF;
+    --brand-dark: #1A4FD4;
+    --text: #152033;
+    --text-secondary: #5A6578;
+    --border: #E2E7EF;
+    --tip-bg: #F0FAF0;
+    --tip-border: #4CAF50;
+    --info-bg: #EBF1FF;
+    --info-border: #2F6BFF;
+    --warn-bg: #FFF8EB;
+    --warn-border: #F5A623;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(21,32,51,0.06);
+  }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body {
+    font-family: Inter, system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ===== Top Navigation ===== */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+  }
+  .top-nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 56px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .top-nav-inner::-webkit-scrollbar { display: none; }
+  .nav-brand {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--brand);
+    margin-right: 16px;
+    flex-shrink: 0;
+    letter-spacing: -0.3px;
+  }
+  .nav-link {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--brand-light); color: var(--brand); }
+
+  /* ===== Layout ===== */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    text-align: center;
+    padding: 48px 24px 40px;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--brand-light);
+    color: var(--brand);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+  .hero h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .hero p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ===== Section ===== */
+  .section {
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .section h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 24px 0 12px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section h3::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    background: var(--brand);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .section p, .section li {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .section p { margin-bottom: 12px; }
+
+  /* ===== Steps ===== */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+  }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  /* ===== Callout Boxes ===== */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13.5px;
+    line-height: 1.7;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout-tip { background: var(--tip-bg); border-left: 3px solid var(--tip-border); }
+  .callout-info { background: var(--info-bg); border-left: 3px solid var(--info-border); }
+  .callout-warn { background: var(--warn-bg); border-left: 3px solid var(--warn-border); }
+
+  /* ===== Tags & Badges ===== */
+  .tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 5px;
+    margin: 2px 4px 2px 0;
+  }
+  .tag-red { background: #FEE; color: #D32F2F; }
+  .tag-yellow { background: #FFF8E1; color: #F57F17; }
+  .tag-blue { background: #E8F0FE; color: #1565C0; }
+  .tag-green { background: #E8F5E9; color: #2E7D32; }
+  .tag-gray { background: #F0F2F5; color: #5A6578; }
+
+  /* ===== Tables ===== */
+  .doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13.5px;
+  }
+  .doc-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--bg);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border);
+  }
+  .doc-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  /* ===== Login Box ===== */
+  .login-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .login-box .label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .login-box .value {
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 14px;
+    color: var(--brand);
+    font-weight: 600;
+    background: var(--brand-light);
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+
+  /* ===== Feature Grid ===== */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .feature-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    transition: border-color 0.15s;
+  }
+  .feature-card:hover { border-color: var(--brand); }
+  .feature-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .feature-card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ===== Sub-nav list ===== */
+  .sub-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0;
+  }
+  .sub-nav-list li {
+    padding: 8px 14px;
+    border-left: 3px solid transparent;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 4px;
+    border-radius: 0 6px 6px 0;
+    background: var(--bg);
+  }
+  .sub-nav-list li strong {
+    color: var(--brand);
+  }
+
+  /* ===== FAQ ===== */
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .faq-q::before {
+    content: 'Q';
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: var(--brand);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .faq-a {
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding-left: 30px;
+    line-height: 1.7;
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    text-align: center;
+    padding: 32px 0 0;
+    font-size: 12px;
+    color: #A0A8B8;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 640px) {
+    .container { padding: 16px 12px 60px; }
+    .section { padding: 20px 16px; }
+    .hero h1 { font-size: 24px; }
+    .hero { padding: 32px 12px 24px; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .login-box { flex-direction: column; gap: 10px; align-items: flex-start; }
+  }
+
+  /* ===== Reduced Motion ===== */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+  }
+
+  /* ===== Focus Visible ===== */
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* ===== Print ===== */
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .top-nav { display: none; }
+    .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .hero { padding: 24px 0 16px; }
+    .container { max-width: 100%; padding: 0 20px; }
+    .feature-card, .callout { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Top Navigation ===== -->
+<nav class="top-nav">
+  <div class="top-nav-inner">
+    <span class="nav-brand">RHC 操作指引</span>
+    <a class="nav-link" href="#quick-start">快速开始</a>
+    <a class="nav-link" href="#navigation">系统导航</a>
+    <a class="nav-link" href="#ai-assistant">销售智能助手</a>
+    <a class="nav-link" href="#customer-mgmt">客户管理</a>
+    <a class="nav-link" href="#dashboard">经营仪表盘</a>
+    <a class="nav-link" href="#order-center">订单履约</a>
+    <a class="nav-link" href="#aftersale">售后中心</a>
+    <a class="nav-link" href="#market">市场洞察</a>
+    <a class="nav-link" href="#config">配置中心</a>
+    <a class="nav-link" href="#faq">常见问题</a>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<div class="hero">
+  <div class="hero-badge">RHC ANREIKANG · SALES SUPPORT</div>
+  <h1>安瑞康外贸营销助手 · 操作指引</h1>
+  <p>本指引帮助试用用户快速上手系统各功能模块，涵盖登录、核心操作流程与常见问题解答。</p>
+</div>
+
+<main class="container">
+
+  <!-- ===== 一、快速开始 ===== -->
+  <div class="section" id="quick-start">
+    <div class="section-header">
+      <div class="section-icon" style="background:#EBF1FF;">🚀</div>
+      <h2>一、快速开始</h2>
+    </div>
+
+    <h3>登录地址</h3>
+    <div class="login-box">
+      <span class="label">系统地址</span>
+      <a class="value" href="https://rhc-marketing-support.up.railway.app/" target="_blank" rel="noopener noreferrer">https://rhc-marketing-support.up.railway.app/</a>
+    </div>
+
+    <h3>测试账号</h3>
+    <div class="login-box">
+      <span class="label">用户名</span>
+      <span class="value">sales1</span>
+      <span class="label">密码</span>
+      <span class="value">demo123</span>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <span>登录后将进入<strong>工作台首页</strong>（panel.html），页面以卡片形式展示全部 6 个功能模块入口，可直接点击卡片进入。</span>
+    </div>
+  </div>
+
+  <!-- ===== 二、系统导航 ===== -->
+  <div class="section" id="navigation">
+    <div class="section-header">
+      <div class="section-icon" style="background:#F0FAF0;">🧭</div>
+      <h2>二、系统导航</h2>
+    </div>
+
+    <p>系统采用<strong>卡片式导航</strong>架构，工作台首页为总入口。</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-title">🏠 工作台首页</div>
+        <div class="feature-card-desc">总入口，卡片导航进入各模块；底部展示市场洞察最新动态</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">📋 左侧导航栏</div>
+        <div class="feature-card-desc">各模块内置左侧导航，可快速切换子功能页面</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">📊 市场洞察动态</div>
+        <div class="feature-card-desc">首页展示 4 类最新动态：行业趋势 / 市场动态 / 同行新闻 / 产品技术</div>
+      </div>
+    </div>
+
+    <h3>六大功能模块</h3>
+    <ul class="sub-nav-list">
+      <li><strong>销售智能助手</strong> — 商机信号、客户分级、邮件助手、PI工作台</li>
+      <li><strong>客户管理系统</strong> — 客户档案、跟进状态</li>
+      <li><strong>经营仪表盘</strong> — 经营概览、订单分布、客户地区分布</li>
+      <li><strong>订单履约中心</strong> — 履约看板、订单列表</li>
+      <li><strong>售后中心</strong> — 工单列表、工单统计</li>
+      <li><strong>配置中心</strong> — 分级规则、信号规则、邮件规范、新闻偏好</li>
+    </ul>
+  </div>
+
+  <!-- ===== 三、销售智能助手 ===== -->
+  <div class="section" id="ai-assistant">
+    <div class="section-header">
+      <div class="section-icon" style="background:#FFF8E1;">🤖</div>
+      <h2>三、销售智能助手（重点模块）</h2>
+    </div>
+    <p>销售智能助手是系统的核心模块，整合商机发现、客户管理、邮件生成与形式发票等能力，帮助外贸销售人员高效完成从线索发现到成交转化的全流程。</p>
+
+    <!-- 3.1 商机信号 -->
+    <h3>3.1 商机信号</h3>
+    <p>页面默认展示<strong>「今日信号流」</strong>，系统实时抓取各渠道的潜在商机并按 AI 初筛结论分级展示。</p>
+
+    <p><strong>每条信号包含：</strong></p>
+    <ul class="sub-nav-list">
+      <li>📌 信号标题 — 简要描述商机内容</li>
+      <li>🏷️ 来源渠道标签 — 标识信号来源平台</li>
+      <li>🧠 AI 初筛结论 — 系统自动评估的意向判断</li>
+      <li>🔗 来源链接 — 可跳转至原始信息页面</li>
+    </ul>
+
+    <p><strong>信号分级标签：</strong></p>
+    <div style="margin: 12px 0;">
+      <span class="tag tag-red">🔴 立即跟进</span>
+      <span style="font-size:13px;color:var(--text-secondary);">高意向，24小时内响应</span>
+    </div>
+    <div style="margin: 8px 0;">
+      <span class="tag tag-yellow">🟡 建议跟进</span>
+      <span style="font-size:13px;color:var(--text-secondary);">中意向，3日内响应</span>
+    </div>
+    <div style="margin: 8px 0;">
+      <span class="tag tag-blue">🔵 待核实</span>
+      <span style="font-size:13px;color:var(--text-secondary);">信息不足，补齐后再分级</span>
+    </div>
+
+    <p><strong>操作流程：</strong></p>
+    <ol class="steps">
+      <li>查看信号列表，识别高价值商机</li>
+      <li>点击<strong>「认领」</strong>按钮锁定商机归属（防止同事撞单）</li>
+      <li>点击<strong>「去邮件助手」</strong>直接跳转到邮件助手发送开发信</li>
+      <li>客户回复后，点击<strong>「转为客户」</strong>将线索转入客户库</li>
+      <li>不需要的信号可点击<strong>「释放」</strong>回公共池</li>
+    </ol>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <span>页面底部设有系统框架说明栏，帮助理解信号采集与分级逻辑。</span>
+    </div>
+
+    <!-- 3.2 客户分级 -->
+    <h3>3.2 客户分级</h3>
+    <p>展示所有客户的 <span class="tag tag-red">A 级</span> <span class="tag tag-yellow">B 级</span> <span class="tag tag-blue">C 级</span> 分级看板，一目了然。</p>
+
+    <p><strong>每个客户卡片显示：</strong></p>
+    <table class="doc-table">
+      <caption style="text-align:left;font-weight:600;font-size:14px;padding:0 14px 10px;color:var(--text);">客户卡片字段说明</caption>
+      <thead>
+        <tr><th>字段</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>客户名称</td><td>公司或联系人名称</td></tr>
+        <tr><td>国家</td><td>客户所在国家/地区</td></tr>
+        <tr><td>分级标签</td><td>A/B/C 等级及对应分数</td></tr>
+        <tr><td>来源渠道</td><td>客户数据来源</td></tr>
+        <tr><td>主营产品</td><td>客户的主营产品类目</td></tr>
+        <tr><td>跟进状态</td><td>当前跟进阶段</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <span>分级由<strong>规则引擎自动计算</strong>，支持在「配置中心」调整评分维度和权重。来源标签区分：<span class="tag tag-green">客户主库</span>（飞书同步）、<span class="tag tag-gray">演示客户</span>（信号转化）、<span class="tag tag-blue">信号转化</span>（新转化）。</span>
+    </div>
+
+    <!-- 3.3 邮件助手 -->
+    <h3>3.3 邮件助手</h3>
+    <p>邮件助手包含三个子 Tab：<strong>询盘回复</strong> / <strong>开发信</strong> / <strong>报价跟进</strong>，覆盖外贸邮件的三大核心场景。</p>
+
+    <p><strong>操作步骤：</strong></p>
+    <ol class="steps">
+      <li><strong>选择客户</strong> — 从下拉框中选择目标客户（含客户国家、主营产品信息）</li>
+      <li><strong>填写/确认要点</strong> — 系统根据客户信息预填关键要点，可手动补充修改</li>
+      <li><strong>调整沟通风格</strong> — 展开风格面板进行精细化配置（详见下方）</li>
+      <li><strong>选择素材</strong> — 从个人素材库勾选要融入邮件的行业洞察内容</li>
+      <li><strong>点击「生成邮件」</strong> — AI 自动生成英文邮件</li>
+      <li><strong>复制使用</strong> — 复制生成的邮件内容到邮箱客户端发送</li>
+    </ol>
+
+    <p><strong>沟通风格面板选项：</strong></p>
+    <table class="doc-table">
+      <caption style="text-align:left;font-weight:600;font-size:14px;padding:0 14px 10px;color:var(--text);">邮件助手沟通风格面板配置项</caption>
+      <thead>
+        <tr><th>维度</th><th>可选值</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>语气正式度</td><td>高度正式 / 商务正式 / 商务友好 / 轻松亲和</td></tr>
+        <tr><td>内容详略度</td><td>精简型 / 标准型 / 详细型</td></tr>
+        <tr><td>说服策略</td><td>数据驱动 / 案例驱动 / 关系驱动 / 价值驱动</td></tr>
+        <tr><td>紧迫感</td><td>无压力 / 轻微引导 / 适度紧迫</td></tr>
+        <tr><td>文化适配</td><td>通用 / 德式严谨 / 美式直接 / 日式礼貌 / 中东热情 / 东南亚温和</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <span>系统会根据客户<strong>所在国家自动推荐</strong>默认风格值。手动调整后，对应维度会标记<strong>「手动」</strong>标签，方便区分系统推荐与个性化设置。风格面板支持折叠/展开。</span>
+    </div>
+
+    <!-- 3.4 PI工作台 -->
+    <h3>3.4 PI 工作台</h3>
+    <p>PI（Proforma Invoice，形式发票）工作台用于快速生成和管理标准格式的形式发票。</p>
+    <ol class="steps">
+      <li>选择目标客户</li>
+      <li>选择产品信息（品名、规格、数量、单价等）</li>
+      <li>系统自动拼装为标准 PI 格式文档</li>
+      <li>预览、编辑、导出使用</li>
+    </ol>
+  </div>
+
+  <!-- ===== 四、客户管理系统 ===== -->
+  <div class="section" id="customer-mgmt">
+    <div class="section-header">
+      <div class="section-icon" style="background:#E8F5E9;">👥</div>
+      <h2>四、客户管理系统</h2>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-title">📁 客户档案</div>
+        <div class="feature-card-desc">查看所有客户列表，包含国家、联系人、主营产品、跟进状态等完整信息。支持搜索与筛选。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">📈 跟进状态</div>
+        <div class="feature-card-desc">按跟进阶段（初次接触 → 需求确认 → 报价 → 成交 → 维护）查看客户进展，快速定位需跟进客户。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 五、经营仪表盘 ===== -->
+  <div class="section" id="dashboard">
+    <div class="section-header">
+      <div class="section-icon" style="background:#FBE9E7;">📊</div>
+      <h2>五、经营仪表盘</h2>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-title">📋 经营概览</div>
+        <div class="feature-card-desc">核心 KPI 指标卡片：订单数、客户数、营收金额等关键经营数据一目了然。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">📦 订单状态分布</div>
+        <div class="feature-card-desc">可视化柱状图/饼图展示各状态订单占比（待确认、生产中、已发货、已完成等）。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">🌍 客户地区分布</div>
+        <div class="feature-card-desc">世界地图/饼图展示客户地理分布，直观了解市场覆盖情况。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 六、订单履约中心 ===== -->
+  <div class="section" id="order-center">
+    <div class="section-header">
+      <div class="section-icon" style="background:#E8F0FE;">🚚</div>
+      <h2>六、订单履约中心</h2>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-title">🗂️ 履约看板</div>
+        <div class="feature-card-desc">看板式展示各订单当前所处节点（下单 → 备货 → 质检 → 发货 → 签收），拖拽即可推进状态。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">📄 订单列表</div>
+        <div class="feature-card-desc">全量订单表格视图，含订单号、客户名称、金额、状态等字段，支持搜索和筛选。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 七、售后中心 ===== -->
+  <div class="section" id="aftersale">
+    <div class="section-header">
+      <div class="section-icon" style="background:#FFF3E0;">🛠️</div>
+      <h2>七、售后中心</h2>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-title">📝 工单列表</div>
+        <div class="feature-card-desc">查看和管理所有售后工单，包括投诉、退换货、质量反馈等类型，支持按状态筛选。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">📊 工单统计</div>
+        <div class="feature-card-desc">按状态（待处理/处理中/已关闭）、类型分布统计，可视化展示售后服务质量。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 八、市场洞察 & 素材库 ===== -->
+  <div class="section" id="market">
+    <div class="section-header">
+      <div class="section-icon" style="background:#F3E5F5;">🔍</div>
+      <h2>八、市场洞察 & 素材库</h2>
+    </div>
+
+    <p>系统持续追踪并整理与业务相关的行业动态，分为 <strong>4 大类别</strong>：</p>
+
+    <table class="doc-table">
+      <caption style="text-align:left;font-weight:600;font-size:14px;padding:0 14px 10px;color:var(--text);">市场洞察动态分类</caption>
+      <thead>
+        <tr><th>类别</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>📈 行业趋势</td><td>所在行业的宏观趋势与预测分析</td></tr>
+        <tr><td>📰 市场动态</td><td>市场价格、供需变化等实时动态</td></tr>
+        <tr><td>🏢 同行新闻</td><td>竞争对手及同行业企业的最新新闻</td></tr>
+        <tr><td>⚙️ 产品技术</td><td>产品技术迭代、新工艺、新材料等</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <span><strong>工作台首页</strong>实时展示各类最新动态摘要；点击「查看更多」可进入完整的市场洞察页面。发现有价值的行业洞察可保存到<strong>素材库</strong>，在邮件助手生成邮件时作为参考素材融入。</span>
+    </div>
+  </div>
+
+  <!-- ===== 九、配置中心 ===== -->
+  <div class="section" id="config">
+    <div class="section-header">
+      <div class="section-icon" style="background:#ECEFF1;">⚙️</div>
+      <h2>九、配置中心</h2>
+    </div>
+
+    <table class="doc-table">
+      <caption style="text-align:left;font-weight:600;font-size:14px;padding:0 14px 10px;color:var(--text);">配置中心功能项说明</caption>
+      <thead>
+        <tr><th>配置项</th><th>功能说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>客户分级规则</strong></td><td>调整 5 个评分维度的权重，修改后实时生效，客户分级自动重新计算</td></tr>
+        <tr><td><strong>商机信号规则</strong></td><td>配置认领机制、响应时效要求等信号管理参数</td></tr>
+        <tr><td><strong>邮件写作规范</strong></td><td>维护业务层面的邮件写作标准与模板规范</td></tr>
+        <tr><td><strong>新闻偏好</strong></td><td>设置行业洞察的分类筛选、关键词过滤、排序方式</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <span>配置中心的修改将影响所有使用该系统的人员，请谨慎调整。客户分级规则的修改会<strong>立即重新计算</strong>所有客户等级。</span>
+    </div>
+  </div>
+
+  <!-- ===== 十、常见问题 FAQ ===== -->
+  <div class="section" id="faq">
+    <div class="section-header">
+      <div class="section-icon" style="background:#E0F7FA;">❓</div>
+      <h2>十、常见问题 FAQ</h2>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">邮件生成的内容可以直接发送吗？</div>
+      <div class="faq-a">当前为<strong>生成预览模式</strong>，生成后需手动复制到邮箱客户端发送。正式版将支持一键发送至客户邮箱。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">客户数据来源是什么？</div>
+      <div class="faq-a">系统包含两部分数据来源：<strong>① 演示客户数据</strong>（预置的示例数据，供体验使用）；<strong>② 飞书同步数据</strong>（正式使用时，客户主库通过飞书多维表格实时同步）。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">可以修改客户分级规则吗？</div>
+      <div class="faq-a">可以。进入<strong>「配置中心 → 客户分级规则」</strong>，调整各评分维度的权重即可。修改后所有客户的分级会自动重新计算。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">风格面板的推荐是怎么计算的？</div>
+      <div class="faq-a">当前版本基于<strong>客户所在国家</strong>预设默认风格（如德国客户推荐「德式严谨」、美国客户推荐「美式直接」等）。后续版本将接入历史邮件学习，自动适配您的个人沟通风格。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">数据会丢失吗？</div>
+      <div class="faq-a"><strong>飞书同步的数据</strong>（客户主库、订单等）持久保存在飞书多维表格中，不会丢失。<strong>本地偏好设置</strong>（如风格偏好、新闻偏好等）存储在浏览器本地，清除浏览器数据后会重置为默认值。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">认领的商机可以转给同事吗？</div>
+      <div class="faq-a">可以。在信号详情页点击<strong>「释放」</strong>将商机退回公共池，同事即可认领。团队协作场景下建议通过内部沟通确认归属后再操作。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">系统支持哪些浏览器？</div>
+      <div class="faq-a">推荐使用 <strong>Chrome 90+</strong>、<strong>Edge 90+</strong>、<strong>Firefox 90+</strong> 或 <strong>Safari 15+</strong>。建议使用最新版本以获得最佳体验。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">如何反馈问题或提出需求？</div>
+      <div class="faq-a">试用期间可通过飞书群或联系对接人反馈问题。系统后续版本将内置反馈入口，方便直接提交意见。</div>
+    </div>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <div class="footer">
+    <p>RHC 安瑞康外贸营销助手 · 操作指引 · 试用版 v1.0</p>
+    <p style="margin-top: 4px;">如有疑问请联系项目对接人</p>
+  </div>
+
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var links = document.querySelectorAll('a[href^="#"]');
+  links.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

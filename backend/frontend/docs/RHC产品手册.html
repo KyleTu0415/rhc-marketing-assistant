@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RHC 安瑞康外贸营销智能工作平台 — 产品手册</title>
+<style>
+/* ── Reset & Base ─────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F8FB;--card:#FFFFFF;--brand:#2F6BFF;--brand-light:#EBF1FF;
+  --green:#16A37B;--green-light:#E6F7F1;--text:#152033;--text2:#4A5568;
+  --text3:#8896AB;--border:#E2E8F0;--sidebar-w:260px;--topbar-h:56px;
+  --radius:10px;--shadow:0 1px 3px rgba(21,32,51,.06);
+  --font:Inter,system-ui,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;min-height:100vh}
+
+/* ── Topbar ───────────────────────────────────── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-h);
+  background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;z-index:100;
+  gap:16px;
+}
+.topbar-brand{font-weight:700;font-size:1.05rem;color:var(--brand);white-space:nowrap}
+.topbar-badge{
+  font-size:.7rem;background:var(--brand-light);color:var(--brand);
+  padding:2px 8px;border-radius:20px;font-weight:600;
+}
+.topbar-spacer{flex:1}
+.topbar-meta{font-size:.8rem;color:var(--text3)}
+
+/* ── Sidebar ──────────────────────────────────── */
+.sidebar{
+  position:fixed;top:var(--topbar-h);left:0;bottom:0;width:var(--sidebar-w);
+  background:var(--card);border-right:1px solid var(--border);
+  overflow-y:auto;padding:20px 0;z-index:90;
+}
+.sidebar-group{margin-bottom:8px}
+.sidebar-label{
+  font-size:.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;
+  letter-spacing:.06em;padding:8px 24px 4px;
+}
+.sidebar a{
+  display:block;padding:7px 24px;font-size:.85rem;color:var(--text2);
+  text-decoration:none;border-left:3px solid transparent;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.sidebar a:hover{background:var(--brand-light);color:var(--brand)}
+.sidebar a.active{color:var(--brand);border-left-color:var(--brand);font-weight:600;background:var(--brand-light)}
+.sidebar a:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+
+/* ── Main ─────────────────────────────────────── */
+.main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:32px 40px 60px}
+.main h1{font-size:1.75rem;font-weight:800;margin-bottom:6px;color:var(--text)}
+.main .subtitle{font-size:1rem;color:var(--text2);margin-bottom:36px}
+
+.section{margin-bottom:48px;scroll-margin-top:calc(var(--topbar-h) + 16px)}
+.section-title{
+  font-size:1.25rem;font-weight:700;margin-bottom:20px;padding-bottom:10px;
+  border-bottom:2px solid var(--brand);display:inline-block;
+}
+
+/* ── Cards ────────────────────────────────────── */
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px 28px;margin-bottom:20px;box-shadow:var(--shadow);
+}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-icon{
+  width:36px;height:36px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:1.1rem;flex-shrink:0;
+}
+.card-icon.blue{background:var(--brand-light);color:var(--brand)}
+.card-icon.green{background:var(--green-light);color:var(--green)}
+.card-icon.purple{background:#F0E6FF;color:#7C3AED}
+.card-icon.orange{background:#FFF3E6;color:#E67E22}
+.card-icon.red{background:#FEE2E2;color:#DC2626}
+.card-icon.teal{background:#E0F7F5;color:#0D9488}
+.card-icon.indigo{background:#E8EAF6;color:#3F51B5}
+.card-title{font-size:1.05rem;font-weight:700}
+.card-desc{color:var(--text2);font-size:.9rem;line-height:1.7}
+
+/* ── Feature Grid ─────────────────────────────── */
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.feature-item{
+  background:var(--bg);border-radius:8px;padding:16px 18px;border:1px solid var(--border);
+}
+.feature-item h4{font-size:.9rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.feature-item p{font-size:.82rem;color:var(--text2);line-height:1.6}
+
+/* ── Sub-section ──────────────────────────────── */
+.sub-section{margin-bottom:24px}
+.sub-title{font-size:1rem;font-weight:700;margin-bottom:10px;color:var(--text)}
+.sub-title::before{content:"";display:inline-block;width:4px;height:16px;background:var(--brand);border-radius:2px;margin-right:8px;vertical-align:middle}
+
+/* ── Tag / Badge ──────────────────────────────── */
+.tag{
+  display:inline-block;font-size:.72rem;padding:2px 10px;border-radius:20px;
+  font-weight:600;margin:2px 4px 2px 0;
+}
+.tag.blue{background:var(--brand-light);color:var(--brand)}
+.tag.green{background:var(--green-light);color:var(--green)}
+.tag.orange{background:#FFF3E6;color:#E67E22}
+.tag.purple{background:#F0E6FF;color:#7C3AED}
+
+/* ── Tables ───────────────────────────────────── */
+.table-wrap{overflow-x:auto;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead{background:var(--brand-light)}
+th{text-align:left;padding:10px 14px;font-weight:700;color:var(--brand);white-space:nowrap;border-bottom:2px solid var(--brand)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+tbody tr:hover{background:var(--bg)}
+
+/* ── Highlight Box ────────────────────────────── */
+.highlight-box{
+  background:var(--brand-light);border-left:4px solid var(--brand);
+  padding:16px 20px;border-radius:0 8px 8px 0;margin:20px 0;font-size:.9rem;
+}
+.highlight-box strong{color:var(--brand)}
+
+/* ── Price Cards ──────────────────────────────── */
+.price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.price-card{
+  background:var(--card);border:2px solid var(--border);border-radius:var(--radius);
+  padding:28px;position:relative;overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.price-card:hover{border-color:var(--brand);box-shadow:0 4px 16px rgba(47,107,255,.1)}
+.price-card.featured{border-color:var(--brand)}
+.price-card.featured::before{
+  content:"推荐";position:absolute;top:12px;right:-28px;
+  background:var(--brand);color:#fff;font-size:.7rem;font-weight:700;
+  padding:2px 32px;transform:rotate(45deg);
+}
+.price-name{font-size:1.1rem;font-weight:700;margin-bottom:4px}
+.price-amount{font-size:1.8rem;font-weight:800;color:var(--brand);margin-bottom:4px}
+.price-amount span{font-size:.85rem;font-weight:400;color:var(--text3)}
+.price-desc{font-size:.82rem;color:var(--text3);margin-bottom:16px}
+.price-list{list-style:none;padding:0}
+.price-list li{
+  font-size:.85rem;color:var(--text2);padding:5px 0;padding-left:20px;position:relative;
+}
+.price-list li::before{
+  content:"✓";position:absolute;left:0;color:var(--green);font-weight:700;
+}
+.price-suit{
+  margin-top:14px;font-size:.78rem;color:var(--text3);
+  background:var(--bg);padding:8px 12px;border-radius:6px;
+}
+
+/* ── Tech Stack ───────────────────────────────── */
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.tech-item{
+  background:var(--bg);padding:14px 16px;border-radius:8px;border:1px solid var(--border);
+}
+.tech-item .label{font-size:.72rem;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:4px}
+.tech-item .value{font-size:.9rem;font-weight:600;color:var(--text)}
+
+/* ── KPI Strip ────────────────────────────────── */
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.kpi-item{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 16px;text-align:center;box-shadow:var(--shadow);
+}
+.kpi-value{font-size:1.6rem;font-weight:800;color:var(--brand)}
+.kpi-label{font-size:.75rem;color:var(--text3);margin-top:2px}
+
+/* ── Timeline ─────────────────────────────────── */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;margin-bottom:24px}
+.timeline-dot{
+  position:absolute;left:-24px;top:4px;width:14px;height:14px;
+  border-radius:50%;border:3px solid var(--brand);background:var(--card);
+}
+.timeline-item.done .timeline-dot{background:var(--green);border-color:var(--green)}
+.timeline-phase{font-weight:700;font-size:.95rem;margin-bottom:2px}
+.timeline-meta{font-size:.8rem;color:var(--text3)}
+.timeline-desc{font-size:.85rem;color:var(--text2);margin-top:4px}
+
+/* ── Payment Steps ────────────────────────────── */
+.pay-steps{display:flex;gap:0;margin:20px 0;flex-wrap:wrap}
+.pay-step{
+  flex:1;min-width:140px;text-align:center;padding:16px;
+  background:var(--card);border:1px solid var(--border);position:relative;
+}
+.pay-step:first-child{border-radius:var(--radius) 0 0 var(--radius)}
+.pay-step:last-child{border-radius:0 var(--radius) var(--radius) 0}
+.pay-step .pct{font-size:1.4rem;font-weight:800;color:var(--brand)}
+.pay-step .pct-label{font-size:.78rem;color:var(--text3);margin-top:2px}
+
+/* ── Footer ───────────────────────────────────── */
+.footer{
+  margin-top:48px;padding:24px 0;border-top:1px solid var(--border);
+  font-size:.78rem;color:var(--text3);text-align:center;
+}
+
+/* ── Mobile Toggle ────────────────────────────── */
+.menu-toggle{
+  display:none;background:none;border:none;font-size:1.3rem;cursor:pointer;
+  color:var(--text);padding:4px 8px;
+}
+.menu-toggle:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:85}
+
+/* ── Responsive ───────────────────────────────── */
+@media(max-width:900px){
+  :root{--sidebar-w:0px}
+  .sidebar{transform:translateX(-100%);width:260px;transition:transform .25s ease}
+  .sidebar.open{transform:translateX(0)}
+  .overlay.open{display:block}
+  .menu-toggle{display:block}
+  .main{padding:24px 18px 48px}
+  .price-grid{grid-template-columns:1fr}
+  .pay-steps{flex-direction:column}
+  .pay-step{border-radius:0 !important}
+  .pay-step:first-child{border-radius:var(--radius) var(--radius) 0 0 !important}
+  .pay-step:last-child{border-radius:0 0 var(--radius) var(--radius) !important}
+}
+@media(max-width:600px){
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
+  .feature-grid{grid-template-columns:1fr}
+  .tech-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── Print ────────────────────────────────────── */
+@media print{
+  .topbar,.sidebar,.menu-toggle,.overlay{display:none !important}
+  .main{margin:0;padding:20px 0}
+  .card{break-inside:avoid;box-shadow:none;border:1px solid #ddd}
+  .price-card{break-inside:avoid}
+  body{font-size:12px;background:#fff}
+  .section{page-break-inside:avoid}
+}
+
+/* ── Motion ───────────────────────────────────── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;transition-duration:.01ms !important;
+  }
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <button class="menu-toggle" aria-label="打开导航菜单">☰</button>
+  <span class="topbar-brand">RHC 安瑞康</span>
+  <span class="topbar-badge">产品手册 v1.0</span>
+  <span class="topbar-spacer"></span>
+  <span class="topbar-meta">外贸营销智能工作平台</span>
+</header>
+
+<!-- Sidebar Navigation -->
+<nav class="sidebar" aria-label="主导航">
+  <div class="sidebar-group">
+    <div class="sidebar-label">概览</div>
+    <a href="#overview" class="active">产品概述</a>
+    <a href="#architecture">技术架构</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-label">功能模块</div>
+    <a href="#mod-sales">销售智能助手</a>
+    <a href="#mod-crm">客户管理系统</a>
+    <a href="#mod-dashboard">经营仪表盘</a>
+    <a href="#mod-order">订单履约中心</a>
+    <a href="#mod-aftersale">售后中心</a>
+    <a href="#mod-market">市场洞察</a>
+    <a href="#mod-config">配置中心</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-label">项目信息</div>
+    <a href="#schedule">开发排期</a>
+    <a href="#pricing">报价方案</a>
+    <a href="#payment">付款方式</a>
+  </div>
+</nav>
+
+<!-- Mobile Overlay -->
+<div class="overlay" aria-hidden="true"></div>
+
+<!-- Main Content -->
+<main class="main">
+  <h1>RHC 安瑞康外贸营销智能工作平台</h1>
+  <p class="subtitle">面向兽医医疗器械外贸企业的 AI 驱动智能营销管理系统 · 产品手册</p>
+
+  <!-- ═══════ 产品概述 ═══════ -->
+  <section id="overview" class="section">
+    <h2 class="section-title">产品概述</h2>
+
+    <div class="kpi-strip">
+      <div class="kpi-item"><div class="kpi-value">7</div><div class="kpi-label">核心功能模块</div></div>
+      <div class="kpi-item"><div class="kpi-value">AI</div><div class="kpi-label">深度学习驱动</div></div>
+      <div class="kpi-item"><div class="kpi-value">17</div><div class="kpi-label">国家风格预设</div></div>
+      <div class="kpi-item"><div class="kpi-value">9</div><div class="kpi-label">履约节点追踪</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">◎</div>
+        <div class="card-title">产品定位</div>
+      </div>
+      <p class="card-desc">
+        RHC 安瑞康外贸营销智能工作平台是专为兽医医疗器械外贸企业打造的智能营销管理系统。平台以 <strong>AI 大模型</strong>为核心驱动力，围绕外贸业务全链路，提供<strong>商机发现 → 智能邮件 → 客户管理 → 订单履约 → 售后服务</strong>的一站式解决方案。
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">★</div>
+        <div class="card-title">核心价值</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>AI 驱动商机发现</h4>
+          <p>多渠道商机自动采集与智能分级，确保优质商机零遗漏，提升销售团队响应速度。</p>
+        </div>
+        <div class="feature-item">
+          <h4>智能邮件生成</h4>
+          <p>基于产品知识库与客户沟通风格，AI 自动生成专业英文邮件，覆盖全业务场景。</p>
+        </div>
+        <div class="feature-item">
+          <h4>客户全生命周期管理</h4>
+          <p>从商机线索到成交复购，全链路客户数据沉淀与跟进状态追踪，精细化管理每一位客户。</p>
+        </div>
+        <div class="feature-item">
+          <h4>一站式订单履约与售后</h4>
+          <p>9 大履约节点可视化追踪，售后工单闭环管理，提升客户满意度与复购率。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 功能模块 ═══════ -->
+
+  <!-- 1. 销售智能助手 -->
+  <section id="mod-sales" class="section">
+    <h2 class="section-title">模块一 · 销售智能助手</h2>
+    <p class="subtitle" style="margin-bottom:24px">核心模块 — 集成商机采集、客户分级、邮件生成、报价管理全流程</p>
+
+    <!-- 商机信号 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">⚡</div>
+        <div class="card-title">商机信号</div>
+        <span class="tag blue">核心能力</span>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        AI 自动采集多渠道商机信息，智能分级并推送给销售人员，确保每一个有价值的商机都能被及时跟进。
+      </p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>多渠道采集</h4>
+          <p>支持阿里国际站询盘、行业论坛（VIN）、展会名片、官网询盘等多种商机来源自动接入。</p>
+        </div>
+        <div class="feature-item">
+          <h4>智能分级</h4>
+          <p>AI 自动分析商机质量，分为<strong>立即跟进 / 建议跟进 / 待核实</strong>三个优先级，帮助销售聚焦高价值商机。</p>
+        </div>
+        <div class="feature-item">
+          <h4>AI 初筛分析</h4>
+          <p>对商机进行自动化初步分析，提取客户背景、需求关键词、预估订单规模等关键信息。</p>
+        </div>
+        <div class="feature-item">
+          <h4>认领与防冲突</h4>
+          <p>销售人员主动认领商机，系统自动防撞单检测；14 天无跟进自动释放，保障商机流转效率。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 客户分级 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon purple">◈</div>
+        <div class="card-title">客户分级</div>
+        <span class="tag purple">规则引擎</span>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        基于多维度规则引擎自动评分，将客户精准分为 A / B / C 三个等级，支持灵活的自定义配置。
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>客户分级规则说明</caption>
+          <thead><tr><th scope="col">等级</th><th scope="col">标准</th><th scope="col">跟进策略</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag blue">A 级</span></td><td>高价值客户，评分 ≥ 80</td><td>优先响应，24h 内跟进</td></tr>
+            <tr><td><span class="tag green">B 级</span></td><td>潜力客户，评分 50–79</td><td>定期跟进，72h 内触达</td></tr>
+            <tr><td><span class="tag orange">C 级</span></td><td>一般线索，评分 &lt; 50</td><td>批量维护，周期性触达</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="highlight-box">
+        <strong>灵活配置：</strong>支持自定义评分维度和权重，并支持 Top Sales 经验替换规则——当资深销售的手动分级与系统结果不一致时，可覆盖系统建议并反哺规则优化。
+      </div>
+    </div>
+
+    <!-- 邮件助手 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">✉</div>
+        <div class="card-title">邮件助手</div>
+        <span class="tag green">AI 驱动</span>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        AI 自动生成专业英文邮件，结合产品知识库和客户沟通风格面板，确保每封邮件精准、得体、高效。
+      </p>
+
+      <div class="sub-section">
+        <div class="sub-title">4 种邮件类型</div>
+        <div class="feature-grid">
+          <div class="feature-item">
+            <h4>开发信</h4>
+            <p>针对新客户的初次触达，突出公司优势与产品卖点，建立专业第一印象。</p>
+          </div>
+          <div class="feature-item">
+            <h4>询盘回复</h4>
+            <p>快速响应客户询盘，结合产品规格、认证信息生成精准回复。</p>
+          </div>
+          <div class="feature-item">
+            <h4>报价跟进</h4>
+            <p>报价后的主动跟进，包含价格优势说明、促单话术，推动成交转化。</p>
+          </div>
+          <div class="feature-item">
+            <h4>售后关怀</h4>
+            <p>订单完成后的关怀邮件，提升客户满意度与复购意愿。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-title">客户沟通风格面板</div>
+        <p class="card-desc" style="margin-bottom:12px">5 维度风格画像，系统根据客户所在国家/地区自动推荐预设，也支持手动覆盖调整。</p>
+        <div class="table-wrap">
+          <table>
+            <caption>沟通风格 5 维度说明</caption>
+            <thead><tr><th scope="col">维度</th><th scope="col">说明</th><th scope="col">范围</th></tr></thead>
+            <tbody>
+              <tr><td>语气正式度</td><td>邮件用语的正式与随意程度</td><td>非常正式 ↔ 轻松随意</td></tr>
+              <tr><td>内容详略度</td><td>邮件内容的详细程度</td><td>详尽全面 ↔ 简洁精炼</td></tr>
+              <tr><td>说服策略</td><td>核心说服手段偏好</td><td>数据驱动 ↔ 情感共鸣</td></tr>
+              <tr><td>紧迫感</td><td>促单节奏的紧迫程度</td><td>强烈紧迫 ↔ 温和引导</td></tr>
+              <tr><td>文化适配</td><td>文化习惯与礼仪适配</td><td>17 国预设自动推荐</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PI 工作台 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon orange">📋</div>
+        <div class="card-title">PI 工作台</div>
+        <span class="tag orange">报价管理</span>
+      </div>
+      <p class="card-desc">
+        形式发票（Proforma Invoice）的快速生成与管理。支持从客户信息和产品库中自动填充数据，一键生成规范的 PI 文档，加速报价到订单的转化流程。
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. 客户管理系统 -->
+  <section id="mod-crm" class="section">
+    <h2 class="section-title">模块二 · 客户管理系统</h2>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">👤</div>
+        <div class="card-title">客户档案管理</div>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        完整的客户信息档案，涵盖基础信息、业务信息和跟进状态，实现客户数据的一站式管理。
+      </p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>基础信息</h4>
+          <p>客户名称、所在国家、联系人姓名、邮箱地址等核心信息。</p>
+        </div>
+        <div class="feature-item">
+          <h4>业务信息</h4>
+          <p>来源渠道、主营产品类别、历史订单关联查看。</p>
+        </div>
+        <div class="feature-item">
+          <h4>跟进状态</h4>
+          <p>实时追踪每位客户的跟进阶段，从初次接触到成交复购，全程可视化。</p>
+        </div>
+        <div class="feature-item">
+          <h4>数据来源</h4>
+          <p>客户数据可从商机信号自动转化，也支持手动录入，灵活满足不同业务场景。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 经营仪表盘 -->
+  <section id="mod-dashboard" class="section">
+    <h2 class="section-title">模块三 · 经营仪表盘</h2>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">📊</div>
+        <div class="card-title">经营数据一目了然</div>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        集成核心经营指标，通过可视化图表帮助管理者快速掌握业务全貌，做出数据驱动的决策。
+      </p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>经营指标总览</h4>
+          <p>订单数、客户数、营收金额、转化率等核心 KPI 实时展示，关键指标一屏掌握。</p>
+        </div>
+        <div class="feature-item">
+          <h4>订单状态分布</h4>
+          <p>可视化展示各阶段订单数量与占比，快速识别履约瓶颈与风险点。</p>
+        </div>
+        <div class="feature-item">
+          <h4>客户地区分布</h4>
+          <p>按国家/地区维度展示客户分布，辅助市场策略制定与资源分配。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 订单履约中心 -->
+  <section id="mod-order" class="section">
+    <h2 class="section-title">模块四 · 订单履约中心</h2>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon orange">📦</div>
+        <div class="card-title">全链路订单履约管理</div>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        从下单到交付，9 大履约节点全程可视化追踪，确保每一笔订单按时、按质完成。
+      </p>
+      <div class="sub-section">
+        <div class="sub-title">履约看板</div>
+        <p class="card-desc">可视化跟踪订单各节点状态，一眼掌握整体履约进度，及时发现异常并干预。</p>
+      </div>
+      <div class="sub-section">
+        <div class="sub-title">9 大履约节点</div>
+        <div class="table-wrap">
+          <table>
+            <caption>订单履约节点说明</caption>
+            <thead><tr><th scope="col">序号</th><th scope="col">节点</th><th scope="col">说明</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>订单确认</td><td>客户确认订单，PI 签署</td></tr>
+              <tr><td>2</td><td>收款确认</td><td>预付款/全款到账确认</td></tr>
+              <tr><td>3</td><td>生产下单</td><td>向工厂/供应商下达生产指令</td></tr>
+              <tr><td>4</td><td>生产进度</td><td>生产过程中的关键节点跟踪</td></tr>
+              <tr><td>5</td><td>质检完成</td><td>产品质量检验通过</td></tr>
+              <tr><td>6</td><td>备货完成</td><td>成品入库，等待发货</td></tr>
+              <tr><td>7</td><td>报关发运</td><td>出口报关与国际物流发运</td></tr>
+              <tr><td>8</td><td>到港清关</td><td>目的港清关与提货</td></tr>
+              <tr><td>9</td><td>尾款结清</td><td>客户尾款到账，订单完结</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 售后中心 -->
+  <section id="mod-aftersale" class="section">
+    <h2 class="section-title">模块五 · 售后中心</h2>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon red">🔧</div>
+        <div class="card-title">售后工单闭环管理</div>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        完善的售后服务管理体系，从工单创建到问题闭环，确保每个客户反馈都能得到及时、专业的处理。
+      </p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>工单创建与分配</h4>
+          <p>支持快速创建售后工单，按类型和紧急程度自动或手动分配给对应处理人员。</p>
+        </div>
+        <div class="feature-item">
+          <h4>全流程跟踪</h4>
+          <p>工单从创建、受理、处理到完结，全流程状态追踪，确保问题不遗漏。</p>
+        </div>
+        <div class="feature-item">
+          <h4>统计分析</h4>
+          <p>按工单状态、类型、处理时效等维度进行统计分析，持续优化售后服务质量。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 市场洞察 -->
+  <section id="mod-market" class="section">
+    <h2 class="section-title">模块六 · 市场洞察</h2>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon teal">🌐</div>
+        <div class="card-title">行业信息自动聚合</div>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        自动采集、翻译、加工兽医医疗器械行业信息，为销售团队提供持续的市场情报支持，同时为邮件生成提供丰富的素材库。
+      </p>
+      <div class="sub-section">
+        <div class="sub-title">4 类信息流</div>
+        <div class="feature-grid">
+          <div class="feature-item">
+            <h4>行业趋势</h4>
+            <p>全球兽医医疗器械行业发展趋势、政策变化、市场规模动态。</p>
+          </div>
+          <div class="feature-item">
+            <h4>市场动态</h4>
+            <p>目标市场需求变化、采购趋势、新兴应用领域。</p>
+          </div>
+          <div class="feature-item">
+            <h4>同行新闻</h4>
+            <p>竞争对手动态、新品发布、并购合作、行业展会信息。</p>
+          </div>
+          <div class="feature-item">
+            <h4>产品技术</h4>
+            <p>新技术、新材料、新认证标准，助力产品竞争力提升。</p>
+          </div>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <strong>自动化运转：</strong>RSS 源自动抓取 → AI 翻译加工 → 12 小时自动刷新。洞察素材按分类保存至素材库，可在邮件生成时直接调用，让每封邮件都有行业深度。
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 配置中心 -->
+  <section id="mod-config" class="section">
+    <h2 class="section-title">模块七 · 配置中心</h2>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon indigo">⚙</div>
+        <div class="card-title">灵活的系统配置</div>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        提供全面的系统配置能力，让平台适配不同企业的业务习惯与管理风格，无需二次开发即可灵活调整。
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>配置中心功能一览</caption>
+          <thead><tr><th scope="col">配置项</th><th scope="col">说明</th><th scope="col">关键能力</th></tr></thead>
+          <tbody>
+            <tr><td>客户分级规则</td><td>自定义评分维度和权重</td><td>5 维度评分权重可调，支持经验覆盖</td></tr>
+            <tr><td>商机信号规则</td><td>认领与响应机制配置</td><td>渠道权重、分级阈值、释放周期</td></tr>
+            <tr><td>邮件写作规范</td><td>邮件生成的风格与规范</td><td>常用话术、禁用词、签名模板</td></tr>
+            <tr><td>新闻偏好配置</td><td>市场洞察的信息筛选</td><td>分类筛选、关键词过滤、排序偏好</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 技术架构 ═══════ -->
+  <section id="architecture" class="section">
+    <h2 class="section-title">技术架构</h2>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">⬡</div>
+        <div class="card-title">轻量化 · 易部署 · 低成本</div>
+      </div>
+      <p class="card-desc" style="margin-bottom:14px">
+        采用轻量级技术栈，前后端分离架构，数据存储在飞书多维表格中，最大化利用现有生态工具，降低运维成本。
+      </p>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <div class="label">前端</div>
+          <div class="value">HTML / CSS / JS</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">字体</div>
+          <div class="value">HarmonyOS Sans</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">后端</div>
+          <div class="value">Python (FastAPI)</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">部署</div>
+          <div class="value">Railway</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">数据存储</div>
+          <div class="value">飞书多维表格</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">行业洞察</div>
+          <div class="value">本地 JSON</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">AI 引擎</div>
+          <div class="value">DeepSeek 大模型</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">新闻采集</div>
+          <div class="value">RSS + 自动翻译</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">AI 计费</div>
+          <div class="value">按量付费</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">月度运营成本</div>
+          <div class="value">约 ¥70 – 110</div>
+        </div>
+      </div>
+      <div class="highlight-box" style="margin-top:18px">
+        <strong>设计原则：</strong>前端采用纯 HTML/CSS/JS，响应式设计，无框架依赖；后端轻量化部署于 Railway，内置静态文件服务；数据层复用飞书多维表格，零额外数据库成本。整体架构追求极简、可控、低运维。
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 开发排期 ═══════ -->
+  <section id="schedule" class="section">
+    <h2 class="section-title">开发排期</h2>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">📅</div>
+        <div class="card-title">5 个阶段，约 11 周交付</div>
+      </div>
+      <p class="card-desc" style="margin-bottom:18px">
+        项目分为 5 个阶段，从基础平台到完整交付，逐步迭代。可根据实际需求灵活裁剪。
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>开发排期详细计划</caption>
+          <thead><tr><th scope="col">阶段</th><th scope="col">内容</th><th scope="col">工期</th><th scope="col">交付物</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="tag blue">Phase 1</span></td>
+              <td>基础平台搭建</td>
+              <td>2 周</td>
+              <td>前端框架 + 产品库 + 市场洞察模块，可演示前端原型</td>
+            </tr>
+            <tr>
+              <td><span class="tag blue">Phase 2</span></td>
+              <td>销售核心功能</td>
+              <td>3 周</td>
+              <td>商机信号 + 客户分级 + 邮件助手，销售助手全功能上线</td>
+            </tr>
+            <tr>
+              <td><span class="tag blue">Phase 3</span></td>
+              <td>业务闭环</td>
+              <td>2 周</td>
+              <td>订单管理 + 售后中心 + 经营仪表盘，全模块上线</td>
+            </tr>
+            <tr>
+              <td><span class="tag blue">Phase 4</span></td>
+              <td>智能化深化</td>
+              <td>3 周</td>
+              <td>AI 深度集成 + 邮件收发 + 客户沟通风格学习</td>
+            </tr>
+            <tr>
+              <td><span class="tag blue">Phase 5</span></td>
+              <td>交付上线</td>
+              <td>1 周</td>
+              <td>测试 + 部署 + 培训 + 文档，正式上线</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-box">
+        <strong>总计约 11 周。</strong>Phase 1–3 完成后即可投入使用，Phase 4–5 为能力增强与正式交付。可根据预算和需求优先级灵活裁剪。
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 报价方案 ═══════ -->
+  <section id="pricing" class="section">
+    <h2 class="section-title">报价方案</h2>
+    <p class="subtitle" style="margin-bottom:24px">三档方案，灵活适配不同阶段需求</p>
+
+    <div class="price-grid">
+      <!-- 体验版 -->
+      <div class="price-card">
+        <div class="price-name">体验版</div>
+        <div class="price-amount">¥3,800 <span>一次性</span></div>
+        <div class="price-desc">适合初步演示与内部评审</div>
+        <ul class="price-list">
+          <li>前端展示原型</li>
+          <li>产品库模块</li>
+          <li>市场洞察模块</li>
+          <li>静态页面展示</li>
+        </ul>
+        <div class="price-suit">适合：初步演示、内部评审、方案汇报</div>
+      </div>
+
+      <!-- 标准版 -->
+      <div class="price-card featured">
+        <div class="price-name">标准版</div>
+        <div class="price-amount">¥12,800 <span>一次性</span></div>
+        <div class="price-desc">全部 7 大模块，AI 核心能力</div>
+        <ul class="price-list">
+          <li>全部 7 大功能模块</li>
+          <li>AI 邮件生成</li>
+          <li>AI 客户分级</li>
+          <li>飞书数据对接</li>
+          <li>基础市场洞察</li>
+          <li>订单履约与售后管理</li>
+        </ul>
+        <div class="price-suit">适合：5 人以下团队日常使用</div>
+      </div>
+
+      <!-- 全栈定制版 -->
+      <div class="price-card">
+        <div class="price-name">全栈定制版</div>
+        <div class="price-amount">¥28,000 – 45,000 <span>一次性</span></div>
+        <div class="price-desc">完整业务闭环，深度定制</div>
+        <ul class="price-list">
+          <li>标准版全部功能</li>
+          <li>邮箱 IMAP/SMTP 收发集成</li>
+          <li>客户沟通风格 AI 学习</li>
+          <li>商机信号 AI 自动采集</li>
+          <li>自定义报表与仪表盘</li>
+          <li>多用户权限管理</li>
+          <li>高级数据分析与导出</li>
+        </ul>
+        <div class="price-suit">适合：需要完整业务闭环的中大型团队</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <div class="card-header">
+        <div class="card-icon green">🔄</div>
+        <div class="card-title">年度维护</div>
+      </div>
+      <p class="card-desc">
+        年度维护费用为开发费用的 <strong>15% – 20%</strong>，包含 Bug 修复、性能优化、小功能迭代及技术支持。
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════ 付款方式 ═══════ -->
+  <section id="payment" class="section">
+    <h2 class="section-title">付款方式</h2>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">💳</div>
+        <div class="card-title">分阶段付款，风险可控</div>
+      </div>
+
+      <div class="pay-steps">
+        <div class="pay-step">
+          <div class="pct">50%</div>
+          <div class="pct-label">预付启动</div>
+        </div>
+        <div class="pay-step">
+          <div class="pct">30%</div>
+          <div class="pct-label">Demo 验收</div>
+        </div>
+        <div class="pay-step">
+          <div class="pct">20%</div>
+          <div class="pct-label">上线交付</div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <strong>付款节奏说明：</strong>合同签订后支付 50% 启动开发；核心功能 Demo 完成后验收支付 30%；系统全部上线并培训交付后支付剩余 20%。分阶段付款保障双方权益，确保项目按计划推进。
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    RHC 安瑞康外贸营销智能工作平台 · 产品手册 v1.0 · 机密文件，仅供内部评审使用
+  </footer>
+</main>
+
+<script>
+(function(){
+  /* ── 移动端导航 ─────────────────────────── */
+  var toggle = document.querySelector('.menu-toggle');
+  var sidebar = document.querySelector('.sidebar');
+  var overlay = document.querySelector('.overlay');
+
+  function openNav(){ sidebar.classList.add('open'); overlay.classList.add('open'); }
+  function closeNav(){ sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+
+  toggle.addEventListener('click', function(){
+    sidebar.classList.contains('open') ? closeNav() : openNav();
+  });
+  overlay.addEventListener('click', closeNav);
+
+  /* ── 侧边栏高亮 ─────────────────────────── */
+  var navLinks = document.querySelectorAll('.sidebar a');
+  var sections = document.querySelectorAll('.section');
+
+  function updateActive(){
+    var scrollY = window.scrollY || window.pageYOffset;
+    var current = '';
+    for(var i = 0; i < sections.length; i++){
+      if(sections[i].offsetTop - 100 <= scrollY){
+        current = sections[i].getAttribute('id');
+      }
+    }
+    for(var j = 0; j < navLinks.length; j++){
+      navLinks[j].classList.remove('active');
+      if(navLinks[j].getAttribute('href') === '#' + current){
+        navLinks[j].classList.add('active');
+      }
+    }
+  }
+  window.addEventListener('scroll', updateActive);
+  updateActive();
+
+  /* ── 平滑滚动（页内链接） ──────────────── */
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a[href^="#"]');
+    if(!link) return;
+    var target = document.getElementById(link.getAttribute('href').slice(1));
+    if(!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    closeNav();
+  });
+})();
+</script>
+</body>
+</html>
