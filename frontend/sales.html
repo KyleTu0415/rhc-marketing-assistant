@@ -179,6 +179,21 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 }
 .material-chip.selected .material-chip-check{display:block}
 
+/* ===== 商机信号 / 客户分级 通用条目样式 ===== */
+.intel-item{padding:16px 0;border-bottom:1px solid var(--color-border-light)}
+.intel-item:last-child{border-bottom:none}
+.ii-desc{font-size:13px;color:var(--color-text);margin:8px 0;line-height:1.7}
+.ii-source{font-size:12px;color:var(--color-text-tertiary);margin:6px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ii-source a{color:var(--color-primary);font-weight:500;margin-left:4px}
+.ii-source a:hover{text-decoration:underline}
+.src-icon{width:14px;height:14px;flex-shrink:0;color:var(--color-text-tertiary)}
+.ii-hint{font-size:12px;color:var(--color-text-secondary);background:var(--color-bg);border-radius:var(--radius-sm);padding:10px 14px;margin:8px 0;line-height:1.7}
+.ii-hint strong{color:var(--color-text)}
+.intel-point{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--color-border-light)}
+.intel-point:last-child{border-bottom:none}
+.intel-point>div{flex:1;font-size:13px;color:var(--color-text);line-height:1.7}
+.ip-tag{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:var(--color-primary-xlight);color:var(--color-primary);flex-shrink:0;margin-top:2px}
+
 @media(max-width:860px){
   .sidebar{width:56px;min-width:56px}
   .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section,.sidebar .sidebar-user .user-info{display:none}
