@@ -194,6 +194,25 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .intel-point>div{flex:1;font-size:13px;color:var(--color-text);line-height:1.7}
 .ip-tag{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:var(--color-primary-xlight);color:var(--color-primary);flex-shrink:0;margin-top:2px}
 
+/* ===== 空状态 / 信号筛选 / 加载态（与 customers.html 一致） ===== */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 64px;gap:6px}
+.empty-state .es-icon{width:64px;height:64px;border-radius:50%;background:var(--color-primary-xlight);border:1px dashed var(--color-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.empty-state .es-title{font-size:15px;font-weight:700;color:var(--color-text)}
+.empty-state .es-desc{font-size:13px;color:var(--color-text-secondary);max-width:480px;line-height:1.7}
+.empty-state .es-value{font-size:12.5px;color:var(--color-text-tertiary);max-width:480px;line-height:1.7;margin-top:2px}
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px;gap:12px;color:var(--color-text-tertiary);font-size:13px}
+.loading-state .spin{width:28px;height:28px;border:3px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:rhc-spin .8s linear infinite}
+@keyframes rhc-spin{to{transform:rotate(360deg)}}
+.sig-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sig-filter-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;color:var(--color-text-secondary);background:var(--color-surface);border:1px solid var(--color-border);cursor:pointer;transition:all var(--transition-fast)}
+.sig-filter-chip:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.sig-filter-chip.active{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
+.sig-filter-chip .sig-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.opp-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.sig-region-tag{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:var(--color-bg);color:var(--color-text-secondary);border:1px solid var(--color-border-light);white-space:nowrap}
+.sig-stats{font-size:12px;color:var(--color-text-tertiary);font-weight:400}
+.sig-retry-note{margin-top:14px;font-size:12px;color:var(--color-text-tertiary);text-align:center;line-height:1.7}
+
 @media(max-width:860px){
   .sidebar{width:56px;min-width:56px}
   .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section,.sidebar .sidebar-user .user-info{display:none}
@@ -223,49 +242,24 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <main class="content-area">
     <section class="page active" id="page-signals">
     <div class="page-header">
-      <div><h2>商机信号</h2><p>多信源采购信号 AI 初筛分级，高价值商机优先响应</p></div>
+      <div><h2>商机信号</h2><p>多信源公开行业资讯每日采集，AI 自动识别商机类型，高价值商机优先响应</p></div>
     </div>
     <div class="card">
-      <div class="card-header"><h3>今日信号流</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span>　2026-09-01 · 已过滤 50 条噪音，4 条待处理</span></div>
+      <div class="card-header"><h3>商机信号流</h3><span class="card-sub sig-stats" id="sig-stats">加载中…</span></div>
       <div class="card-body">
-        <div class="intel-item">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-success">立即跟进 · 24小时内响应</span><span class="tag tag-gray">阿里国际站</span><strong>VetCare Group（美国）</strong></div>
-          <div class="ii-desc">「Looking for anesthesia workstation supplier for 12-clinic expansion, CE & ISO 13485 required, initial order 8 units」——美国连锁兽医集团扩店，寻麻醉工作站供应商，首单 8 台，明确要求 CE 与 ISO 13485。</div>
-          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：阿里国际站询盘（演示链接，正式版直达原始询盘页）<a href="https://www.alibaba.com/trade/search?SearchText=veterinary+anesthesia+machine" target="_blank" rel="noopener noreferrer">查看原始信息 →</a></div>
-          <div class="ii-hint"><strong>AI 初筛：</strong>采购量明确、认证要求与我方资质匹配、连锁集团复购潜力高。建议：24h 内发开发信并附 V5 Plus 工作站资料与认证清单。</div>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="claimSignal(this,'VetCare Group')">认领信号</button></div>
-        </div>
-        <div class="intel-item">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-success">立即跟进 · 24小时内响应</span><span class="tag tag-gray">行业论坛</span><strong>EquineMed Clinic（阿联酋）</strong></div>
-          <div class="ii-desc">兽医论坛发帖：马场扩建需大动物麻醉设备，询问 M800 类工作站的交期与本地售后。</div>
-          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：VIN 兽医专业社区帖子（演示链接；Reddit 等被墙渠道正式版以网页快照在平台内展示）<a href="https://www.vin.com/" target="_blank" rel="noopener noreferrer">查看原始信息 →</a></div>
-          <div class="ii-hint"><strong>AI 初筛：</strong>明确大动物场景、中东增量市场、机型指向 M800。建议：当日回复交期与 CE 认证，附中东代理售后响应说明。</div>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="tag tag-success" style="font-size:11px">已认领 · 我（正式版显示账号姓名）</span><button class="btn btn-outline btn-sm" onclick="switchPage('mail',document.querySelector('[data-page=mail]'))">去邮件助手</button><button class="btn btn-outline btn-sm" onclick="showToast('正式版：释放后信号回到公共池，其他销售可认领','info')">释放</button></div>
-        </div>
-        <div class="intel-item">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-warning">建议跟进 · 3日内</span><span class="tag tag-gray">展会名录</span><strong>NorthPet Distribution（加拿大）</strong></div>
-          <div class="ii-desc">VMX 展会名片回访：经销商，对 X35VET 报价有兴趣，需对比本地竞品价格。</div>
-          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：VMX 展会名片名录（线下交换、无公开网页；正式版在此查看名片扫描件与现场备注）</div>
-          <div class="ii-hint"><strong>AI 初筛：</strong>渠道型客户、处比价阶段。进展：X35VET 总体拥有成本对比资料已发，<strong>客户已回复</strong>询问代理折扣与备件供应——确认真实买家，可转客户。</div>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="tag tag-success" style="font-size:11px">已认领 · 展会接待人</span><span class="tag tag-info" style="font-size:11px">客户已回复</span><button class="btn btn-outline btn-sm" onclick="switchPage('mail',document.querySelector('[data-page=mail]'))">去邮件助手</button><button class="btn btn-primary btn-sm" onclick="convertCustomer(this,'NorthPet Distribution')">转为客户</button></div>
-        </div>
-        <div class="intel-item">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag tag-info">待核实 · 补齐信息再分级</span><span class="tag tag-gray">官网询盘</span><strong>SaoPaulo Vet Supply（巴西）</strong></div>
-          <div class="ii-desc">官网表单询 SA Series 注射泵价格与 DERS 药库功能细节，未说明采购数量。</div>
-          <div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>来源：RHC 官网询盘表单（内部渠道，正式版点击可查看询盘原文与客户留资）</div>
-          <div class="ii-hint"><strong>AI 初筛：</strong>需求真实但量级未知。建议：回复药库功能说明并询问诊所/渠道规模与预计采购量，补齐信息后再分级。</div>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="claimSignal(this,'SaoPaulo Vet Supply')">认领信号</button></div>
+        <div class="sig-filter" id="sig-filter"></div>
+        <div id="signal-list">
+          <div class="loading-state"><div class="spin"></div><div>正在加载商机信号…</div></div>
         </div>
       </div>
     </div>
     <div class="card">
-      <div class="card-header"><h3>信源覆盖</h3><span class="card-sub">正式版接入范围以技术评估为准</span></div>
+      <div class="card-header"><h3>信源覆盖与处理规则</h3><span class="card-sub">规则说明 · 正式版以技术评估为准</span></div>
       <div class="card-body">
-        <div class="intel-point"><span class="ip-tag">B2B 平台</span><div>阿里国际站、Made-in-China 询盘与采购信息自动采集（部分接口受平台规则限制，接入方式待评估）。</div></div>
-        <div class="intel-point"><span class="ip-tag">行业论坛</span><div>海外兽医专业社区采购/求购帖关键词监控（VIN 等公开版块；Reddit 等被墙渠道由服务器抓取并生成网页快照，在平台内直接查看）。</div></div>
-        <div class="intel-point"><span class="ip-tag">展会名录</span><div>VMX、WVC 等展会名片与参展商名录导入，自动匹配跟进状态。</div></div>
-        <div class="intel-point"><span class="ip-tag">官网与社媒</span><div>官网询盘表单、企业社媒消息统一汇入信号流。</div></div>
-        <div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：信号均为演示示例。正式版由 AI 定时采集→初筛去噪→分级推送。信号分三档：<strong>立即跟进</strong>（高意向 · 24 小时内响应）、<strong>建议跟进</strong>（中意向 · 3 日内）、<strong>待核实</strong>（信息不足，补齐后再分级），与客户档案的 A/B/C 分级相互独立。处理流程：线上信号进公共池，<strong>认领</strong>即锁定归属（其他销售不可见联系方式，防止撞单）；线下信号（展会扫码、手动录入）录入即自动归属接待人，无需认领。归属后在时效内发开发信 → 客户回复确认后点<strong>「转为客户」</strong>，档案自动建立并完成 A/B/C 分级；14 天无跟进自动释放回公共池。每条信号均携带<strong>来源链接</strong>可一键核验；被过滤的噪音进入噪音列表，可逐条核查、误判可捞回。</div>
+        <div class="intel-point"><span class="ip-tag">已接入</span><div><strong>公开行业资讯：</strong>系统每日采集海外兽医/医疗行业公开新闻与行业资讯，AI 自动识别诊所扩张、招标采购、展会机会、渠道动态、采购动态等商机信号；每条信号附<strong>原文链接</strong>，可一键跳转核验。</div></div>
+        <div class="intel-point"><span class="ip-tag">接入中</span><div><strong>B2B 平台询盘：</strong>阿里国际站、Made-in-China 询盘与采购信息自动采集（部分接口受平台规则限制，接入方式待评估）。</div></div>
+        <div class="intel-point"><span class="ip-tag">接入中</span><div><strong>展会名录与官网询盘：</strong>VMX、WVC 等展会名片与参展商名录导入；官网询盘表单、企业社媒消息统一汇入信号流（正式版上线）。</div></div>
+        <div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary);line-height:1.8">正式版由 AI 定时采集 → 初筛去噪 → 分级推送。信号分三档：<strong>立即跟进</strong>（高意向 · 24 小时内响应）、<strong>建议跟进</strong>（中意向 · 3 日内）、<strong>待核实</strong>（信息不足，补齐后再分级），与客户档案的 A/B/C 分级相互独立。处理流程：线上信号进公共池，<strong>认领</strong>即锁定归属（其他销售不可见联系方式，防止撞单）；线下信号（展会扫码、手动录入）录入即自动归属接待人，无需认领。归属后在时效内发开发信 → 客户回复确认后转为客户，档案自动建立并完成 A/B/C 分级；<strong>14 天</strong>无跟进自动释放回公共池。被过滤的噪音进入噪音列表，可逐条核查、误判可捞回。</div>
       </div>
     </div>
     </section>
@@ -279,7 +273,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       <div class="card-body" id="grading-rules-card"></div>
     </div>
     <div class="card">
-      <div class="card-header"><h3>客户分级看板</h3><span class="card-sub">数据来源：飞书客户主库 + 演示线索</span></div>
+      <div class="card-header"><h3>客户分级看板</h3><span class="card-sub">数据来源：客户主库（飞书多维表格，接入后自动同步）</span></div>
       <div class="card-body" id="grading-list">
         <div style="padding:20px;text-align:center;color:var(--color-text-tertiary);font-size:13px">客户数据加载中…</div>
       </div>
@@ -305,6 +299,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
               <label>客户</label>
               <select id="mail-customer" onchange="onMailCustomerChange()"><option value="">— 选择客户（加载中…）—</option></select>
               <input type="text" id="mail-customer-manual" placeholder="手动输入客户名称" style="margin-top:8px;display:none">
+              <div id="mail-customer-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--color-text-tertiary);line-height:1.7">客户主库暂未接入，下拉中暂无已建档客户。可选择「手动输入客户 / 商机客户」直接填写客户名称生成邮件；商机认领跟进并转为客户后，客户将自动出现在此下拉中。</div>
             </div>
             <div class="form-group">
               <label>相关产品（可多选）</label>
@@ -355,15 +350,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     </div>
 
     <div class="card" style="margin-top:14px">
-      <div class="card-header"><h3>客户回函 · 收件箱</h3><span class="card-sub"><span class="tag tag-gray">演示示例</span>　正式版接通企业邮箱自动拉取回函</span></div>
+      <div class="card-header"><h3>客户回函 · 收件箱</h3><span class="card-sub">正式接入企业邮箱后自动拉取回函</span></div>
       <div class="card-body">
-        <div style="border:1px solid var(--color-border-light);border-radius:8px;padding:12px 14px;background:var(--color-bg-subtle,#fafbfc)">
-          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--color-text-secondary)"><span><strong style="color:var(--color-text-primary)">James Carter</strong> &lt;j.carter@northpet.ca&gt; · NorthPet Distribution（加拿大）</span><span>2026-09-02 09:41（加拿大时间 9月1日晚）</span></div>
-          <div style="margin:8px 0 4px;font-weight:600">Re: X35VET Total Cost of Ownership Comparison</div>
-          <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">"Hi, thanks for the TCO sheet — the turbine-free airflow story is compelling. Two questions before we move forward: <strong>1)</strong> what distributor discount do you offer for the Canadian market? <strong>2)</strong> how are spare parts and annual service handled in North America? We'd also like a quote for 3 units to start."</div>
-          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="tag tag-success" style="font-size:11px">客户已回复 · 商机信号已同步</span><button class="btn btn-primary btn-sm" onclick="switchPage('signals',document.querySelector('[data-page=signals]'));showToast('NorthPet 已在商机信号标记「客户已回复」，可点「转为客户」','info')">去商机信号转为客户 →</button><button class="btn btn-outline btn-sm" onclick="switchMailTab('inquiry');showToast('选择 NorthPet 客户后，AI 将据此回函内容生成回复邮件','info')">用询盘回复模板回信</button></div>
+        <div class="empty-state">
+          <div class="es-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div class="es-title">暂无客户回函</div>
+          <div class="es-desc">正式接入企业邮箱后，客户回函自动拉取归档，AI 判定回复类型并可一键生成英文回信。</div>
+          <div class="es-value">回函将按客户归档到对应信号与客户档案，商机信号状态同步更新为「客户已回复」。</div>
         </div>
-        <div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：正式版接通企业微信邮箱/企业邮箱后，客户回函自动拉取到此处、按客户归档到对应信号与客户档案；AI 自动判定回复类型（询价/拒绝/要资料），商机信号状态同步更新为「客户已回复」，并可一键生成英文回信。</div>
       </div>
     </div>
 
@@ -380,6 +374,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
             <div class="form-group">
               <label>客户</label>
               <select id="quote-customer"><option value="">— 选择客户（加载中…）—</option></select>
+              <div id="quote-customer-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--color-text-tertiary);line-height:1.7">暂无已建档客户：商机认领跟进转为客户后自动进入客户库，即可在此选择客户并生成 PI。</div>
             </div>
             <div class="form-group">
               <label>产品与数量</label>
@@ -870,7 +865,7 @@ function onMailCustomerChange(){
   // 切换客户时重置手动覆盖，按新客户的国家推荐风格
   styleManualOverrides={};
   var country='';
-  if(sel.value&&sel.value!=='__manual__'){
+  if(sel.value&&sel.value!=='__manual__'&&snapshotData){
     var c=(snapshotData.customers||[]).filter(function(x){return x['客户名称']===sel.value})[0]||{};
     country=c['国家/地区']||c['国家地区']||'';
   }
@@ -910,8 +905,8 @@ function getMailCustomer(){
   }
   var name=sel.value;
   if(!name)return {name:'',country:''};
-  var c=(snapshotData.customers||[]).filter(function(x){return x['客户名称']===name})[0]||{};
-  return {name:name,country:c['国家/地区']||''};
+  var c=(snapshotData&&snapshotData.customers||[]).filter(function(x){return x['客户名称']===name})[0]||{};
+  return {name:name,country:c['国家/地区']||c['国家地区']||''};
 }
 function getSelectedMailProducts(){
   var out=[];
@@ -1049,7 +1044,7 @@ function generatePI(){
     }
   });
   if(lines.length===0){showToast('请至少勾选一个产品','error');return}
-  var cust=(snapshotData.customers||[]).filter(function(c){return c['客户名称']===custName})[0]||{};
+  var cust=(snapshotData&&snapshotData.customers||[]).filter(function(c){return c['客户名称']===custName})[0]||{};
   var today=new Date();
   var dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
   var piNoStr='PI-FRAME-'+String(today.getFullYear()).slice(2)+String(today.getMonth()+1).padStart(2,'0')+'-'+String(Math.floor(Math.random()*900)+100);
@@ -1076,31 +1071,140 @@ function generatePI(){
   showToast('PI 预览已生成','success');
 }
 
-/* ===== 信号认领与转化（演示交互；正式版归属/查重/释放由后端处理） ===== */
-function claimSignal(btn,name){
-  var bar=btn.parentNode;
-  bar.innerHTML='<span class="tag tag-success" style="font-size:11px">已认领 · 我（正式版显示账号姓名）</span><button class="btn btn-outline btn-sm" onclick="switchPage(\'mail\',document.querySelector(\'[data-page=mail]\'))">去邮件助手</button><button class="btn btn-outline btn-sm" onclick="showToast(\'正式版：释放后信号回到公共池，其他销售可认领\',\'info\')">释放</button>';
-  showToast('已认领「'+name+'」：归属锁定，其他销售不可见联系方式；请在时效内发开发信','success');
+/* ===== 商机信号（真实数据：GET /api/signals，公开行业资讯 AI 筛选） ===== */
+var SIGNAL_ICON_RSS='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>';
+var SIGNAL_ICON_WARN='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+var SIGNAL_REGION_LABELS={
+  'global':'全球','north-america':'北美','europe':'欧洲','africa':'非洲',
+  'middle-east':'中东','southeast-asia':'东南亚','brazil':'巴西',
+  'south-america':'南美','china':'中国','asia':'亚太'
+};
+var sigAll=[];        // 全部信号（接口返回）
+var sigOppTypes=[];  // [{key,label,color}]
+var sigFilter='all';
+var sigLoaded=false;
+
+function hexToRgba(hex,alpha){
+  var m=/^#?([0-9a-fA-F]{6})$/.exec(String(hex||''));
+  if(!m)return 'rgba(0,0,0,'+alpha+')';
+  var n=parseInt(m[1],16);
+  return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+alpha+')';
 }
-function convertCustomer(btn,name){
-  btn.disabled=true;btn.textContent='已转入客户库';
-  if(!window.__convertedSig)window.__convertedSig={};
-  if(!window.__convertedSig[name]){
-    window.__convertedSig[name]=true;
-    GRADING_DEMO_LEADS.push({客户名称:'NorthPet Distribution',国家地区:'加拿大',跟进状态:'询盘谈判',来源渠道:'展会名录',来源链接:'',来源链接说明:'VMX 展会名片转化（正式版关联名片扫描件与现场备注）',主营产品:'X35VET兽用麻醉机',备注:'加拿大经销商，VMX展会名片；已回复询问代理折扣与备件供应；由商机信号转化',最近跟进:'2026-09-02 客户回函询价',demo:true,converted:true});
-    try{renderGrading();}catch(e){}
+function sigEmptyStateHtml(){
+  return '<div class="empty-state"><div class="es-icon">'+SIGNAL_ICON_RSS+'</div>'+
+    '<div class="es-title">暂未筛出商机信号</div>'+
+    '<div class="es-desc">系统每日采集公开行业资讯，AI 自动识别诊所扩张、招标采购、展会机会、渠道动态、采购动态等机会，每条附原文链接可核验。</div>'+
+    '<div class="es-value">暂无新增商机，可点击下方按钮重新加载，或等待系统下一次定时采集后再查看。</div>'+
+    '<div style="margin-top:14px"><button class="btn btn-outline btn-sm" onclick="loadSignals()">重新加载</button></div></div>';
+}
+function sigErrorHtml(){
+  return '<div class="empty-state"><div class="es-icon">'+SIGNAL_ICON_WARN+'</div>'+
+    '<div class="es-title">商机信号加载失败</div>'+
+    '<div class="es-desc">可能是网络异常或信号服务暂不可用。请重试；若持续失败，请联系系统管理员。</div>'+
+    '<div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="loadSignals()">重试加载</button></div></div>';
+}
+function sigLoadingHtml(){
+  return '<div class="loading-state"><div class="spin"></div><div>正在加载商机信号…</div></div>';
+}
+function renderSignalFilter(){
+  var el=document.getElementById('sig-filter');
+  if(!el)return;
+  var html='<button type="button" class="sig-filter-chip'+(sigFilter==='all'?' active':'')+'" onclick="setSignalFilter(\'all\')">全部</button>';
+  html+=sigOppTypes.map(function(t){
+    var active=sigFilter===t.key?' active':'';
+    var dot='<span class="sig-dot" style="background:'+t.color+'"></span>';
+    return '<button type="button" class="sig-filter-chip'+active+'" onclick="setSignalFilter(\''+esc(t.key)+'\')">'+dot+esc(t.label)+'</button>';
+  }).join('');
+  el.innerHTML=html;
+}
+function setSignalFilter(key){
+  sigFilter=key;
+  renderSignalFilter();
+  if(sigLoaded)renderSignals();
+}
+function loadSignals(){
+  var list=document.getElementById('signal-list');
+  var stats=document.getElementById('sig-stats');
+  if(list)list.innerHTML=sigLoadingHtml();
+  if(stats)stats.textContent='加载中…';
+  fetch('/api/signals?limit=100',{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error('signals '+r.status);return r.json()})
+    .then(function(d){
+      if(!d||d.ok===false)throw new Error('signals bad payload');
+      sigAll=Array.isArray(d.items)?d.items:[];
+      // opp_types 兼容数组与对象两种形态
+      var types=[];
+      if(Array.isArray(d.opp_types)){
+        types=d.opp_types.map(function(t){return {key:t.key||t.opp_type||'',label:t.label||'',color:t.color||'#5B21B6'}});
+      }else if(d.opp_types&&typeof d.opp_types==='object'){
+        for(var k in d.opp_types){types.push({key:k,label:d.opp_types[k].label||k,color:d.opp_types[k].color||'#5B21B6'})}
+      }
+      sigOppTypes=types.filter(function(t){return t.key});
+      sigLoaded=true;
+      renderSignalFilter();
+      renderSignals();
+    })
+    .catch(function(){
+      sigLoaded=false;
+      if(list)list.innerHTML=sigErrorHtml();
+      if(stats)stats.textContent='';
+    });
+}
+function renderSignals(){
+  var list=document.getElementById('signal-list');
+  var stats=document.getElementById('sig-stats');
+  if(!list)return;
+  var items=sigFilter==='all'?sigAll:sigAll.filter(function(it){return it.opp_type===sigFilter});
+  if(stats){
+    var typeLabel='';
+    if(sigFilter!=='all'){
+      for(var i=0;i<sigOppTypes.length;i++){if(sigOppTypes[i].key===sigFilter){typeLabel='（'+sigOppTypes[i].label+'）';break}}
+    }
+    stats.textContent='最新 '+items.length+' 条商机信号'+typeLabel+' · 来自公开行业资讯 AI 筛选 · 每条附原文链接可核验';
   }
-  showToast('「'+name+'」已转为客户：档案自动建立、规则引擎完成分级，现已出现在「客户分级」页（绿色"信号转化"标签）','success');
+  if(!items.length){list.innerHTML=sigEmptyStateHtml();return}
+  var html=items.map(function(it,idx){
+    var color=it.opp_color||'#5B21B6';
+    var label=it.opp_label||'采购动态';
+    var oid=it.id!=null&&String(it.id)!==''?String(it.id):('sig-'+idx);
+    var regions=Array.isArray(it.regions)?it.regions:[];
+    var regionHtml=regions.map(function(r){
+      var rl=SIGNAL_REGION_LABELS[r]||r;
+      return rl?'<span class="sig-region-tag">'+esc(rl)+'</span>':'';
+    }).join('');
+    var meta=[];
+    if(it.source)meta.push('来源：'+it.source);
+    if(it.date)meta.push(it.date);
+    var catHtml=it.categoryLabel?'<span class="tag tag-gray" style="font-size:11px">'+esc(it.categoryLabel)+'</span>':'';
+    var url=it.url||'';
+    var viewBtn=url
+      ? '<a class="btn btn-outline btn-sm" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">查看原文 ↗</a>'
+      : '<span class="tag tag-gray" style="font-size:11px">原文链接暂缺</span>';
+    return '<div class="intel-item">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+        '<span class="opp-chip" style="color:'+color+';background:'+hexToRgba(color,0.1)+';border:1px solid '+hexToRgba(color,0.35)+'"><span class="sig-dot" style="background:'+color+'"></span>'+esc(label)+'</span>'+
+        catHtml+
+        regionHtml+
+      '</div>'+
+      '<strong style="display:block;margin-top:8px;font-size:14px">'+esc(it.title||'（无标题）')+'</strong>'+
+      '<div class="ii-desc">'+esc(it.summary||'')+'</div>'+
+      '<div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'+esc(meta.join('　·　')||'')+'</div>'+
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
+        viewBtn+
+        '<button type="button" class="btn btn-primary btn-sm sig-claim-btn" onclick="claimSignal(this,\''+esc(oid)+'\')">认领信号</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  html+='<div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary);line-height:1.8">以上商机信号由系统每日采集公开行业资讯、AI 自动识别生成，点击「查看原文」可跳转来源页面核验；认领与转客户为框架演示交互，正式版由后端锁定归属并同步客户档案。</div>';
+  list.innerHTML=html;
+}
+/* 认领：仅演示交互（不写后端）；正式版认领即锁定归属、防撞单 */
+function claimSignal(btn,id){
+  var bar=btn.parentNode;
+  bar.innerHTML='<span class="tag tag-success" style="font-size:11px">已认领</span><button type="button" class="btn btn-outline btn-sm" onclick="switchPage(\'mail\',document.querySelector(\'[data-page=mail]\'))">去邮件助手</button><button type="button" class="btn btn-outline btn-sm" onclick="showToast(\'正式版：14 天无跟进自动释放回公共池，其他销售可认领\',\'info\')">释放</button>';
+  showToast('正式版认领即锁定归属，防撞单；当前为框架演示，认领不写入后端','info');
 }
 
-/* ===== 客户分级（默认规则，top sales 访谈后可替换） ===== */
-var GRADING_DEMO_LEADS=[
-  {客户名称:'PetCare Alliance',国家地区:'美国',跟进状态:'已成交',来源渠道:'阿里国际站',来源链接:'https://www.alibaba.com/trade/search?SearchText=veterinary+anesthesia+machine',来源链接说明:'2025年阿里询盘转化的已成交客户（演示链接）',主营产品:'V5 Plus兽用麻醉工作站、SA Series注射泵、DC50制氧机',备注:'美国连锁兽医集团，28家诊所；首批V5 Plus 6台已交付，复购洽谈中',最近跟进:'2026-08-31 首批交付回访，复购洽谈',demo:true},
-  {客户名称:'TierMed GmbH',国家地区:'德国',跟进状态:'询盘谈判',来源渠道:'展会名录',来源链接:'',来源链接说明:'MEDICA 展会名片转化（正式版关联名片扫描件）',主营产品:'M800大动物麻醉工作站、SA Series注射泵、DC50制氧机',备注:'德国兽医器械经销商，覆盖DACH地区，正评估M800代理合作',最近跟进:'2026-08-31 代理条款谈判中',demo:true},
-  {客户名称:'Cotswold Equine Hospital',国家地区:'英国',跟进状态:'询盘谈判',来源渠道:'行业论坛',来源链接:'https://www.vin.com/',来源链接说明:'VIN 社区帖子转化（演示链接；Reddit 等被墙渠道正式版以网页快照展示）',主营产品:'M800大动物麻醉工作站、SA Series注射泵',备注:'英国马术专科医院，马场扩建采购大动物设备',最近跟进:'2026-08-22 报价已发待回复',demo:true},
-  {客户名称:'Dubai Falcon Veterinary Clinic',国家地区:'阿联酋',跟进状态:'询盘谈判',来源渠道:'展会名录',来源链接:'',来源链接说明:'VMX Dubai 名片转化（正式版关联名片扫描件）',主营产品:'X35VET兽用麻醉机、SA Series注射泵',备注:'迪拜兽医诊所，询单台麻醉机与注射泵，价格协商中',最近跟进:'2026-09-01 客户回函询价',demo:true},
-  {客户名称:'Clínica VetSur',国家地区:'智利',跟进状态:'初步接触',来源渠道:'B2B平台',来源链接:'https://www.made-in-china.com/products-search/hot-china-products/Veterinary_Anesthesia_Machine.html',来源链接说明:'B2B平台询盘页（演示链接）',主营产品:'X35VET兽用麻醉机',备注:'智利单体宠物诊所，求购单台麻醉机，预算敏感',最近跟进:'2026-08-10 首封开发信已发',demo:true}
-];
 /* 分级规则从规则配置中心读取（assets/rhc-config.js），不再写死在本页面 */
 function getGradingRules(){
   var d=RHC_CONFIG.DEFAULT.grading;
@@ -1137,14 +1241,21 @@ function renderGradingRulesCard(){
     '<div class="intel-point"><span class="ip-tag">跟进新鲜度</span><div>7 天内有跟进 '+g.fresh.d7+' 分 / 14 天内 '+g.fresh.d14+' 分 / 超过 14 天 '+g.fresh.stale+' 分（超期自动提醒）。</div></div>'+
     '<div style="margin-top:12px;font-size:12px;color:var(--color-text-secondary)"><strong>等级划分：</strong><span class="tag tag-success">A 级 ≥'+g.gradeA+'分</span> 重点保障，优先响应与资源投入　<span class="tag tag-warning">B 级 '+g.gradeB+'–'+(g.gradeA-1)+'分</span> 标准节奏跟进　<span class="tag tag-gray">C 级 &lt;'+g.gradeB+'分</span> 低成本批量维护　<a href="config.html" style="font-weight:600">前往规则配置中心调整 →</a></div>';
 }
+/* 客户分级看板：仅渲染真实客户主库数据；无数据时诚实空状态 */
 function renderGrading(customers){
-  var all=(customers||[]).concat(GRADING_DEMO_LEADS.map(function(c){
-    return {'客户名称':c.客户名称,'国家/地区':c.国家地区,'跟进状态':c.跟进状态,'来源渠道':c.来源渠道,'来源链接':c.来源链接||'','来源链接说明':c.来源链接说明||'','主营产品':c.主营产品,'备注':c.备注,'最近跟进':c.最近跟进,demo:c.demo,converted:c.converted};
-  }));
-  var rows=all.map(function(c){
-    var g=gradeCustomer(c);
-    return {c:c,g:g};
-  }).sort(function(a,b){return b.g.total-a.g.total});
+  var el=document.getElementById('grading-list');
+  if(!el)return;
+  var all=(customers||[]).filter(function(c){return c&&c['客户名称']});
+  if(!all.length){
+    el.innerHTML='<div class="empty-state"><div class="es-icon">'+
+      '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'+
+      '<div class="es-title">暂无客户</div>'+
+      '<div class="es-desc">商机认领跟进后可转为客户，客户档案自动建立并按上方 A/B/C 规则打分分级。</div>'+
+      '<div class="es-value">客户主库（飞书多维表格）正式接入后，已建档客户与跟进记录自动同步到此处。</div>'+
+      '<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button type="button" class="btn btn-outline btn-sm" onclick="switchPage(\'signals\',document.querySelector(\'[data-page=signals]\'))">去商机信号</button></div></div>';
+    return;
+  }
+  var rows=all.map(function(c){return {c:c,g:gradeCustomer(c)}}).sort(function(a,b){return b.g.total-a.g.total});
   var cnt={A:0,B:0,C:0};
   rows.forEach(function(r){cnt[r.g.grade]++});
   var html='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'+
@@ -1160,22 +1271,19 @@ function renderGrading(customers){
     if(stale)followNote+='　<span class="tag tag-warning" style="font-size:10px">跟进超期</span>';
     else if(near)followNote+='　<span class="tag tag-gray" style="font-size:10px">临近超期</span>';
     return '<div class="intel-item">'+
-      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag '+tagCls+'">'+g.grade+' 级 · '+g.total+'分</span><strong>'+esc(c['客户名称'])+'</strong>'+(c.converted?'<span class="tag tag-success">信号转化</span>':c.demo?'<span class="tag tag-gray">演示客户</span>':'<span class="tag tag-info">客户主库</span>')+'</div>'+
-      '<div class="ii-desc">'+esc(c['国家/地区']||'—')+'　·　'+esc(c['跟进状态']||'—')+'　·　来源：'+esc(c['来源渠道']||'—')+'<br>主营：'+esc(c['主营产品']||'—')+'</div>'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag '+tagCls+'">'+g.grade+' 级 · '+g.total+'分</span><strong>'+esc(c['客户名称'])+'</strong><span class="tag tag-info">客户主库</span></div>'+
+      '<div class="ii-desc">'+esc(c['国家/地区']||c['国家地区']||'—')+'　·　'+esc(c['跟进状态']||'—')+'　·　来源：'+esc(c['来源渠道']||'—')+'<br>主营：'+esc(c['主营产品']||'—')+'</div>'+
       (c['来源链接']
         ? '<div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'+esc(c['来源链接说明']||'查看原始来源')+'<a href="'+esc(c['来源链接'])+'" target="_blank" rel="noopener noreferrer">打开来源链接 →</a></div>'
-        : (c.demo
-            ? '<div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'+esc(c['来源链接说明']||'内部渠道，无外部链接')+'</div>'
-            : ''))+
+        : '')+
       '<div class="ii-hint"><strong>评级依据：</strong>'+g.parts.join(' + ')+' = '+g.total+' 分</div>'+
       '<div style="margin-top:8px;font-size:12px;color:'+(stale?'var(--color-danger)':'var(--color-text-tertiary)')+'">'+followNote+'</div>'+
-      '<div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="switchPage(\'mail\',document.querySelector(\'[data-page=mail]\'))">去跟进（邮件助手）</button></div>'+
+      '<div style="margin-top:10px"><button type="button" class="btn btn-outline btn-sm" onclick="switchPage(\'mail\',document.querySelector(\'[data-page=mail]\'))">去跟进（邮件助手）</button></div>'+
     '</div>';
   }).join('');
-  html+='<div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary)">框架演示：分级打分为默认外贸规则；标注「演示客户」的为已从信号池转化的客户样例（转化时来源信息自动带入客户档案，展会名片等无URL渠道记录渠道名与备注）。top sales 经验访谈后，规则在配置中心替换，分数与理由自动重算，跟进成单/丢单结果回流用于校准规则。</div>';
-  document.getElementById('grading-list').innerHTML=html;
+  html+='<div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary);line-height:1.7">分级打分为外贸通用规则（可在规则配置中心调整，调整后即时重算）；商机转化为客户时来源信息自动带入档案，跟进成单/丢单结果回流用于校准规则。</div>';
+  el.innerHTML=html;
 }
-
 /* ===== 规则配置中心联动 ===== */
 function applyMailRules(){
   try{
@@ -1205,6 +1313,7 @@ renderProductPick();
 renderMailProducts(PRODUCTS);
 renderMailMaterials();
 renderStylePanel();
+loadSignals();
 fetch('/api/products',{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('products '+r.status);return r.json()})
   .then(function(d){
@@ -1215,22 +1324,39 @@ fetch('/api/products',{cache:'no-store'})
     }));
   })
   .catch(function(){renderMailProducts(PRODUCTS)});
+function customerOptionsHtml(customers){
+  var list=customers||[];
+  var opts='<option value="">— 选择客户 —</option>'+list.map(function(c){
+    return '<option value="'+esc(c['客户名称'])+'">'+esc(c['客户名称'])+'（'+esc(c['国家/地区']||c['国家地区']||'')+'）</option>';
+  }).join('')+'<option value="__manual__">手动输入客户 / 商机客户</option>';
+  return opts;
+}
+function refreshCustomerHints(customers){
+  var empty=!(customers&&customers.length);
+  var mh=document.getElementById('mail-customer-hint');
+  var qh=document.getElementById('quote-customer-hint');
+  if(mh)mh.style.display=empty?'block':'none';
+  if(qh)qh.style.display=empty?'block':'none';
+}
 fetch('data/snapshot.json',{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
   .then(function(d){
-    snapshotData=d;
-    var opts='<option value="">— 选择客户 —</option>'+(d.customers||[]).map(function(c){
-      return '<option value="'+esc(c['客户名称'])+'">'+esc(c['客户名称'])+'（'+esc(c['国家/地区']||'')+'）</option>';
-    }).join('')+'<option value="__manual__">手动输入客户</option>';
+    snapshotData=d||{customers:[],orders:[]};
+    var customers=(d&&d.customers)||[];
+    var opts=customerOptionsHtml(customers);
     document.getElementById('quote-customer').innerHTML=opts;
     document.getElementById('mail-customer').innerHTML=opts;
-    renderGrading(d.customers||[]);
+    refreshCustomerHints(customers);
+    renderGrading(customers);
   })
   .catch(function(){
-    document.getElementById('quote-customer').innerHTML='<option value="">客户数据加载失败</option>';
-    document.getElementById('mail-customer').innerHTML='<option value="">客户数据加载失败</option>';
+    snapshotData={customers:[],orders:[]};
+    var opts=customerOptionsHtml([]);
+    document.getElementById('quote-customer').innerHTML=opts;
+    document.getElementById('mail-customer').innerHTML=opts;
+    refreshCustomerHints([]);
     renderGrading([]);
-    showToast('客户数据加载失败，请通过本地 HTTP 服务访问本页面','error');
+    showToast('客户主库暂未接入，当前无建档客户（可手动输入客户名称使用邮件助手）','info');
   });
 
 /* ===== 素材库弹窗（内嵌式）逻辑 ===== */
