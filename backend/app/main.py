@@ -5,6 +5,7 @@ import json
 import hmac
 import hashlib
 import base64
+import re
 import time
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -684,6 +685,7 @@ LEADS_FIELD_MAP = {
     "状态": "状态",
     "联系邮箱": "联系邮箱",
     "跟进备注": "跟进备注",
+    "邮箱来源": "邮箱来源",
 }
 LEAD_ACTIVE_STATUS = ("跟进中", "已转客户")
 LEAD_STATUS_OPTIONS = ("跟进中", "已转客户", "已释放")
@@ -705,6 +707,8 @@ def _ensure_leads_table():
     for t in resp.get("data", {}).get("items", []):
         if t.get("name") == LEADS_TABLE_NAME:
             _leads_table_id = t.get("table_id")
+            # 旧表幂等补字段（如「邮箱来源」），内部吞异常不阻断
+            _ensure_leads_fields(_leads_table_id)
             return _leads_table_id
     fields = [
         {"field_name": "线索标题", "type": 1},   # 文本（主字段）
@@ -722,6 +726,7 @@ def _ensure_leads_table():
          "property": {"options": [{"name": n} for n in LEAD_STATUS_OPTIONS]}},
         {"field_name": "联系邮箱", "type": 1},   # 文本
         {"field_name": "跟进备注", "type": 1},   # 文本
+        {"field_name": "邮箱来源", "type": 1},   # 文本（智能查找采用邮箱时记录来源 URL）
     ]
     resp = _feishu_api("POST", f"/bitable/v1/apps/{FEISHU_ATK}/tables",
                        {"table": {"name": LEADS_TABLE_NAME,
@@ -732,6 +737,66 @@ def _ensure_leads_table():
         raise RuntimeError(f"创建「{LEADS_TABLE_NAME}」表失败: {resp}")
     print(f"[leads] 已创建飞书线索表「{LEADS_TABLE_NAME}」: {_leads_table_id}")
     return _leads_table_id
+
+
+# 线索表全量字段定义（表名 -> 类型/选项）。用于对线上旧表做幂等补字段：
+# 线上表由旧版代码建好时可能缺少后加的字段（如「邮箱来源」），预热/写操作时自动补齐。
+LEADS_FIELDS_SCHEMA = [
+    {"field_name": "线索标题", "type": 1},
+    {"field_name": "商机类型", "type": 3,
+     "property": {"options": [{"name": n} for n in LEAD_OPP_OPTIONS]}},
+    {"field_name": "公司/机构", "type": 1},
+    {"field_name": "摘要", "type": 1},
+    {"field_name": "来源", "type": 1},
+    {"field_name": "原文链接", "type": 1},
+    {"field_name": "地区", "type": 1},
+    {"field_name": "发布日期", "type": 1},
+    {"field_name": "认领人", "type": 1},
+    {"field_name": "认领时间", "type": 1},
+    {"field_name": "状态", "type": 3,
+     "property": {"options": [{"name": n} for n in LEAD_STATUS_OPTIONS]}},
+    {"field_name": "联系邮箱", "type": 1},
+    {"field_name": "跟进备注", "type": 1},
+    {"field_name": "邮箱来源", "type": 1},
+]
+
+
+def _ensure_leads_fields(tid):
+    """幂等补齐线索表缺失字段（含单选选项）。线上旧表没有「邮箱来源」等新字段时自动补上。"""
+    try:
+        resp = _feishu_api(
+            "GET", f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/fields?page_size=100")
+        existing = {}
+        for f in resp.get("data", {}).get("items", []):
+            existing[f.get("field_name", "")] = f
+        for fdef in LEADS_FIELDS_SCHEMA:
+            name = fdef["field_name"]
+            cur = existing.get(name)
+            if not cur:
+                # 主字段（线索标题）是建表时自动生成的，正常不会缺失；缺失时尝试创建
+                _feishu_api(
+                    "POST", f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/fields",
+                    fdef)
+                print(f"[leads] 线索表补字段「{name}」")
+                continue
+            # 单选字段：选项不全则补齐（PUT 更新字段 property）
+            if fdef.get("type") == 3 and fdef.get("property", {}).get("options"):
+                want = {o["name"] for o in fdef["property"]["options"]}
+                have = {o.get("name", "") for o in
+                        (cur.get("property") or {}).get("options", [])}
+                missing = want - have
+                if missing:
+                    merged = list((cur.get("property") or {}).get("options", [])) + \
+                             [{"name": n} for n in sorted(missing)]
+                    _feishu_api(
+                        "PUT",
+                        f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/fields/{cur.get('field_id')}",
+                        {"field_name": name, "type": 3,
+                         "property": {"options": merged}})
+                    print(f"[leads] 线索表单选字段「{name}」补选项：{sorted(missing)}")
+    except Exception as e:
+        # 字段补齐失败不阻断主流程（读接口通常不依赖新字段；写新字段时若仍缺失会另行报错）
+        print(f"[leads] 线索表字段补齐检查失败（忽略）: {e}")
 
 
 def _warmup_leads_table():
@@ -812,6 +877,11 @@ class LeadUpdateRequest(BaseModel):
     email: Optional[str] = None
     status: Optional[str] = None
     note: Optional[str] = None
+    email_source: Optional[str] = None
+
+
+class LeadFindEmailRequest(BaseModel):
+    record_id: str = ""
 
 
 @app.post("/api/leads/claim")
@@ -857,6 +927,7 @@ async def api_leads_claim(req: LeadClaimRequest, request: Request):
             "状态": "跟进中",
             "联系邮箱": "",
             "跟进备注": "",
+            "邮箱来源": "",
         }
         tid = _ensure_leads_table()
         resp = _feishu_api(
@@ -901,6 +972,8 @@ async def api_leads_update(record_id: str, req: LeadUpdateRequest, request: Requ
             fields["联系邮箱"] = req.email.strip()
         if req.note is not None:
             fields["跟进备注"] = req.note.strip()
+        if req.email_source is not None:
+            fields["邮箱来源"] = req.email_source.strip()
         if req.status is not None:
             status = req.status.strip()
             if status not in LEAD_STATUS_OPTIONS:
@@ -919,6 +992,432 @@ async def api_leads_update(record_id: str, req: LeadUpdateRequest, request: Requ
         print(f"[leads] 更新线索失败（{record_id}）: {e}")
         return JSONResponse({"ok": False, "message": f"更新线索失败：飞书线索服务暂时不可用（{e}）"},
                             status_code=502)
+
+
+@app.delete("/api/leads/{record_id}")
+async def api_leads_delete(record_id: str, request: Request):
+    """删除线索记录。admin 可删任意；普通销售仅可删本人认领的记录。"""
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return JSONResponse({"detail": "未登录或登录已过期"}, status_code=401)
+    try:
+        leads = _fetch_leads(force_refresh=True)
+        target = None
+        for ld in leads:
+            if ld.get("record_id") == record_id:
+                target = ld
+                break
+        if not target:
+            return JSONResponse({"detail": "线索记录不存在或已被删除"}, status_code=404)
+        is_admin = user_info.get("role") == "admin"
+        claimer = (target.get("认领人") or "").strip()
+        my_name = (user_info.get("name") or user_info.get("username") or "").strip()
+        if not is_admin and claimer != my_name:
+            return JSONResponse(
+                {"detail": "仅可删除本人认领的线索；他人线索请联系管理员"}, status_code=403)
+        tid = _ensure_leads_table()
+        try:
+            _feishu_api(
+                "DELETE",
+                f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records/{record_id}")
+        except RuntimeError as e:
+            # 飞书记录已不存在视为删除成功（幂等），其余错误抛出
+            if "HTTP 404" not in str(e):
+                raise
+        _invalidate_leads_cache()
+        return {"ok": True}
+    except Exception as e:
+        print(f"[leads] 删除线索失败（{record_id}）: {e}")
+        return JSONResponse({"detail": f"删除失败：飞书线索服务暂时不可用（{e}）"},
+                            status_code=502)
+
+
+# ============================================================
+# 线索邮箱智能查找：搜索引擎找官网 -> 抓官网/联系页/新闻原文 -> 正则提取邮箱
+# 仅用标准库 urllib/re/html/json，不引入新依赖。结果供人工审核采用，不自动落库。
+# ============================================================
+_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+_EMAIL_FETCH_TIMEOUT = 8          # 单个 HTTP 请求超时（秒）
+_FIND_EMAIL_BUDGET = 35.0         # 整体时间预算（秒），到点即返回已收集结果
+_FIND_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+# 社媒/招聘/百科/平台站：不作为候选官网
+_EMAIL_SKIP_HOST_KEYWORDS = (
+    "facebook.com", "linkedin.com", "instagram.com", "youtube.com", "x.com",
+    "twitter.com", "wikipedia.org", "indeed.com", "glassdoor.com",
+    "duckduckgo.com", "bing.com", "microsoft.com", "google.com",
+    "yelp.com", "yellowpages.com", "bloomberg.com", "crunchbase.com",
+    "amazon.", "reddit.com", "pinterest.com", "tiktok.com",
+)
+_EMAIL_BAD_DOMAINS = (
+    "example.com", "example.org", "sentry.io", "wordpress.org", "w3.org",
+    "schema.org", "sentry.wtf",
+)
+_EMAIL_BAD_DOMAIN_KEYWORDS = ("schema", "wordpress", "w3.org", "sentry")
+# 图片/样式误匹配的邮箱式字符串域名后缀
+_EMAIL_IMAGE_SUFFIXES = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp", ".ico")
+
+
+def _http_get(url: str, timeout: int = _EMAIL_FETCH_TIMEOUT) -> str:
+    """带浏览器 UA 的 GET，返回解码后的 HTML 文本；任何异常抛出由调用方吞掉。"""
+    import urllib.request as _ur
+    req = _ur.Request(url, headers={
+        "User-Agent": _FIND_UA,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8",
+    })
+    with _ur.urlopen(req, timeout=timeout) as r:
+        ctype = r.headers.get("Content-Type", "")
+        if "text/html" not in ctype and "application/xhtml" not in ctype and \
+           "text/plain" not in ctype and not url.endswith((".html", ".htm", "/")):
+            # 非 HTML 资源（PDF/图片/下载件）不抓取
+            return ""
+        raw = r.read(2_000_000)  # 最多读 2MB，避免大文件拖慢
+    # 尝试按 charset 解码，失败回退 utf-8
+    enc = "utf-8"
+    try:
+        m = re.search(r"charset=([\w-]+)", ctype, re.I)
+        if m:
+            enc = m.group(1)
+    except Exception:
+        pass
+    return raw.decode(enc, "ignore")
+
+
+def _ddg_real_url(href: str) -> str:
+    """DuckDuckGo 跳转链接 //duckduckgo.com/l/?uddg=<编码URL>&... -> 真实 URL。"""
+    try:
+        from urllib.parse import urlparse, parse_qs, unquote
+        p = urlparse("https:" + href if href.startswith("//") else href)
+        qs = parse_qs(p.query)
+        u = qs.get("uddg", [""])[0]
+        if u:
+            return unquote(u)
+    except Exception:
+        pass
+    return href
+
+
+def _search_ddg(company: str) -> list:
+    """DuckDuckGo HTML 版搜索，返回结果真实 URL 列表。"""
+    import urllib.parse as _up
+    import urllib.request as _ur
+    q = _up.urlencode({"q": company + " official website contact"})
+    url = "https://html.duckduckgo.com/html/?" + q
+    req = _ur.Request(url, headers={"User-Agent": _FIND_UA,
+                                    "Accept-Language": "en-US,en;q=0.9"})
+    with _ur.urlopen(req, timeout=_EMAIL_FETCH_TIMEOUT) as r:
+        html_text = r.read(1_500_000).decode("utf-8", "ignore")
+    out = []
+    for m in re.finditer(
+            r'<a[^>]+class="result__a"[^>]+href="([^"]+)"', html_text):
+        u = _ddg_real_url(m.group(1))
+        if u and u not in out:
+            out.append(u)
+    return out
+
+
+def _search_bing(company: str) -> list:
+    """Bing 备用搜索，从结果 <a href="http..."> 提取外链。"""
+    import urllib.parse as _up
+    import urllib.request as _ur
+    from urllib.parse import urlparse
+    q = _up.urlencode({"q": company + " contact email"})
+    url = "https://www.bing.com/search?" + q
+    req = _ur.Request(url, headers={"User-Agent": _FIND_UA,
+                                    "Accept-Language": "en-US,en;q=0.9"})
+    with _ur.urlopen(req, timeout=_EMAIL_FETCH_TIMEOUT) as r:
+        html_text = r.read(1_500_000).decode("utf-8", "ignore")
+    out = []
+    for m in re.finditer(r'<a[^>]+href="(https?://[^"]+)"', html_text):
+        u = m.group(1)
+        try:
+            host = urlparse(u).netloc.lower()
+        except Exception:
+            continue
+        if not host or "bing.com" in host or "microsoft.com" in host:
+            continue
+        if u not in out:
+            out.append(u)
+    return out
+
+
+def _host_of(url: str) -> str:
+    from urllib.parse import urlparse
+    try:
+        return (urlparse(url).netloc or "").lower().split(":")[0]
+    except Exception:
+        return ""
+
+
+def _reg_host(host: str) -> str:
+    """取注册域名近似值（去 www. 等前缀与端口；多级域名取末两段，country-level 例外不细分）。"""
+    h = (host or "").lower().split(":")[0]  # 去端口
+    if h.startswith("www."):
+        h = h[4:]
+    parts = h.split(".")
+    if len(parts) >= 2:
+        return ".".join(parts[-2:])
+    return h
+
+
+def _is_skippable_host(host: str) -> bool:
+    h = (host or "").lower()
+    return any(k in h for k in _EMAIL_SKIP_HOST_KEYWORDS)
+
+
+def _candidate_official_domains(urls: list) -> list:
+    """从搜索结果 URL 中挑前 4 个候选官网域名（去社媒/招聘/百科/PDF，按注册域去重）。"""
+    from urllib.parse import urlparse
+    seen = set()
+    domains = []
+    for u in urls:
+        try:
+            if not u or not u.lower().startswith("http"):
+                continue
+            low = u.lower()
+            if low.endswith(".pdf") or ".pdf?" in low or "/pdf/" in low:
+                continue
+            netloc = (urlparse(u).netloc or "").lower()  # 含端口（本地/非常规环境兼容）
+            host = netloc.split(":")[0]
+            if not host or _is_skippable_host(host):
+                continue
+            reg = _reg_host(host)
+            if reg in seen:
+                continue
+            seen.add(reg)
+            domains.append(netloc or host)
+        except Exception:
+            continue
+        if len(domains) >= 4:
+            break
+    return domains
+
+
+def _abs_url(base: str, link: str) -> str:
+    from urllib.parse import urljoin
+    try:
+        return urljoin(base, link)
+    except Exception:
+        return ""
+
+
+def _crawl_official_site(host: str, deadline: float) -> list:
+    """抓官网首页 + 首页中 contact/about 链接（每域名最多 3 页），返回 [{url, html}]。"""
+    pages = []
+    if time.time() > deadline:
+        return pages
+    home_html = ""
+    home = "https://" + host + "/"
+    try:
+        home_html = _http_get(home)
+    except Exception:
+        home_html = ""
+    if not home_html:
+        # https 失败/为空兜底试一次 http
+        home = "http://" + host + "/"
+        try:
+            home_html = _http_get(home)
+        except Exception:
+            return pages
+    if not home_html:
+        return pages
+    pages.append({"url": home, "html": home_html})
+    if time.time() > deadline:
+        return pages
+    # 从首页提取 contact / about 链接
+    sub_links = []
+    seen = {pages[0]["url"]}
+    for m in re.finditer(r'href=["\']([^"\']+)["\']', pages[0]["html"], re.I):
+        link = m.group(1).strip()
+        low = link.lower()
+        if not ("/contact" in low or "contact-" in low or "/about" in low
+                or "about-" in low or "contactus" in low):
+            continue
+        if low.startswith(("mailto:", "tel:", "javascript:", "#")):
+            continue
+        absu = _abs_url(pages[0]["url"], link)
+        if not absu or not absu.startswith("http"):
+            continue
+        if _reg_host(_host_of(absu)) != _reg_host(host):
+            continue  # 只抓同域页面
+        if absu.rstrip("/") in seen or absu in seen:
+            continue
+        seen.add(absu.rstrip("/"))
+        sub_links.append(absu)
+        if len(sub_links) >= 2:  # 首页 + 2 个子页 = 每域名最多 3 页
+            break
+    for su in sub_links:
+        if time.time() > deadline:
+            break
+        try:
+            txt = _http_get(su)
+            if txt:
+                pages.append({"url": su, "html": txt})
+        except Exception:
+            continue
+    return pages
+
+
+def _is_valid_email(em: str) -> bool:
+    """过滤示例域名、图片误匹配、schema/wordpress 等噪声、超长邮箱。"""
+    low = em.lower()
+    if len(em) > 40:
+        return False
+    dom = low.split("@", 1)[1] if "@" in low else ""
+    if not dom:
+        return False
+    if any(dom == d or dom.endswith("." + d) for d in _EMAIL_BAD_DOMAINS):
+        return False
+    if any(k in dom for k in _EMAIL_BAD_DOMAIN_KEYWORDS):
+        return False
+    if any(dom.endswith(suf) for suf in _EMAIL_IMAGE_SUFFIXES):
+        return False
+    # 域名末段必须是纯字母（正则已保证 {2,}），再排掉数字 TLD 误匹配
+    tld = dom.rsplit(".", 1)[-1]
+    if not tld.isalpha():
+        return False
+    return True
+
+
+def _scan_emails(html_text: str, source_url: str, out: list, seen: set):
+    """从单页 HTML 提取邮箱并登记来源（out 追加，seen 去重）。"""
+    try:
+        for m in _EMAIL_RE.finditer(html_text or ""):
+            em = m.group(0)
+            if em in seen or not _is_valid_email(em):
+                continue
+            seen.add(em)
+            out.append({
+                "email": em,
+                "source_url": source_url,
+                "host": _host_of(source_url),
+            })
+    except Exception:
+        pass
+
+
+def find_lead_email_candidates(company: str, signal_url: str = "") -> dict:
+    """核心查找流程（供接口与本地测试直接调用）。
+    返回 {ok, candidates:[{email,source_url,host,kind}], message?}。
+    搜索引擎全部失败抛 RuntimeError（接口层转 502）。"""
+    import html as _html
+    deadline = time.time() + _FIND_EMAIL_BUDGET
+
+    # 1) 搜索引擎：首选 DDG，失败/不足回退 Bing
+    result_urls = []
+    engines_ok = 0
+    try:
+        r1 = _search_ddg(company)
+        if r1:
+            engines_ok += 1
+            result_urls.extend(r1)
+    except Exception as e:
+        print(f"[find-email] DuckDuckGo 搜索失败: {e}")
+    if len(result_urls) < 2:
+        try:
+            r2 = _search_bing(company)
+            if r2:
+                engines_ok += 1
+                for u in r2:
+                    if u not in result_urls:
+                        result_urls.append(u)
+        except Exception as e:
+            print(f"[find-email] Bing 搜索失败: {e}")
+    if engines_ok == 0:
+        raise RuntimeError("all search engines failed")
+
+    # 2) 候选官网域名（前 4 个）
+    official_hosts = _candidate_official_domains(result_urls)
+    official_regs = {_reg_host(h) for h in official_hosts}
+
+    found = []
+    seen = set()
+
+    # 3) 新闻原文页（新闻稿常含媒体联系邮箱），失败忽略
+    su = (signal_url or "").strip()
+    if su and time.time() < deadline:
+        try:
+            txt = _http_get(su)
+            if txt:
+                _scan_emails(txt, su, found, seen)
+        except Exception as e:
+            print(f"[find-email] 原文页抓取失败（{su[:80]}）: {e}")
+
+    # 4) 逐个官网：首页 + 联系/关于页，每域最多 3 页
+    for host in official_hosts:
+        if time.time() >= deadline or len(found) >= 8:
+            break
+        try:
+            pages = _crawl_official_site(host, deadline)
+        except Exception as e:
+            print(f"[find-email] 官网抓取失败（{host}）: {e}")
+            continue
+        reg = _reg_host(host)
+        for pg in pages:
+            # 扫描前先反转义 HTML 实体（&amp; 等），保证邮箱完整
+            _scan_emails(_html.unescape(pg["html"]), pg["url"], found, seen)
+            # kind 标记：来源域名属于搜索结果官网域 -> 官网，否则（原文页）-> 新闻原文
+        # 标记本轮官网抓到的邮箱
+        for item in found:
+            if "kind" in item:
+                continue
+            if _reg_host(item.get("host", "")) == reg:
+                item["kind"] = "官网"
+
+    # 未标 kind 的（来自新闻原文页或非官网域）统一为「新闻原文」
+    for item in found:
+        item.setdefault("kind", "新闻原文")
+        # 兜底：若来源域恰好命中某官网注册域，归为官网
+        if item["kind"] == "新闻原文" and \
+                _reg_host(item.get("host", "")) in official_regs:
+            item["kind"] = "官网"
+
+    # 官网候选排前面，同类按发现顺序
+    found.sort(key=lambda x: 0 if x.get("kind") == "官网" else 1)
+    candidates = found[:5]
+    if not candidates:
+        return {"ok": True, "candidates": [],
+                "message": "未在公开网页自动找到邮箱，可手动搜索或查看原文联系页"}
+    return {"ok": True, "candidates": candidates}
+
+
+@app.post("/api/leads/find-email")
+async def api_leads_find_email(req: LeadFindEmailRequest, request: Request):
+    """智能查找线索联系邮箱：自动搜官网/联系页/新闻原文，返回候选供人工审核采用。"""
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return JSONResponse({"detail": "未登录或登录已过期"}, status_code=401)
+    record_id = (req.record_id or "").strip()
+    if not record_id:
+        return JSONResponse({"detail": "缺少 record_id"}, status_code=400)
+    try:
+        tid = _ensure_leads_table()
+        resp = _feishu_api(
+            "GET", f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records/{record_id}")
+        rec = resp.get("data", {}).get("record") or {}
+        fields = rec.get("fields", {})
+        company = _tv(fields.get("公司/机构")).strip()
+        signal_url = _tv(fields.get("原文链接")).strip()
+    except Exception as e:
+        print(f"[find-email] 读取线索记录失败（{record_id}）: {e}")
+        return JSONResponse({"detail": f"读取线索失败：飞书线索服务暂时不可用（{e}）"},
+                            status_code=502)
+    if not company:
+        return JSONResponse({"detail": "请先填写公司/机构名再查找邮箱"}, status_code=400)
+    try:
+        result = find_lead_email_candidates(company, signal_url)
+    except RuntimeError as e:
+        print(f"[find-email] 搜索服务失败（{company}）: {e}")
+        return JSONResponse({"detail": "搜索服务暂不可用，请稍后重试或手动搜索"},
+                            status_code=502)
+    except Exception as e:
+        print(f"[find-email] 查找异常（{company}）: {e}")
+        return JSONResponse({"detail": "搜索服务暂不可用，请稍后重试或手动搜索"},
+                            status_code=502)
+    return result
 
 
 @app.post("/api/products")

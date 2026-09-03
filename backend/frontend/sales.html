@@ -231,6 +231,39 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .lead-status-following{background:#E8F0FE;color:#1A56C4}
 .lead-status-won{background:#E6F9F1;color:#0D7B57}
 .lead-status-released{background:#F0F2F3;color:#637089}
+/* 线索状态筛选 tab */
+.lead-filter-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px;align-items:center}
+.lead-filter-tab{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:14px;font-size:12px;font-weight:600;color:var(--color-text-secondary);background:var(--color-surface);border:1px solid var(--color-border);cursor:pointer;transition:all var(--transition-fast)}
+.lead-filter-tab:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.lead-filter-tab.active{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
+.lead-filter-tab .lf-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:14px;padding:0 4px;border-radius:7px;font-size:10px;background:rgba(0,0,0,0.06)}
+.lead-filter-tab.active .lf-badge{background:rgba(255,255,255,0.25)}
+/* 非「跟进中」线索卡片：降视觉权重，字段与操作按钮禁用 */
+.lead-card.lead-card-inactive{opacity:0.65}
+.lead-card.lead-card-inactive .lead-actions{display:none}
+.lead-card.lead-card-inactive .lead-actions-readonly{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center;font-size:12px;color:var(--color-text-tertiary)}
+/* 智能查找邮箱：候选结果区 */
+.lead-email-results{margin-top:8px;padding:8px 10px;background:var(--color-bg);border:1px dashed var(--color-border);border-radius:6px;font-size:12px}
+.lead-email-results:empty{display:none}
+.lead-email-cand{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:3px 0}
+.lead-email-cand+.lead-email-cand{border-top:1px dashed var(--color-border-light)}
+.lead-email-cand .lec-email{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600;color:var(--color-text)}
+.lead-email-cand .lec-host{color:var(--color-text-tertiary);font-size:11px}
+.lead-email-cand .lec-kind{font-size:10px;color:var(--color-text-secondary);background:var(--color-surface);border:1px solid var(--color-border-light);padding:1px 6px;border-radius:8px;margin-left:2px}
+.lead-email-cand .lec-adopt{padding:2px 8px;font-size:11px}
+.lead-email-cand .lec-verify{font-size:11px;color:var(--color-primary)}
+.lead-email-empty{color:var(--color-text-tertiary);font-style:italic}
+/* 邮箱来源展示行（保存后显示在输入框下方） */
+.lead-email-source{font-size:11px;color:var(--color-text-tertiary);margin-top:4px;line-height:1.5}
+.lead-email-source a{color:var(--color-primary);text-decoration:none}
+.lead-email-source a:hover{text-decoration:underline}
+/* 释放卡片底部：红色文字删除按钮（右对齐） */
+.lead-card-bottom{display:flex;justify-content:flex-end;margin-top:8px}
+.btn-text-danger{background:none;border:none;padding:4px 8px;font-size:12px;color:var(--color-danger);cursor:pointer;font-weight:500}
+.btn-text-danger:hover{text-decoration:underline}
+/* 智能查找主按钮 + 手动搜索小按钮 */
+.btn-text-muted{background:none;border:none;padding:4px 6px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;text-decoration:underline}
+.btn-text-muted:hover{color:var(--color-primary)}
 @media (max-width:720px){.lead-fields{grid-template-columns:1fr}}
 .sig-stats{font-size:12px;color:var(--color-text-tertiary);font-weight:400}
 .sig-retry-note{margin-top:14px;font-size:12px;color:var(--color-text-tertiary);text-align:center;line-height:1.7}
@@ -254,8 +287,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   <div class="sidebar-nav">
     <div class="nav-section">销售智能助手</div>
     <div class="nav-item active" data-page="signals" onclick="switchPage('signals',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg><span>商机信号</span></div>
-    <div class="nav-item" data-page="grading" onclick="switchPage('grading',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>客户分级</span></div>
     <div class="nav-item" data-page="mail" onclick="switchPage('mail',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>邮件助手</span></div>
+    <div class="nav-item" data-page="grading" onclick="switchPage('grading',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>客户分级</span></div>
     <div class="nav-item" data-page="pi" onclick="switchPage('pi',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><span>PI工作台</span></div>
     <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
   </div>
@@ -1146,6 +1179,8 @@ var currentUser=null;            // /api/auth/me -> {username,role,name}
 var leadsAll=[];                 // GET /api/leads 全部线索
 var leadsLoaded=false;
 var sigView='pool';              // pool=公共信号池 / mine=我的线索
+var leadStatusFilter='跟进中';    // 我的线索状态筛选：跟进中/已转客户/已释放/全部
+var leadEmailAdopted={};         // 本卡已「采用」的邮箱来源：{rid: source_url}（保存时随 PUT 落库）
 var currentMailRecipient='';     // 生成邮件时选中线索的收件邮箱
 var LEAD_TYPE_COLORS={'诊所扩张':'#00796B','招标采购':'#C8102E','展会机会':'#0277BD','渠道动态':'#EF6C00','采购动态':'#5B21B6'};
 
@@ -1414,6 +1449,43 @@ function leadStatusTag(status){
   if(status==='已释放')return '<span class="lead-status-tag lead-status-released">已释放</span>';
   return '<span class="lead-status-tag lead-status-released">'+esc(status||'')+'</span>';
 }
+function leadFilterTabsHtml(){
+  var nFollowing=activeLeads().length;
+  var nWon=leadsAll.filter(function(l){return l['状态']==='已转客户'}).length;
+  var nReleased=leadsAll.filter(function(l){return l['状态']==='已释放'}).length;
+  var tabs=[
+    {key:'跟进中', label:'跟进中', badge:nFollowing},
+    {key:'已转客户', label:'已转客户', badge:nWon},
+    {key:'已释放', label:'已释放', badge:nReleased},
+    {key:'全部', label:'全部', badge:leadsAll.length}
+  ];
+  return '<div class="lead-filter-tabs" id="lead-filter-tabs">'+tabs.map(function(t){
+    return '<button type="button" class="lead-filter-tab'+(leadStatusFilter===t.key?' active':'')+'" onclick="setLeadStatusFilter(\''+t.key+'\')">'+
+      esc(t.label)+' <span class="lf-badge">'+t.badge+'</span></button>';
+  }).join('')+'</div>';
+}
+function setLeadStatusFilter(key){
+  leadStatusFilter=key;
+  renderLeads();
+}
+function visibleLeads(){
+  if(leadStatusFilter==='全部')return leadsAll.slice();
+  return leadsAll.filter(function(l){return (l['状态']||'跟进中')===leadStatusFilter});
+}
+function leadFilterEmptyHtml(){
+  var map={'跟进中':'暂无跟进中的线索','已转客户':'暂无已转客户的线索','已释放':'暂无已释放的线索','全部':'暂无线索'};
+  return '<div class="empty-state"><div class="es-icon">'+SIGNAL_ICON_RSS+'</div>'+
+    '<div class="es-title">'+esc(map[leadStatusFilter]||'暂无线索')+'</div>'+
+    '<div class="es-desc">切换上方状态筛选查看其他线索；在公共信号池认领商机后会出现在这里。</div></div>';
+}
+function leadEmailSourceLine(ld){
+  var email=(ld['联系邮箱']||'').trim();
+  var src=(ld['邮箱来源']||'').trim();
+  if(!email||!src)return '';
+  var host=src;
+  try{host=new URL(src).host}catch(e){}
+  return '<div class="lead-email-source">来源：<a href="'+esc(src)+'" target="_blank" rel="noopener noreferrer">'+esc(host)+'（核验 ↗）</a></div>';
+}
 function renderLeads(){
   var el=document.getElementById('lead-list');
   if(!el)return;
@@ -1421,7 +1493,10 @@ function renderLeads(){
   var stats=document.getElementById('sig-stats');
   if(stats)stats.textContent='我的线索 '+leadsAll.length+' 条（跟进中 '+activeLeads().length+' 条）· 数据落库飞书，归属锁定';
   if(!leadsAll.length){el.innerHTML=leadEmptyHtml();return}
-  el.innerHTML=leadsAll.map(function(ld){
+  var list=visibleLeads();
+  var html=leadFilterTabsHtml();
+  if(!list.length){el.innerHTML=html+leadFilterEmptyHtml();return}
+  html+=list.map(function(ld){
     var rid=ld.record_id||'';
     var type=ld['商机类型']||'采购动态';
     var color=LEAD_TYPE_COLORS[type]||'#5B21B6';
@@ -1431,30 +1506,41 @@ function renderLeads(){
     var note=ld['跟进备注']||'';
     var title=ld['标题']||'（无标题）';
     var url=ld['原文链接']||'';
+    var active=status==='跟进中';
+    var inactive=!active;
+    var released=status==='已释放';
+    var fieldDis=inactive?' disabled':'';
+    var fields=
+      '<div class="lead-fields">'+
+        '<div><label>公司 / 机构</label><input type="text" id="lf-company-'+rid+'" value="'+esc(company)+'" placeholder="未自动识别，请填写公司/机构名"'+fieldDis+'></div>'+
+        '<div><label>联系邮箱</label><input type="text" id="lf-email-'+rid+'" value="'+esc(email)+'" placeholder="补录客户联系邮箱，用于写开发信"'+fieldDis+'>'+leadEmailSourceLine(ld)+'</div>'+
+        '<div class="lf-full"><label>跟进备注</label><textarea id="lf-note-'+rid+'" rows="2" placeholder="跟进进展、联系人、沟通要点等"'+fieldDis+'>'+esc(note)+'</textarea></div>'+
+      '</div>';
     var meta=[];
     if(ld['来源'])meta.push('来源：'+ld['来源']);
     if(ld['发布日期'])meta.push(ld['发布日期']);
     if(ld['认领人'])meta.push('认领人：'+ld['认领人']);
     if(ld['认领时间'])meta.push('认领于 '+ld['认领时间']);
-    var released=status==='已释放';
-    var fieldDis=released?' disabled':'';
-    var fields=
-      '<div class="lead-fields">'+
-        '<div><label>公司 / 机构</label><input type="text" id="lf-company-'+rid+'" value="'+esc(company)+'" placeholder="未自动识别，请填写公司/机构名"'+fieldDis+'></div>'+
-        '<div><label>联系邮箱</label><input type="text" id="lf-email-'+rid+'" value="'+esc(email)+'" placeholder="补录客户联系邮箱，用于写开发信"'+fieldDis+'></div>'+
-        '<div class="lf-full"><label>跟进备注</label><textarea id="lf-note-'+rid+'" rows="2" placeholder="跟进进展、联系人、沟通要点等"'+fieldDis+'>'+esc(note)+'</textarea></div>'+
-      '</div>';
-    var actions=[];
-    if(url)actions.push('<a class="btn btn-outline btn-sm" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">查看原文 ↗</a>');
-    if(!released){
-      actions.push('<button type="button" class="btn btn-outline btn-sm" onclick="searchLeadContact(\''+esc(rid)+'\')">搜索联系方式</button>');
+    var actionsHtml='';
+    if(active){
+      var actions=[];
+      actions.push('<button type="button" class="btn btn-primary btn-sm" id="find-email-btn-'+rid+'" onclick="findLeadEmail(\''+esc(rid)+'\',this)">智能查找邮箱</button>');
+      actions.push('<button type="button" class="btn-text-muted" onclick="manualSearchLead(\''+esc(rid)+'\')">手动搜索</button>');
+      if(url)actions.push('<a class="btn btn-outline btn-sm" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">查看原文 ↗</a>');
       actions.push('<button type="button" class="btn btn-primary btn-sm" onclick="writeLeadMail(\''+esc(rid)+'\')">写开发信</button>');
       actions.push('<button type="button" class="btn btn-outline btn-sm" onclick="saveLead(\''+esc(rid)+'\',this)">保存</button>');
-      if(status!=='已转客户'){
-        actions.push('<button type="button" class="btn btn-outline btn-sm" style="color:var(--color-danger)" onclick="releaseLead(\''+esc(rid)+'\')">释放</button>');
+      actions.push('<button type="button" class="btn btn-outline btn-sm" style="color:var(--color-danger)" onclick="releaseLead(\''+esc(rid)+'\')">释放</button>');
+      actionsHtml='<div class="lead-actions" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+actions.join('')+'</div>';
+    }else{
+      var ro=[];
+      if(url)ro.push('<a class="btn btn-outline btn-sm" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">查看原文 ↗</a>');
+      ro.push('<span style="color:var(--color-text-tertiary)">'+(released?'该线索已释放回公共池，字段只读':'该线索已转为客户，字段只读')+'</span>');
+      actionsHtml='<div class="lead-actions-readonly">'+ro.join('')+'</div>';
+      if(released){
+        actionsHtml+='<div class="lead-card-bottom"><button type="button" class="btn-text-danger" onclick="deleteLead(\''+esc(rid)+'\')">删除记录</button></div>';
       }
     }
-    return '<div class="lead-card">'+
+    return '<div class="lead-card'+(inactive?' lead-card-inactive':'')+'">'+
       '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
         '<span class="opp-chip" style="color:'+color+';background:'+hexToRgba(color,0.1)+';border:1px solid '+hexToRgba(color,0.35)+'"><span class="sig-dot" style="background:'+color+'"></span>'+esc(type)+'</span>'+
         leadStatusTag(status)+
@@ -1462,9 +1548,11 @@ function renderLeads(){
       '<strong style="display:block;margin-top:8px;font-size:14px">'+esc(title)+'</strong>'+
       fields+
       '<div class="lead-meta-line">'+esc(meta.join('　·　'))+'</div>'+
-      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+actions.join('')+'</div>'+
+      actionsHtml+
+      '<div class="lead-email-results" id="find-email-results-'+rid+'"></div>'+
     '</div>';
   }).join('');
+  el.innerHTML=html;
 }
 function saveLead(rid,btn){
   var company=(document.getElementById('lf-company-'+rid)||{}).value||'';
@@ -1474,15 +1562,20 @@ function saveLead(rid,btn){
   if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
     showToast('联系邮箱格式不正确，请检查','error');return;
   }
+  // 采用智能查找候选时记住的来源 URL；邮箱被用户改动/清空则不带来源
+  var payload={company:company,email:email,note:note};
+  var adoptedSrc=leadEmailAdopted[rid]||'';
+  if(adoptedSrc&&email){payload.email_source=adoptedSrc}
   if(btn){btn.disabled=true;btn.textContent='保存中…'}
   fetch('/api/leads/'+encodeURIComponent(rid),{
     method:'PUT',
     headers:Object.assign({'Content-Type':'application/json'},authHeaders()),
-    body:JSON.stringify({company:company,email:email,note:note})
+    body:JSON.stringify(payload)
   }).then(function(r){return r.json().then(function(d){return {status:r.status,data:d}})})
     .then(function(res){
       if(res.status===200&&res.data&&res.data.ok){
         showToast('线索已保存','success');
+        delete leadEmailAdopted[rid];
         loadLeads();
       }else{
         if(btn){btn.disabled=false;btn.textContent='保存'}
@@ -1510,12 +1603,99 @@ function releaseLead(rid){
       }
     }).catch(function(){showToast('网络异常，释放失败','error')});
 }
-function searchLeadContact(rid){
+function manualSearchLead(rid){
   var ld=leadsAll.filter(function(x){return x.record_id===rid})[0];
   if(!ld)return;
   var q=(ld['公司机构']||'').trim()||(ld['标题']||'').trim();
   if(!q){showToast('该线索缺少公司/机构名与标题，无法搜索','error');return}
   window.open('https://www.bing.com/search?q='+encodeURIComponent(q+' contact email'),'_blank');
+}
+/* 智能查找邮箱：后端自动搜官网/联系页/新闻原文，返回候选供人工审核采用 */
+function findLeadEmail(rid,btn){
+  var box=document.getElementById('find-email-results-'+rid);
+  if(btn){btn.disabled=true;btn.textContent='正在搜索官网与公开联系页…'}
+  if(box)box.innerHTML='<div class="lead-email-empty">正在搜索官网与公开联系页，通常 20-35 秒，请稍候…</div>';
+  fetch('/api/leads/find-email',{
+    method:'POST',
+    headers:Object.assign({'Content-Type':'application/json'},authHeaders()),
+    body:JSON.stringify({record_id:rid})
+  }).then(function(r){return r.json().then(function(d){return {status:r.status,data:d}})})
+    .then(function(res){
+      if(btn){btn.disabled=false;btn.textContent='智能查找邮箱'}
+      if(res.status===401){showToast('登录已过期，请重新登录','error');return}
+      if(res.status===400){
+        showToast((res.data&&res.data.detail)||'请先填写公司/机构名','error');
+        if(box)box.innerHTML='<div class="lead-email-empty">'+esc((res.data&&res.data.detail)||'请先填写公司/机构名')+'</div>';
+        return;
+      }
+      if(!res.ok&&res.status>=500){
+        var msg=(res.data&&res.data.detail)||'搜索服务暂不可用，请稍后重试或手动搜索';
+        showToast(msg,'error');
+        if(box)box.innerHTML='<div class="lead-email-empty">'+esc(msg)+'</div>'+
+          '<div style="margin-top:6px"><button type="button" class="btn-text-muted" onclick="manualSearchLead(\''+esc(rid)+'\')">手动搜索</button></div>';
+        return;
+      }
+      var d=res.data||{};
+      var cands=Array.isArray(d.candidates)?d.candidates:[];
+      if(!cands.length){
+        if(box)box.innerHTML='<div class="lead-email-empty">'+esc(d.message||'未在公开网页自动找到邮箱')+'</div>'+
+          '<div style="margin-top:6px"><button type="button" class="btn-text-muted" onclick="manualSearchLead(\''+esc(rid)+'\')">手动搜索</button></div>';
+        return;
+      }
+      if(box){
+        box.innerHTML=cands.map(function(c,i){
+          var em=esc(c.email||'');var su=esc(c.source_url||'');var hs=esc(c.host||'');var kd=esc(c.kind||'');
+          return '<div class="lead-email-cand">'+
+            '<span class="lec-email">'+em+'</span>'+
+            (hs?'<span class="lec-host">'+hs+'</span>':'')+
+            (kd?'<span class="lec-kind">'+kd+'</span>':'')+
+            (su?'<a class="lec-verify" href="'+su+'" target="_blank" rel="noopener noreferrer">核验</a>':'')+
+            '<button type="button" class="btn btn-outline btn-sm lec-adopt" onclick="adoptLeadEmail(\''+esc(rid)+'\','+i+')">采用</button>'+
+          '</div>';
+        }).join('')+
+        '<div style="margin-top:6px"><button type="button" class="btn-text-muted" onclick="manualSearchLead(\''+esc(rid)+'\')">以上都不对？手动搜索</button></div>';
+        box._cands=cands;
+      }
+    })
+    .catch(function(){
+      if(btn){btn.disabled=false;btn.textContent='智能查找邮箱'}
+      showToast('网络异常，请稍后重试或手动搜索','error');
+      if(box)box.innerHTML='<div class="lead-email-empty">网络异常，请稍后重试。</div>'+
+        '<div style="margin-top:6px"><button type="button" class="btn-text-muted" onclick="manualSearchLead(\''+esc(rid)+'\')">手动搜索</button></div>';
+    });
+}
+function adoptLeadEmail(rid,idx){
+  var box=document.getElementById('find-email-results-'+rid);
+  var cands=(box&&box._cands)||[];
+  var c=cands[idx];
+  if(!c)return;
+  var inp=document.getElementById('lf-email-'+rid);
+  if(inp){
+    inp.value=c.email||'';
+    inp.focus();
+  }
+  leadEmailAdopted[rid]=c.source_url||'';
+  showToast('已填入，请核对后点保存','success');
+}
+function deleteLead(rid){
+  if(!confirm('彻底删除这条线索记录？删除后不可恢复'))return;
+  fetch('/api/leads/'+encodeURIComponent(rid),{
+    method:'DELETE',
+    headers:authHeaders()
+  }).then(function(r){return r.json().then(function(d){return {status:r.status,data:d}}).catch(function(){return {status:r.status,data:{}}})})
+    .then(function(res){
+      if(res.status===200&&res.data&&res.data.ok){
+        showToast('线索记录已删除','success');
+        loadLeads();
+      }else if(res.status===403){
+        showToast((res.data&&res.data.detail)||'仅可删除本人认领的线索','error');
+      }else if(res.status===404){
+        showToast('线索记录不存在或已被删除','error');
+        loadLeads();
+      }else{
+        showToast((res.data&&res.data.detail)||'删除失败，请稍后重试','error');
+      }
+    }).catch(function(){showToast('网络异常，删除失败','error')});
 }
 function writeLeadMail(rid){
   var ld=leadsAll.filter(function(x){return x.record_id===rid})[0];
