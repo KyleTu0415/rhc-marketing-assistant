@@ -663,6 +663,264 @@ async def api_admin_account_delete(record_id: str, request: Request):
         print(f"[admin] 删除账号失败（{record_id}）: {e}")
         return JSONResponse({"ok": False, "message": f"删除账号失败：{e}"}, status_code=502)
 
+# ============================================================
+# 商机线索表（飞书多维表格「商机线索」）
+# 销售从商机信号认领的线索落库锁定归属，可补录公司/邮箱/备注、
+# 转客户或释放；邮件助手直接引用跟进中线索作为收件客户。
+# 表结构不存在时自动建表；启动时后台预热（同系统账号表模式）。
+# ============================================================
+LEADS_TABLE_NAME = "商机线索"
+LEADS_FIELD_MAP = {
+    "标题": "线索标题",
+    "商机类型": "商机类型",
+    "公司机构": "公司/机构",
+    "摘要": "摘要",
+    "来源": "来源",
+    "原文链接": "原文链接",
+    "地区": "地区",
+    "发布日期": "发布日期",
+    "认领人": "认领人",
+    "认领时间": "认领时间",
+    "状态": "状态",
+    "联系邮箱": "联系邮箱",
+    "跟进备注": "跟进备注",
+}
+LEAD_ACTIVE_STATUS = ("跟进中", "已转客户")
+LEAD_STATUS_OPTIONS = ("跟进中", "已转客户", "已释放")
+LEAD_OPP_OPTIONS = ("诊所扩张", "招标采购", "展会机会", "渠道动态", "采购动态")
+
+_leads_table_id = None
+_leads_cache = {"data": None, "ts": 0.0}
+_LEADS_CACHE_TTL = 30  # 线索列表内存缓存秒数（信号接口 enrichment 使用）
+
+
+def _ensure_leads_table():
+    """确保多维表中存在「商机线索」表，返回 table_id；不存在则自动创建。"""
+    global _leads_table_id
+    if _leads_table_id:
+        return _leads_table_id
+    if not FEISHU_ATK:
+        raise RuntimeError("FEISHU_APP_TOKEN 未配置")
+    resp = _feishu_api("GET", f"/bitable/v1/apps/{FEISHU_ATK}/tables?page_size=100")
+    for t in resp.get("data", {}).get("items", []):
+        if t.get("name") == LEADS_TABLE_NAME:
+            _leads_table_id = t.get("table_id")
+            return _leads_table_id
+    fields = [
+        {"field_name": "线索标题", "type": 1},   # 文本（主字段）
+        {"field_name": "商机类型", "type": 3,    # 单选
+         "property": {"options": [{"name": n} for n in LEAD_OPP_OPTIONS]}},
+        {"field_name": "公司/机构", "type": 1},  # 文本
+        {"field_name": "摘要", "type": 1},       # 文本
+        {"field_name": "来源", "type": 1},       # 文本
+        {"field_name": "原文链接", "type": 1},   # 文本
+        {"field_name": "地区", "type": 1},       # 文本
+        {"field_name": "发布日期", "type": 1},   # 文本
+        {"field_name": "认领人", "type": 1},     # 文本
+        {"field_name": "认领时间", "type": 1},   # 文本（ISO 时间）
+        {"field_name": "状态", "type": 3,        # 单选
+         "property": {"options": [{"name": n} for n in LEAD_STATUS_OPTIONS]}},
+        {"field_name": "联系邮箱", "type": 1},   # 文本
+        {"field_name": "跟进备注", "type": 1},   # 文本
+    ]
+    resp = _feishu_api("POST", f"/bitable/v1/apps/{FEISHU_ATK}/tables",
+                       {"table": {"name": LEADS_TABLE_NAME,
+                                  "default_view_name": "线索列表",
+                                  "fields": fields}})
+    _leads_table_id = resp.get("data", {}).get("table_id")
+    if not _leads_table_id:
+        raise RuntimeError(f"创建「{LEADS_TABLE_NAME}」表失败: {resp}")
+    print(f"[leads] 已创建飞书线索表「{LEADS_TABLE_NAME}」: {_leads_table_id}")
+    return _leads_table_id
+
+
+def _warmup_leads_table():
+    """启动后台预热：尽早建表并读取一次，失败不影响服务启动（接口调用时会重试）。"""
+    try:
+        _fetch_leads(force_refresh=True)
+        print(f"[leads] 飞书线索表初始化完成（{len(_leads_cache['data'] or [])} 条）")
+    except Exception as e:
+        print(f"[leads] 飞书线索表初始化失败（接口调用时将自动重试）: {e}")
+
+
+def _norm_lead_record(rec: dict) -> dict:
+    """飞书记录 -> 归一化字段（英文短 key 供前端使用，另附 record_id）。"""
+    fl = rec.get("fields", {})
+    out = {"record_id": rec.get("record_id", "")}
+    for short, full in LEADS_FIELD_MAP.items():
+        out[short] = _tv(fl.get(full))
+    return out
+
+
+def _fetch_leads(force_refresh=False) -> list:
+    """读取线索表全部记录（按认领时间倒序），30 秒内存缓存。
+    飞书失败时抛出异常（由调用方决定降级或 502）。"""
+    now = time.time()
+    if not force_refresh and _leads_cache["data"] is not None \
+            and now - _leads_cache["ts"] < _LEADS_CACHE_TTL:
+        return list(_leads_cache["data"])
+    tid = _ensure_leads_table()
+    items = []
+    page_token = None
+    while True:
+        path = f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records?page_size=100"
+        if page_token:
+            path += f"&page_token={page_token}"
+        resp = _feishu_api("GET", path)
+        data = resp.get("data", {})
+        for it in data.get("items", []):
+            items.append(_norm_lead_record(it))
+        if not data.get("has_more"):
+            break
+        page_token = data.get("page_token")
+    items.sort(key=lambda x: x.get("认领时间", ""), reverse=True)
+    _leads_cache["data"] = items
+    _leads_cache["ts"] = now
+    return list(items)
+
+
+def _invalidate_leads_cache():
+    _leads_cache["data"] = None
+    _leads_cache["ts"] = 0.0
+
+
+def _find_active_lead_by_url(leads: list, url: str):
+    """按原文链接查找有效线索（状态=跟进中/已转客户），返回记录或 None。"""
+    u = (url or "").strip()
+    if not u:
+        return None
+    for ld in leads:
+        if ld.get("原文链接", "").strip() == u and ld.get("状态") in LEAD_ACTIVE_STATUS:
+            return ld
+    return None
+
+
+class LeadClaimRequest(BaseModel):
+    title: str = ""
+    opp_type: str = ""
+    summary: str = ""
+    source: str = ""
+    url: str = ""
+    regions: List[str] = []
+    date: str = ""
+    company: Optional[str] = None
+    org: Optional[str] = None
+
+
+class LeadUpdateRequest(BaseModel):
+    company: Optional[str] = None
+    email: Optional[str] = None
+    status: Optional[str] = None
+    note: Optional[str] = None
+
+
+@app.post("/api/leads/claim")
+async def api_leads_claim(req: LeadClaimRequest, request: Request):
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    title = (req.title or "").strip()
+    if not title:
+        return JSONResponse({"ok": False, "message": "线索标题不能为空"}, status_code=400)
+    try:
+        leads = _fetch_leads(force_refresh=True)
+        # 按原文链接查重：已有有效线索（跟进中/已转客户）则拒绝重复认领
+        dup = _find_active_lead_by_url(leads, req.url)
+        if dup:
+            return JSONResponse({
+                "detail": "该信号已被认领",
+                "claimed_by": dup.get("认领人", ""),
+                "status": dup.get("状态", ""),
+            }, status_code=409)
+
+        opp_label = (req.opp_type or "").strip()
+        if opp_label not in LEAD_OPP_OPTIONS:
+            # 兼容传入英文 opp_type key（clinic_expansion 等）
+            from app.insights_llm import OPP_LABELS
+            opp_label = OPP_LABELS.get(opp_label, "采购动态")
+        # 公司/机构：优先用信号自带 AI 提取机构名（org），兼容 company 字段
+        company = ((req.org or "").strip() or (req.company or "").strip())
+        regions = req.regions if isinstance(req.regions, list) else []
+        now_iso = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+        fields = {
+            "线索标题": title,
+            "商机类型": opp_label,
+            "公司/机构": company,
+            "摘要": (req.summary or "")[:2000],
+            "来源": req.source or "",
+            "原文链接": req.url or "",
+            "地区": ", ".join(str(r) for r in regions if r),
+            "发布日期": req.date or "",
+            "认领人": user_info.get("name") or user_info.get("username", ""),
+            "认领时间": now_iso,
+            "状态": "跟进中",
+            "联系邮箱": "",
+            "跟进备注": "",
+        }
+        tid = _ensure_leads_table()
+        resp = _feishu_api(
+            "POST", f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records",
+            {"fields": fields})
+        rec = resp.get("data", {}).get("record", {})
+        lead = _norm_lead_record(rec) if rec else dict(fields, record_id="")
+        _invalidate_leads_cache()
+        return {"ok": True, "lead": lead}
+    except Exception as e:
+        print(f"[leads] 认领失败（{title[:30]}）: {e}")
+        return JSONResponse({"ok": False, "message": f"认领失败：飞书线索服务暂时不可用（{e}）"},
+                            status_code=502)
+
+
+@app.get("/api/leads")
+async def api_leads_list(request: Request):
+    token = _get_token_from_request(request)
+    if not token or not _verify_token(token):
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    try:
+        leads = _fetch_leads(force_refresh=True)
+    except Exception as e:
+        print(f"[leads] 读取线索列表失败: {e}")
+        return JSONResponse({"ok": False, "message": f"读取线索列表失败：飞书线索服务暂时不可用（{e}）"},
+                            status_code=502)
+    return {"ok": True, "items": leads, "total": len(leads)}
+
+
+@app.put("/api/leads/{record_id}")
+async def api_leads_update(record_id: str, req: LeadUpdateRequest, request: Request):
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    try:
+        tid = _ensure_leads_table()
+        fields = {}
+        if req.company is not None:
+            fields["公司/机构"] = req.company.strip()
+        if req.email is not None:
+            fields["联系邮箱"] = req.email.strip()
+        if req.note is not None:
+            fields["跟进备注"] = req.note.strip()
+        if req.status is not None:
+            status = req.status.strip()
+            if status not in LEAD_STATUS_OPTIONS:
+                return JSONResponse({"ok": False, "message": f"状态仅支持：{'/'.join(LEAD_STATUS_OPTIONS)}"},
+                                    status_code=400)
+            fields["状态"] = status
+        if not fields:
+            return {"ok": True, "message": "无需要更新的内容"}
+        _feishu_api(
+            "PUT",
+            f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records/{record_id}",
+            {"fields": fields})
+        _invalidate_leads_cache()
+        return {"ok": True}
+    except Exception as e:
+        print(f"[leads] 更新线索失败（{record_id}）: {e}")
+        return JSONResponse({"ok": False, "message": f"更新线索失败：飞书线索服务暂时不可用（{e}）"},
+                            status_code=502)
+
+
 @app.post("/api/products")
 async def api_product_create(req: ProductUpsertRequest):
     import urllib.request as _ur
@@ -968,6 +1226,7 @@ async def api_signals_list(limit: str = "20", opp_type: Optional[str] = None):
         "opp_type": it.get("opp_type"),
         "opp_label": OPP_LABELS.get(it.get("opp_type"), "采购动态"),
         "opp_color": OPP_COLORS.get(it.get("opp_type"), "#5B21B6"),
+        "org": it.get("opp_org", "") or "",
         "date": it.get("date", ""),
         "source": it.get("source", ""),
         "url": it.get("url", ""),
@@ -976,6 +1235,29 @@ async def api_signals_list(limit: str = "20", opp_type: Optional[str] = None):
         "categoryLabel": it.get("categoryLabel", ""),
         "lang": it.get("lang", ""),
     } for it in sig]
+
+    # 附加线索认领状态（按原文链接匹配有效线索）。
+    # 飞书线索表查询失败时降级为 claimed:false，不影响信号主接口。
+    lead_by_url = {}
+    try:
+        for ld in _fetch_leads():
+            if ld.get("状态") in LEAD_ACTIVE_STATUS and ld.get("原文链接"):
+                lead_by_url[ld["原文链接"].strip()] = ld
+    except Exception as e:
+        print(f"[signals] 线索认领状态 enrichment 失败（降级为未认领）: {e}")
+        lead_by_url = {}
+    for it in items:
+        ld = lead_by_url.get((it.get("url") or "").strip())
+        if ld:
+            it["claimed"] = True
+            it["claimed_by"] = ld.get("认领人", "")
+            it["lead_status"] = ld.get("状态", "")
+            it["lead_id"] = ld.get("record_id", "")
+        else:
+            it["claimed"] = False
+            it["claimed_by"] = ""
+            it["lead_status"] = ""
+            it["lead_id"] = ""
 
     return {
         "ok": True,
@@ -994,6 +1276,8 @@ except Exception as _e:
 
 # 启动时后台预热飞书「系统账号」表（建表+种子数据），不阻塞服务启动
 threading.Thread(target=_warmup_account_table, daemon=True).start()
+# 启动时后台预热飞书「商机线索」表（自动建表），不阻塞服务启动
+threading.Thread(target=_warmup_leads_table, daemon=True).start()
 
 # Serve frontend - try multiple possible locations
 _candidate_dirs = [

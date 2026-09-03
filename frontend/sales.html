@@ -210,6 +210,28 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .sig-filter-chip .sig-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .opp-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
 .sig-region-tag{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:var(--color-bg);color:var(--color-text-secondary);border:1px solid var(--color-border-light);white-space:nowrap}
+/* ===== 商机信号：公共池/我的线索 子页签 ===== */
+.sig-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sig-subtab{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;font-size:13px;font-weight:600;color:var(--color-text-secondary);background:var(--color-surface);border:1px solid var(--color-border);cursor:pointer;transition:all var(--transition-fast)}
+.sig-subtab:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.sig-subtab.active{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
+.sig-subtab .subtab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--color-primary-xlight);color:var(--color-primary-dark);font-size:11px;font-weight:700}
+.sig-subtab.active .subtab-badge{background:rgba(255,255,255,0.25);color:#fff}
+.sig-org-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:var(--color-bg);color:var(--color-text-secondary);border:1px solid var(--color-border-light);max-width:100%}
+/* ===== 我的线索卡片 ===== */
+.lead-card{padding:16px 0;border-bottom:1px solid var(--color-border-light)}
+.lead-card:last-child{border-bottom:none}
+.lead-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 4px}
+.lead-fields .lf-full{grid-column:1/-1}
+.lead-fields label{display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px}
+.lead-fields input,.lead-fields textarea{width:100%;font-size:13px;padding:7px 10px}
+.lead-fields textarea{resize:vertical;min-height:52px}
+.lead-meta-line{font-size:12px;color:var(--color-text-tertiary);margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lead-status-tag{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.lead-status-following{background:#E8F0FE;color:#1A56C4}
+.lead-status-won{background:#E6F9F1;color:#0D7B57}
+.lead-status-released{background:#F0F2F3;color:#637089}
+@media (max-width:720px){.lead-fields{grid-template-columns:1fr}}
 .sig-stats{font-size:12px;color:var(--color-text-tertiary);font-weight:400}
 .sig-retry-note{margin-top:14px;font-size:12px;color:var(--color-text-tertiary);text-align:center;line-height:1.7}
 
@@ -247,10 +269,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
     <div class="card">
       <div class="card-header"><h3>商机信号流</h3><span class="card-sub sig-stats" id="sig-stats">加载中…</span></div>
       <div class="card-body">
-        <div class="sig-filter" id="sig-filter"></div>
+        <div class="sig-subtabs" id="sig-subtabs">
+          <button type="button" class="sig-subtab active" data-view="pool" onclick="setSignalView('pool')">公共信号池</button>
+          <button type="button" class="sig-subtab" data-view="mine" onclick="setSignalView('mine')">我的线索 <span class="subtab-badge" id="sig-mine-count" style="display:none">0</span></button>
+        </div>
+        <div id="sig-filter"></div>
         <div id="signal-list">
           <div class="loading-state"><div class="spin"></div><div>正在加载商机信号…</div></div>
         </div>
+        <div id="lead-list" style="display:none"></div>
       </div>
     </div>
     <div class="card">
@@ -299,6 +326,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
               <label>客户</label>
               <select id="mail-customer" onchange="onMailCustomerChange()"><option value="">— 选择客户（加载中…）—</option></select>
               <input type="text" id="mail-customer-manual" placeholder="手动输入客户名称" style="margin-top:8px;display:none">
+              <div id="mail-lead-hint" style="display:none;margin-top:8px;font-size:12px;line-height:1.7"></div>
               <div id="mail-customer-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--color-text-tertiary);line-height:1.7">客户主库暂未接入，下拉中暂无已建档客户。可选择「手动输入客户 / 商机客户」直接填写客户名称生成邮件；商机认领跟进并转为客户后，客户将自动出现在此下拉中。</div>
             </div>
             <div class="form-group">
@@ -345,7 +373,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
             </div>
           </div>
         </div>
-        <div class="mail-footnote">框架演示：AI生成内容请核对后使用。正式版将接通企业邮箱（IMAP/SMTP），邮件可直接发送并自动归档至客户档案。</div>
+        <div class="mail-footnote">AI 生成内容请核对后使用。选择「我的线索」时自动带出收件邮箱；当前请复制正文与邮箱到企业邮箱发送，正式版接通企业邮箱（IMAP/SMTP）后可一键发送并自动归档至线索/客户档案。</div>
       </div>
     </div>
 
@@ -861,14 +889,31 @@ function switchMailTab(type){
 function onMailCustomerChange(){
   var sel=document.getElementById('mail-customer');
   var manual=document.getElementById('mail-customer-manual');
+  var leadHint=document.getElementById('mail-lead-hint');
   manual.style.display=(sel.value==='__manual__')?'block':'none';
+  // 线索选中：展示收件邮箱提示
+  var leadMatch=/^lead:(.+)$/.exec(sel.value||'');
+  var ld=leadMatch?leadsAll.filter(function(x){return x.record_id===leadMatch[1]})[0]:null;
+  if(ld){
+    var email=(ld['联系邮箱']||'').trim();
+    if(email){
+      leadHint.style.display='block';
+      leadHint.style.color='var(--color-text-secondary)';
+      leadHint.innerHTML='<strong>收件邮箱：</strong>'+esc(email);
+    }else{
+      leadHint.style.display='block';
+      leadHint.style.color='var(--color-warning,#B27A1B)';
+      leadHint.innerHTML='该线索尚未补录联系邮箱，请先在「我的线索」中补录';
+    }
+  }else{
+    leadHint.style.display='none';
+    leadHint.innerHTML='';
+  }
   // 切换客户时重置手动覆盖，按新客户的国家推荐风格
   styleManualOverrides={};
   var country='';
-  if(sel.value&&sel.value!=='__manual__'&&snapshotData){
-    var c=(snapshotData.customers||[]).filter(function(x){return x['客户名称']===sel.value})[0]||{};
-    country=c['国家/地区']||c['国家地区']||'';
-  }
+  var info=getMailCustomer();
+  country=info.country||'';
   updateStyleRecommendation(country);
 }
 /* ===== 多选下拉通用交互 ===== */
@@ -899,14 +944,23 @@ function renderMailProducts(list){
 }
 function getMailCustomer(){
   var sel=document.getElementById('mail-customer');
-  if(sel.value==='__manual__'){
+  var v=sel.value||'';
+  if(v==='__manual__'){
     var m=document.getElementById('mail-customer-manual');
-    return {name:(m.value||'').trim(),country:'',manual:true};
+    return {name:(m.value||'').trim(),country:'',email:'',manual:true};
   }
-  var name=sel.value;
-  if(!name)return {name:'',country:''};
-  var c=(snapshotData&&snapshotData.customers||[]).filter(function(x){return x['客户名称']===name})[0]||{};
-  return {name:name,country:c['国家/地区']||c['国家地区']||''};
+  var leadMatch=/^lead:(.+)$/.exec(v);
+  if(leadMatch){
+    var ld=leadsAll.filter(function(x){return x.record_id===leadMatch[1]})[0];
+    if(ld){
+      // 客户名取公司/机构（为空则取线索标题）
+      var name=(ld['公司机构']||'').trim()||(ld['标题']||'').trim();
+      return {name:name,country:'',email:(ld['联系邮箱']||'').trim(),lead:ld};
+    }
+  }
+  if(!v)return {name:'',country:'',email:''};
+  var c=(snapshotData&&snapshotData.customers||[]).filter(function(x){return x['客户名称']===v})[0]||{};
+  return {name:v,country:c['国家/地区']||c['国家地区']||'',email:c['联系邮箱']||c['邮箱']||''};
 }
 function getSelectedMailProducts(){
   var out=[];
@@ -947,6 +1001,9 @@ function renderMail(text,source){
   var html='';
   if(subject)html+='<div class="mail-subject">Subject: '+esc(subject)+'</div>';
   html+='<div class="mail-body">'+esc(body)+'</div>';
+  if(currentMailRecipient){
+    html+='<div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--color-border);font-size:12px;color:var(--color-text-tertiary);line-height:1.7">收件邮箱：'+esc(currentMailRecipient)+'（复制正文与邮箱后，到企业邮箱发送；正式版接入邮箱后可一键发送）</div>';
+  }
   document.getElementById('mail-preview').innerHTML=html;
   var copyBtn=document.getElementById('mail-copy-btn');
   copyBtn.style.display='inline-flex';
@@ -957,6 +1014,7 @@ function generateMail(){
   if(!ctx0.name){showToast('请先选择或输入客户','error');return}
   var prods=getSelectedMailProducts();
   var keyPoints=document.getElementById('mail-keypoints').value.trim();
+  currentMailRecipient=ctx0.email||'';
   // 读取选中的素材
   var selectedMaterials=RHC_INSIGHT_DATA.filter(function(item){return selectedMaterialIds.indexOf(item.id)!==-1});
   var ctx={customerName:ctx0.name,country:ctx0.country,products:prods,keyPoints:keyPoints,materials:selectedMaterials};
@@ -1083,6 +1141,24 @@ var sigAll=[];        // 全部信号（接口返回）
 var sigOppTypes=[];  // [{key,label,color}]
 var sigFilter='all';
 var sigLoaded=false;
+/* ===== 商机认领闭环：登录态 + 线索数据 ===== */
+var currentUser=null;            // /api/auth/me -> {username,role,name}
+var leadsAll=[];                 // GET /api/leads 全部线索
+var leadsLoaded=false;
+var sigView='pool';              // pool=公共信号池 / mine=我的线索
+var currentMailRecipient='';     // 生成邮件时选中线索的收件邮箱
+var LEAD_TYPE_COLORS={'诊所扩张':'#00796B','招标采购':'#C8102E','展会机会':'#0277BD','渠道动态':'#EF6C00','采购动态':'#5B21B6'};
+
+function authHeaders(){
+  var token=localStorage.getItem('rhc_auth_token');
+  return token?{'Authorization':'Bearer '+token}:{};
+}
+function loadCurrentUser(){
+  return fetch('/api/auth/me',{headers:authHeaders(),cache:'no-store'})
+    .then(function(r){return r.ok?r.json():{ok:false}})
+    .then(function(d){if(d&&d.ok){currentUser=d.user}return currentUser})
+    .catch(function(){return null});
+}
 
 function hexToRgba(hex,alpha){
   var m=/^#?([0-9a-fA-F]{6})$/.exec(String(hex||''));
@@ -1122,6 +1198,30 @@ function setSignalFilter(key){
   renderSignalFilter();
   if(sigLoaded)renderSignals();
 }
+/* ===== 公共信号池 / 我的线索 子视图切换 ===== */
+function setSignalView(view){
+  sigView=view;
+  document.querySelectorAll('.sig-subtab').forEach(function(b){
+    b.classList.toggle('active',b.getAttribute('data-view')===view);
+  });
+  document.getElementById('sig-filter').style.display=view==='pool'?'flex':'none';
+  document.getElementById('signal-list').style.display=view==='pool'?'':'none';
+  var leadEl=document.getElementById('lead-list');
+  leadEl.style.display=view==='mine'?'':'none';
+  if(view==='mine'){
+    if(!leadsLoaded){loadLeads()}else{renderLeads()}
+    var stats=document.getElementById('sig-stats');
+    if(stats)stats.textContent='我认领的商机线索 · 跟进中的线索可补全联系方式后直接写开发信';
+  }else{
+    if(sigLoaded)renderSignals();
+  }
+}
+function activeLeads(){return leadsAll.filter(function(l){return l['状态']==='跟进中'})}
+function updateLeadCount(){
+  var n=activeLeads().length;
+  var badge=document.getElementById('sig-mine-count');
+  if(badge){badge.textContent=String(n);badge.style.display=n>0?'inline-flex':'none'}
+}
 function loadSignals(){
   var list=document.getElementById('signal-list');
   var stats=document.getElementById('sig-stats');
@@ -1142,7 +1242,7 @@ function loadSignals(){
       sigOppTypes=types.filter(function(t){return t.key});
       sigLoaded=true;
       renderSignalFilter();
-      renderSignals();
+      if(sigView==='pool')renderSignals();
     })
     .catch(function(){
       sigLoaded=false;
@@ -1163,6 +1263,7 @@ function renderSignals(){
     stats.textContent='最新 '+items.length+' 条商机信号'+typeLabel+' · 来自公开行业资讯 AI 筛选 · 每条附原文链接可核验';
   }
   if(!items.length){list.innerHTML=sigEmptyStateHtml();return}
+  var uname=currentUser?currentUser.name:'';
   var html=items.map(function(it,idx){
     var color=it.opp_color||'#5B21B6';
     var label=it.opp_label||'采购动态';
@@ -1176,14 +1277,26 @@ function renderSignals(){
     if(it.source)meta.push('来源：'+it.source);
     if(it.date)meta.push(it.date);
     var catHtml=it.categoryLabel?'<span class="tag tag-gray" style="font-size:11px">'+esc(it.categoryLabel)+'</span>':'';
+    var orgHtml=it.org?'<span class="sig-org-tag" title="AI 自动识别的商机主体机构">🏛 '+esc(it.org)+'</span>':'';
     var url=it.url||'';
     var viewBtn=url
       ? '<a class="btn btn-outline btn-sm" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">查看原文 ↗</a>'
       : '<span class="tag tag-gray" style="font-size:11px">原文链接暂缺</span>';
+    var claimBtn;
+    if(it.claimed){
+      if(it.claimed_by&&uname&&it.claimed_by===uname){
+        claimBtn='<button type="button" class="btn btn-primary btn-sm" onclick="goMyLeads()">已认领 · 去跟进</button>';
+      }else{
+        claimBtn='<button type="button" class="btn btn-outline btn-sm" disabled style="opacity:.55;cursor:not-allowed">已被 '+esc(it.claimed_by||'他人')+' 认领</button>';
+      }
+    }else{
+      claimBtn='<button type="button" class="btn btn-primary btn-sm sig-claim-btn" onclick="claimSignal(\''+esc(oid)+'\',this)">认领信号</button>';
+    }
     return '<div class="intel-item">'+
       '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
         '<span class="opp-chip" style="color:'+color+';background:'+hexToRgba(color,0.1)+';border:1px solid '+hexToRgba(color,0.35)+'"><span class="sig-dot" style="background:'+color+'"></span>'+esc(label)+'</span>'+
         catHtml+
+        orgHtml+
         regionHtml+
       '</div>'+
       '<strong style="display:block;margin-top:8px;font-size:14px">'+esc(it.title||'（无标题）')+'</strong>'+
@@ -1191,18 +1304,239 @@ function renderSignals(){
       '<div class="ii-source"><svg class="src-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'+esc(meta.join('　·　')||'')+'</div>'+
       '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
         viewBtn+
-        '<button type="button" class="btn btn-primary btn-sm sig-claim-btn" onclick="claimSignal(this,\''+esc(oid)+'\')">认领信号</button>'+
+        claimBtn+
       '</div>'+
     '</div>';
   }).join('');
-  html+='<div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary);line-height:1.8">以上商机信号由系统每日采集公开行业资讯、AI 自动识别生成，点击「查看原文」可跳转来源页面核验；认领与转客户为框架演示交互，正式版由后端锁定归属并同步客户档案。</div>';
+  html+='<div style="margin-top:12px;font-size:12px;color:var(--color-text-tertiary);line-height:1.8">以上商机信号由系统每日采集公开行业资讯、AI 自动识别生成，点击「查看原文」可跳转来源页面核验；认领即写入线索库并锁定归属（其他销售不可重复认领），补全联系方式后可直接写开发信；释放后信号回到公共池。</div>';
   list.innerHTML=html;
 }
-/* 认领：仅演示交互（不写后端）；正式版认领即锁定归属、防撞单 */
-function claimSignal(btn,id){
-  var bar=btn.parentNode;
-  bar.innerHTML='<span class="tag tag-success" style="font-size:11px">已认领</span><button type="button" class="btn btn-outline btn-sm" onclick="switchPage(\'mail\',document.querySelector(\'[data-page=mail]\'))">去邮件助手</button><button type="button" class="btn btn-outline btn-sm" onclick="showToast(\'正式版：14 天无跟进自动释放回公共池，其他销售可认领\',\'info\')">释放</button>';
-  showToast('正式版认领即锁定归属，防撞单；当前为框架演示，认领不写入后端','info');
+function goMyLeads(){setSignalView('mine')}
+/* 认领：真实落库 POST /api/leads/claim；成功后信号按钮即时切换状态 */
+function claimSignal(id,btn){
+  var it=null;
+  for(var i=0;i<sigAll.length;i++){
+    var oid=sigAll[i].id!=null&&String(sigAll[i].id)!==''?String(sigAll[i].id):('sig-'+i);
+    if(oid===id){it=sigAll[i];break}
+  }
+  if(!it){showToast('未找到该信号，请刷新后重试','error');return}
+  if(btn){btn.disabled=true;btn.textContent='认领中…'}
+  fetch('/api/leads/claim',{
+    method:'POST',
+    headers:Object.assign({'Content-Type':'application/json'},authHeaders()),
+    body:JSON.stringify({
+      title:it.title||'',opp_type:it.opp_type||'',summary:it.summary||'',
+      source:it.source||'',url:it.url||'',regions:it.regions||[],
+      date:it.date||'',org:it.org||'',company:it.org||''
+    })
+  }).then(function(r){
+    return r.json().then(function(d){return {status:r.status,data:d}});
+  }).then(function(res){
+    if(res.status===200&&res.data&&res.data.ok){
+      var lead=res.data.lead||{};
+      it.claimed=true;
+      it.claimed_by=(currentUser&&currentUser.name)||lead['认领人']||'';
+      it.lead_status='跟进中';
+      it.lead_id=lead.record_id||'';
+      if(lead.record_id)leadsAll.unshift(lead);
+      updateLeadCount();
+      renderSignals();
+      showToast('认领成功，已进入「我的线索」；补全联系邮箱后即可在邮件助手直接选用','success');
+    }else if(res.status===409){
+      var d=res.data||{};
+      it.claimed=true;
+      it.claimed_by=d.claimed_by||'他人';
+      it.lead_status=d.status||'';
+      renderSignals();
+      showToast('该信号已被 '+esc(d.claimed_by||'他人')+' 认领','error');
+    }else if(res.status===401){
+      showToast('请先登录后再认领商机','error');
+    }else{
+      if(btn){btn.disabled=false;btn.textContent='认领信号'}
+      showToast((res.data&&(res.data.message||res.data.detail))||'认领失败，请稍后重试','error');
+    }
+  }).catch(function(e){
+    if(btn){btn.disabled=false;btn.textContent='认领信号'}
+    showToast('网络异常，认领失败：'+(e&&e.message?e.message:''),'error');
+  });
+}
+
+/* ===== 我的线索（GET /api/leads，落库飞书「商机线索」表） ===== */
+function leadLoadingHtml(){
+  return '<div class="loading-state"><div class="spin"></div><div>正在加载我的线索…</div></div>';
+}
+function leadErrorHtml(){
+  return '<div class="empty-state"><div class="es-icon">'+SIGNAL_ICON_WARN+'</div>'+
+    '<div class="es-title">线索加载失败</div>'+
+    '<div class="es-desc">可能是网络异常或线索服务暂不可用。请重试；若持续失败，请联系系统管理员。</div>'+
+    '<div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="loadLeads()">重试加载</button></div></div>';
+}
+function leadEmptyHtml(){
+  return '<div class="empty-state"><div class="es-icon">'+SIGNAL_ICON_RSS+'</div>'+
+    '<div class="es-title">暂无认领线索</div>'+
+    '<div class="es-desc">在公共信号池看到值得跟进的商机，点击「认领信号」即可收进这里，补全联系方式后直接写开发信。</div>'+
+    '<div style="margin-top:14px"><button class="btn btn-outline btn-sm" onclick="setSignalView(\'pool\')">去公共信号池看看</button></div></div>';
+}
+function loadLeads(){
+  var el=document.getElementById('lead-list');
+  if(el)el.innerHTML=leadLoadingHtml();
+  fetch('/api/leads',{headers:authHeaders(),cache:'no-store'})
+    .then(function(r){
+      if(r.status===401)throw new Error('UNAUTHORIZED');
+      if(!r.ok)throw new Error('leads '+r.status);
+      return r.json();
+    })
+    .then(function(d){
+      if(!d||d.ok===false)throw new Error(d&&d.message||'leads bad payload');
+      leadsAll=Array.isArray(d.items)?d.items:[];
+      leadsLoaded=true;
+      updateLeadCount();
+      renderLeads();
+      renderMailCustomerOptions();
+    })
+    .catch(function(e){
+      leadsLoaded=false;
+      if(el){
+        if(String(e&&e.message)==='UNAUTHORIZED'){
+          el.innerHTML='<div class="empty-state"><div class="es-icon">'+SIGNAL_ICON_WARN+'</div>'+
+            '<div class="es-title">登录已过期</div>'+
+            '<div class="es-desc">请先登录后查看与跟进你的商机线索。</div>'+
+            '<div style="margin-top:14px"><a class="btn btn-primary btn-sm" href="login.html">去登录</a></div></div>';
+        }else{
+          el.innerHTML=leadErrorHtml();
+        }
+      }
+    });
+}
+function leadStatusTag(status){
+  if(status==='跟进中')return '<span class="lead-status-tag lead-status-following">跟进中</span>';
+  if(status==='已转客户')return '<span class="lead-status-tag lead-status-won">已转客户</span>';
+  if(status==='已释放')return '<span class="lead-status-tag lead-status-released">已释放</span>';
+  return '<span class="lead-status-tag lead-status-released">'+esc(status||'')+'</span>';
+}
+function renderLeads(){
+  var el=document.getElementById('lead-list');
+  if(!el)return;
+  updateLeadCount();
+  var stats=document.getElementById('sig-stats');
+  if(stats)stats.textContent='我的线索 '+leadsAll.length+' 条（跟进中 '+activeLeads().length+' 条）· 数据落库飞书，归属锁定';
+  if(!leadsAll.length){el.innerHTML=leadEmptyHtml();return}
+  el.innerHTML=leadsAll.map(function(ld){
+    var rid=ld.record_id||'';
+    var type=ld['商机类型']||'采购动态';
+    var color=LEAD_TYPE_COLORS[type]||'#5B21B6';
+    var status=ld['状态']||'跟进中';
+    var company=ld['公司机构']||'';
+    var email=ld['联系邮箱']||'';
+    var note=ld['跟进备注']||'';
+    var title=ld['标题']||'（无标题）';
+    var url=ld['原文链接']||'';
+    var meta=[];
+    if(ld['来源'])meta.push('来源：'+ld['来源']);
+    if(ld['发布日期'])meta.push(ld['发布日期']);
+    if(ld['认领人'])meta.push('认领人：'+ld['认领人']);
+    if(ld['认领时间'])meta.push('认领于 '+ld['认领时间']);
+    var released=status==='已释放';
+    var fieldDis=released?' disabled':'';
+    var fields=
+      '<div class="lead-fields">'+
+        '<div><label>公司 / 机构</label><input type="text" id="lf-company-'+rid+'" value="'+esc(company)+'" placeholder="未自动识别，请填写公司/机构名"'+fieldDis+'></div>'+
+        '<div><label>联系邮箱</label><input type="text" id="lf-email-'+rid+'" value="'+esc(email)+'" placeholder="补录客户联系邮箱，用于写开发信"'+fieldDis+'></div>'+
+        '<div class="lf-full"><label>跟进备注</label><textarea id="lf-note-'+rid+'" rows="2" placeholder="跟进进展、联系人、沟通要点等"'+fieldDis+'>'+esc(note)+'</textarea></div>'+
+      '</div>';
+    var actions=[];
+    if(url)actions.push('<a class="btn btn-outline btn-sm" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">查看原文 ↗</a>');
+    if(!released){
+      actions.push('<button type="button" class="btn btn-outline btn-sm" onclick="searchLeadContact(\''+esc(rid)+'\')">搜索联系方式</button>');
+      actions.push('<button type="button" class="btn btn-primary btn-sm" onclick="writeLeadMail(\''+esc(rid)+'\')">写开发信</button>');
+      actions.push('<button type="button" class="btn btn-outline btn-sm" onclick="saveLead(\''+esc(rid)+'\',this)">保存</button>');
+      if(status!=='已转客户'){
+        actions.push('<button type="button" class="btn btn-outline btn-sm" style="color:var(--color-danger)" onclick="releaseLead(\''+esc(rid)+'\')">释放</button>');
+      }
+    }
+    return '<div class="lead-card">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+        '<span class="opp-chip" style="color:'+color+';background:'+hexToRgba(color,0.1)+';border:1px solid '+hexToRgba(color,0.35)+'"><span class="sig-dot" style="background:'+color+'"></span>'+esc(type)+'</span>'+
+        leadStatusTag(status)+
+      '</div>'+
+      '<strong style="display:block;margin-top:8px;font-size:14px">'+esc(title)+'</strong>'+
+      fields+
+      '<div class="lead-meta-line">'+esc(meta.join('　·　'))+'</div>'+
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+actions.join('')+'</div>'+
+    '</div>';
+  }).join('');
+}
+function saveLead(rid,btn){
+  var company=(document.getElementById('lf-company-'+rid)||{}).value||'';
+  var email=(document.getElementById('lf-email-'+rid)||{}).value||'';
+  var note=(document.getElementById('lf-note-'+rid)||{}).value||'';
+  email=email.trim();
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    showToast('联系邮箱格式不正确，请检查','error');return;
+  }
+  if(btn){btn.disabled=true;btn.textContent='保存中…'}
+  fetch('/api/leads/'+encodeURIComponent(rid),{
+    method:'PUT',
+    headers:Object.assign({'Content-Type':'application/json'},authHeaders()),
+    body:JSON.stringify({company:company,email:email,note:note})
+  }).then(function(r){return r.json().then(function(d){return {status:r.status,data:d}})})
+    .then(function(res){
+      if(res.status===200&&res.data&&res.data.ok){
+        showToast('线索已保存','success');
+        loadLeads();
+      }else{
+        if(btn){btn.disabled=false;btn.textContent='保存'}
+        showToast((res.data&&res.data.message)||'保存失败，请稍后重试','error');
+      }
+    }).catch(function(e){
+      if(btn){btn.disabled=false;btn.textContent='保存'}
+      showToast('网络异常，保存失败','error');
+    });
+}
+function releaseLead(rid){
+  if(!confirm('确定释放该线索？释放后信号回到公共池，其他销售可以认领。'))return;
+  fetch('/api/leads/'+encodeURIComponent(rid),{
+    method:'PUT',
+    headers:Object.assign({'Content-Type':'application/json'},authHeaders()),
+    body:JSON.stringify({status:'已释放'})
+  }).then(function(r){return r.json().then(function(d){return {status:r.status,data:d}})})
+    .then(function(res){
+      if(res.status===200&&res.data&&res.data.ok){
+        showToast('线索已释放，信号回到公共池','success');
+        loadLeads();
+        loadSignals();
+      }else{
+        showToast((res.data&&res.data.message)||'释放失败，请稍后重试','error');
+      }
+    }).catch(function(){showToast('网络异常，释放失败','error')});
+}
+function searchLeadContact(rid){
+  var ld=leadsAll.filter(function(x){return x.record_id===rid})[0];
+  if(!ld)return;
+  var q=(ld['公司机构']||'').trim()||(ld['标题']||'').trim();
+  if(!q){showToast('该线索缺少公司/机构名与标题，无法搜索','error');return}
+  window.open('https://www.bing.com/search?q='+encodeURIComponent(q+' contact email'),'_blank');
+}
+function writeLeadMail(rid){
+  var ld=leadsAll.filter(function(x){return x.record_id===rid})[0];
+  if(!ld)return;
+  var mailNav=document.querySelector('[data-page=mail]');
+  if(mailNav)switchPage('mail',mailNav);
+  switchMailTab('development');
+  // 等待邮件助手下拉完成渲染（loadLeads 已填充过；此处兜底延迟一次）
+  var tries=0;
+  var timer=setInterval(function(){
+    var sel=document.getElementById('mail-customer');
+    var opt=sel?sel.querySelector('option[value="lead:'+rid+'"]'):null;
+    if(opt){
+      sel.value='lead:'+rid;
+      onMailCustomerChange();
+      clearInterval(timer);
+    }else if(++tries>=10){
+      clearInterval(timer);
+      showToast('请在邮件助手客户下拉中选择该线索','info');
+    }
+  },200);
 }
 
 /* 分级规则从规则配置中心读取（assets/rhc-config.js），不再写死在本页面 */
@@ -1313,7 +1647,9 @@ renderProductPick();
 renderMailProducts(PRODUCTS);
 renderMailMaterials();
 renderStylePanel();
+loadCurrentUser().then(function(){ if(sigLoaded)renderSignals() });
 loadSignals();
+loadLeads();
 fetch('/api/products',{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('products '+r.status);return r.json()})
   .then(function(d){
@@ -1331,11 +1667,43 @@ function customerOptionsHtml(customers){
   }).join('')+'<option value="__manual__">手动输入客户 / 商机客户</option>';
   return opts;
 }
+/* 邮件助手客户下拉：我的线索（跟进中）+ 客户主库 + 手动输入 */
+function renderMailCustomerOptions(){
+  var sel=document.getElementById('mail-customer');
+  if(!sel)return;
+  var prev=sel.value;
+  var opts='<option value="">— 选择客户 —</option>';
+  var mine=(leadsAll||[]).filter(function(l){return l['状态']==='跟进中'});
+  if(mine.length){
+    opts+='<optgroup label="我的线索（'+mine.length+'）">'+mine.map(function(l){
+      var rid=l.record_id||'';
+      var name=(l['公司机构']||'').trim()||(l['标题']||'（未命名线索）').trim();
+      var email=(l['联系邮箱']||'').trim();
+      return '<option value="lead:'+esc(rid)+'"'+(email?'':' data-no-email="1"')+'>'+esc(name)+(email?'':'（未补邮箱）')+'</option>';
+    }).join('')+'</optgroup>';
+  }
+  var customers=(snapshotData&&snapshotData.customers)||[];
+  if(customers.length){
+    opts+='<optgroup label="客户主库（'+customers.length+'）">'+customers.map(function(c){
+      return '<option value="'+esc(c['客户名称'])+'">'+esc(c['客户名称'])+'（'+esc(c['国家/地区']||c['国家地区']||'')+'）</option>';
+    }).join('')+'</optgroup>';
+  }
+  opts+='<option value="__manual__">手动输入客户名称</option>';
+  sel.innerHTML=opts;
+  if(prev){
+    // 尝试保持原选择（线索保存后重渲染等场景）
+    for(var i=0;i<sel.options.length;i++){
+      if(sel.options[i].value===prev){sel.value=prev;break}
+    }
+  }
+  // 主库空提示：线索与主库都为空时才展示
+  var mh=document.getElementById('mail-customer-hint');
+  if(mh)mh.style.display=(!mine.length&&!customers.length)?'block':'none';
+  onMailCustomerChange();
+}
 function refreshCustomerHints(customers){
   var empty=!(customers&&customers.length);
-  var mh=document.getElementById('mail-customer-hint');
   var qh=document.getElementById('quote-customer-hint');
-  if(mh)mh.style.display=empty?'block':'none';
   if(qh)qh.style.display=empty?'block':'none';
 }
 fetch('data/snapshot.json',{cache:'no-store'})
@@ -1345,7 +1713,7 @@ fetch('data/snapshot.json',{cache:'no-store'})
     var customers=(d&&d.customers)||[];
     var opts=customerOptionsHtml(customers);
     document.getElementById('quote-customer').innerHTML=opts;
-    document.getElementById('mail-customer').innerHTML=opts;
+    renderMailCustomerOptions();
     refreshCustomerHints(customers);
     renderGrading(customers);
   })
@@ -1353,10 +1721,9 @@ fetch('data/snapshot.json',{cache:'no-store'})
     snapshotData={customers:[],orders:[]};
     var opts=customerOptionsHtml([]);
     document.getElementById('quote-customer').innerHTML=opts;
-    document.getElementById('mail-customer').innerHTML=opts;
+    renderMailCustomerOptions();
     refreshCustomerHints([]);
     renderGrading([]);
-    showToast('客户主库暂未接入，当前无建档客户（可手动输入客户名称使用邮件助手）','info');
   });
 
 /* ===== 素材库弹窗（内嵌式）逻辑 ===== */

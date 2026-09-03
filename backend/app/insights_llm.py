@@ -33,9 +33,14 @@ SYSTEM_PROMPT = """你是兽医医疗器械出口公司（安瑞康 RHC，产品
    趋势报告/市场规模分析、单纯的产品发布或技术突破、人事任命、财报营收数据
    （除非伴随融资扩张）、监管政策、动物医学研究结论。拿不准时给 false。
    opp_type 只能取：clinic_expansion / tender / expo / channel / company_move / none。
+6. 对判定为商机（is_opportunity=true）的条目，额外输出 opp_org：
+   该商机事件涉及的【主要公司/机构/组织名称】，用英文原名或当地官方名称
+   （如 "Animal Friends Alliance"、"Amferia"、"Kogi State Government"）；
+   一条新闻涉及多个主体时，取与该商机最直接相关的一个主体；
+   无法确定时输出空字符串 ""，严禁编造。非商机条目输出空字符串 ""。
 
 严格只输出 JSON 数组，不要任何解释文字。格式：
-[{"id": 0, "relevant": true, "category": "market", "title_zh": "中文标题", "summary_zh": "中文摘要", "regions": ["north-america"], "is_opportunity": false, "opp_type": "none"}, ...]
+[{"id": 0, "relevant": true, "category": "market", "title_zh": "中文标题", "summary_zh": "中文摘要", "regions": ["north-america"], "is_opportunity": false, "opp_type": "none", "opp_org": ""}, ...]
 不相关的新闻输出 {"id": 编号, "relevant": false}，id 必须与输入编号一一对应。"""
 
 
@@ -68,7 +73,7 @@ def process_items(raw_items: list, batch_size: int = 10) -> list:
             p = processed.get(idx)
             if not p or not p.get("relevant"):
                 continue
-            is_opp, opp_type = _norm_opp(p)
+            is_opp, opp_type, opp_org = _norm_opp(p)
             results.append({
                 "category": p.get("category", "market"),
                 "categoryLabel": CATEGORY_LABELS.get(p.get("category"), "市场动态"),
@@ -82,6 +87,8 @@ def process_items(raw_items: list, batch_size: int = 10) -> list:
                 "title_en": item["title"],
                 "is_opportunity": is_opp,
                 "opp_type": opp_type,
+                # 商机涉及的主要公司/机构（LLM 提取，仅商机条目可能非空；缺字段/异常时为空串）
+                "opp_org": opp_org,
             })
     return results
 
@@ -120,9 +127,11 @@ OPP_TYPES = tuple(OPP_LABELS.keys())
 
 def _norm_opp(p: dict) -> tuple:
     """归一化商机字段（LLM 路径与降级路径共用）。
-    返回 (is_opportunity: bool, opp_type: str)。
+    返回 (is_opportunity: bool, opp_type: str, opp_org: str)。
     以 is_opportunity 布尔为准；opp_type 非法/缺失时按布尔自动修正，
-    保证 is_opportunity 为 True 时一定带有效类型。"""
+    保证 is_opportunity 为 True 时一定带有效类型。
+    opp_org 为 LLM 提取的商机主体机构名：缺字段/异常不报错，
+    非商机条目一律归一为空串（降级关键词路径不猜机构名）。"""
     opp_type = str(p.get("opp_type", "") or "").strip().lower()
     if opp_type not in OPP_TYPES:
         opp_type = "none"
@@ -131,7 +140,13 @@ def _norm_opp(p: dict) -> tuple:
         opp_type = "company_move"  # 模型只给了 true 没给类型：兜底为采购合作
     if not flag and opp_type != "none":
         flag = True               # 给了有效类型但漏标布尔：视为商机
-    return flag, opp_type
+    opp_org = ""
+    if flag:
+        try:
+            opp_org = str(p.get("opp_org", "") or "").strip()
+        except Exception:
+            opp_org = ""
+    return flag, opp_type, opp_org
 
 
 def _call_llm(cfg: dict, batch: list):
@@ -309,5 +324,7 @@ def _fallback_items(raw_items: list) -> list:
             "title_en": it["title"],
             "is_opportunity": opp_type != "none",
             "opp_type": opp_type,
+            # 降级路径不做机构名正则猜测，统一留空
+            "opp_org": "",
         })
     return out
