@@ -1980,6 +1980,46 @@ async def api_signals_list(limit: str = "20", opp_type: Optional[str] = None):
                       for k in OPP_TYPES],
     }
 
+# ============================================================
+# 经营仪表盘 API（真实数据聚合 + AI 经营速览）
+# ============================================================
+@app.get("/api/dashboard/stats")
+async def api_dashboard_stats(request: Request):
+    """经营仪表盘聚合统计：信号（总数/今日新增/待认领）、线索
+    （跟进中/已转客户/已释放/超期未跟进）、销售漏斗 6 层、层间转化率、
+    商机地区分布。需登录（与 /api/leads 一致，Bearer token 或 cookie）。
+    飞书线索表不可用时信号侧统计照常返回，线索侧字段为 null。"""
+    token = _get_token_from_request(request)
+    user_info = _verify_token(token) if token else None
+    if not user_info:
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    try:
+        from app.dashboard import collect_dashboard_stats, save_daily_snapshot
+        stats = collect_dashboard_stats(user_info=user_info)
+        # 每次调用落当日快照（覆盖写），供环比与 AI 速览趋势分析
+        save_daily_snapshot(stats)
+        return stats
+    except Exception as e:
+        print(f"[dashboard] 统计聚合失败: {e}")
+        return JSONResponse({"ok": False, "message": f"经营数据聚合失败：{e}"}, status_code=502)
+
+
+@app.get("/api/dashboard/ai-brief")
+async def api_dashboard_ai_brief(request: Request, refresh: str = "0"):
+    """AI 经营速览（SCQA 中文诊断，只基于真实统计数字）。
+    结果文件缓存 1 小时；?refresh=1 强制重新生成（刷新按钮）。
+    需登录。生成失败返回 502，由前端显示降级文案，不阻塞页面。"""
+    token = _get_token_from_request(request)
+    if not token or not _verify_token(token):
+        return JSONResponse({"ok": False, "message": "未登录或登录已过期"}, status_code=401)
+    try:
+        from app.dashboard import get_ai_brief
+        return get_ai_brief(force_refresh=(refresh == "1"))
+    except Exception as e:
+        print(f"[dashboard] AI 速览接口失败: {e}")
+        return JSONResponse({"ok": False, "message": "诊断生成中，请稍后刷新"}, status_code=502)
+
+
 try:
     from app import insights_store
     insights_store.start_scheduler()

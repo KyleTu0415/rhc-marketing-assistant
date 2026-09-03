@@ -26,7 +26,6 @@ a{color:var(--color-primary);text-decoration:none}
 a:hover{text-decoration:underline}
 button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;font-size:13px}
 input,select,textarea{font-family:var(--font-sans);font-size:13px;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--color-text);background:var(--color-surface);outline:none;transition:border-color var(--transition-fast)}
-input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(200,16,46,0.12)}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:3px}
@@ -37,7 +36,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .sidebar{width:200px;min-width:200px;background:var(--color-surface);border-right:1px solid var(--color-border);display:flex;flex-direction:column;overflow-y:auto;z-index:100}
 .sidebar-logo{padding:15px 0 20px;text-align:left}
 .sidebar-logo img{height:90px;width:auto;margin:0 auto;display:block}
-.sidebar-logo span{display:block;font-size:13px;font-weight:700;color:var(--color-primary);margin-top:10px;letter-spacing:2px;text-transform:uppercase}
 .sidebar-nav{flex:1;display:flex;flex-direction:column}
 .sidebar-nav .nav-section{padding:4px 16px 10px;font-size:15px;letter-spacing:0.5px;color:var(--color-text-secondary);font-weight:700;text-align:left}
 .sidebar-nav .nav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;color:#6B7280;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--transition-fast);border-left:3px solid transparent;text-decoration:none;position:relative}
@@ -48,36 +46,69 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .sidebar-nav .nav-item:hover .nav-icon,.sidebar-nav .nav-item.active .nav-icon{color:var(--color-primary)}
 .sidebar-nav .nav-item-back-home{border-top:1px solid var(--color-border-light);margin-top:auto;padding-top:11px}
 .nav-item.nav-item-back-home,.nav-item.nav-item-back-home .nav-icon{color:var(--color-primary);font-weight:600;font-size:14px;opacity:1}
-.sidebar-footer{padding:12px 16px;border-top:1px solid var(--color-border-light)}
-.sidebar-user{display:flex;align-items:center;gap:8px}
-.sidebar-user .avatar{width:30px;height:30px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
-.sidebar-user .user-name{font-size:13px;font-weight:600}
-.sidebar-user .user-role{font-size:11px;color:var(--color-text-tertiary)}
 .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-.page{display:none;animation:fadeIn 0.3s ease}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.content-area{flex:1;overflow-y:auto;padding:20px 28px 28px;scroll-behavior:smooth}
+.page-header{margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .page-header h2{font-size:18px;font-weight:700;color:var(--color-text);margin:0 0 4px}
 .page-header p{margin:0;font-size:14px;color:var(--color-text-secondary)}
 .page-header-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.content-area{flex:1;overflow-y:auto;padding:20px 28px 28px;scroll-behavior:smooth}
 
-/* ===== Cards / metrics ===== */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:24px}
-.metric-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:20px;transition:box-shadow var(--transition-fast)}
-.metric-card:hover{box-shadow:var(--shadow-md)}
-.metric-card .metric-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-.metric-card .metric-value{font-size:28px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
-.metric-card .metric-value .value-sub{font-size:14px;font-weight:600;color:var(--color-text-secondary);margin-left:6px}
-.metric-card .metric-label{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
-.metric-card .metric-note{font-size:12px;color:var(--color-text-tertiary);margin-top:8px;line-height:1.5}
-.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+/* ===== Cards ===== */
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:20px}
 .card-header{padding:16px 20px;border-bottom:1px solid var(--color-border-light);display:flex;align-items:center;justify-content:space-between;gap:10px}
 .card-header h3{font-size:14px;font-weight:600}
 .card-header .card-sub{font-size:12px;color:var(--color-text-tertiary);font-weight:400}
 .card-body{padding:20px}
-.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+/* ===== Metric cards ===== */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:20px}
+.metric-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:20px;transition:box-shadow var(--transition-fast),border-color var(--transition-fast);cursor:pointer;text-align:left;width:100%;font-family:var(--font-sans)}
+.metric-card:hover{box-shadow:var(--shadow-md);border-color:var(--color-primary-light)}
+.metric-card .metric-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.metric-card .metric-value{font-size:28px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.metric-card .metric-label{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.metric-card .metric-note{font-size:12px;color:var(--color-text-tertiary);margin-top:8px;line-height:1.5}
+.metric-card .metric-jump{font-size:12px;color:var(--color-primary);margin-top:10px;font-weight:600;opacity:0;transition:opacity var(--transition-fast)}
+.metric-card:hover .metric-jump{opacity:1}
+.metric-card.m-danger .metric-value{color:var(--color-danger)}
+
+/* ===== AI brief ===== */
+.ai-brief{background:linear-gradient(135deg,#FFF8F9 0%,#FFFFFF 60%);border:1px solid var(--color-primary-light);border-radius:var(--radius-md);padding:18px 20px}
+.ai-brief-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.ai-brief-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--color-primary-dark);background:var(--color-primary-light);border-radius:20px;padding:4px 12px}
+.ai-brief-time{font-size:12px;color:var(--color-text-tertiary)}
+.ai-brief-text{font-size:13.5px;line-height:1.9;color:var(--color-text)}
+.ai-brief-fallback{font-size:13px;color:var(--color-text-secondary);padding:6px 0}
+.ai-brief-loading{display:flex;align-items:center;gap:10px;color:var(--color-text-secondary);font-size:13px;padding:6px 0}
+
+/* ===== Funnel ===== */
+.funnel{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.funnel-stage{flex:1;min-width:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 8px;border-radius:var(--radius-sm);position:relative;text-align:center}
+.funnel-stage.fs-on{background:var(--color-primary-xlight);border:1px solid var(--color-primary-light)}
+.funnel-stage.fs-off{background:var(--color-bg);border:1px dashed var(--color-border)}
+.funnel-stage .fs-label{font-size:12.5px;font-weight:600;color:var(--color-text-secondary)}
+.funnel-stage.fs-off .fs-label{color:var(--color-text-tertiary)}
+.funnel-stage .fs-value{font-size:26px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--color-primary-dark)}
+.funnel-stage.fs-off .fs-value{color:var(--color-text-tertiary);font-weight:600}
+.funnel-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px;min-width:74px}
+.funnel-arrow .fa-rate{font-size:12px;font-weight:700;color:var(--color-success);font-variant-numeric:tabular-nums;white-space:nowrap}
+.funnel-arrow .fa-rate.rate-off{color:var(--color-text-tertiary);font-weight:500}
+.funnel-arrow .fa-line{color:var(--color-border);margin-top:2px}
+.funnel-note{font-size:12px;color:var(--color-text-tertiary);margin-top:14px;line-height:1.6}
+
+/* ===== Team table ===== */
+.team-table{width:100%;border-collapse:collapse;font-size:13px}
+.team-table th{text-align:left;font-size:12px;color:var(--color-text-tertiary);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--color-border-light);white-space:nowrap}
+.team-table td{padding:11px 10px;border-bottom:1px solid var(--color-border-light);vertical-align:middle}
+.team-table tr:last-child td{border-bottom:none}
+.team-name{display:flex;align-items:center;gap:9px;font-weight:600}
+.team-avatar{width:28px;height:28px;border-radius:50%;background:var(--color-primary-light);color:var(--color-primary-dark);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.team-num{font-variant-numeric:tabular-nums;font-weight:600}
+.team-overdue{display:inline-flex;align-items:center;gap:5px;color:var(--color-danger);font-weight:700}
+.team-overdue.zero{color:var(--color-text-tertiary);font-weight:500}
+.team-bar-wrap{display:flex;align-items:center;gap:8px}
+.team-bar-track{flex:1;max-width:120px;height:6px;background:var(--color-bg);border-radius:3px;overflow:hidden}
+.team-bar-fill{height:100%;background:var(--color-primary);border-radius:3px}
 
 /* ===== Bar charts (pure CSS) ===== */
 .bar-chart{display:flex;flex-direction:column;gap:12px}
@@ -85,73 +116,51 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .bar-label{width:118px;flex-shrink:0;color:var(--color-text-secondary);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar-track{flex:1;background:var(--color-bg);border-radius:6px;height:20px;min-width:50px;overflow:hidden}
 .bar-fill{height:100%;border-radius:6px;background:var(--color-primary);width:0;transition:width .5s ease}
-.bar-fill.fill-green{background:var(--color-success)}
 .bar-fill.fill-blue{background:var(--color-info)}
 .bar-val{width:34px;flex-shrink:0;font-weight:600;font-variant-numeric:tabular-nums;color:var(--color-text)}
 .chart-legend-note{font-size:12px;color:var(--color-text-tertiary);margin-top:14px}
 
 /* ===== Empty state ===== */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 24px 60px;gap:6px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px 52px;gap:6px}
 .empty-state .es-icon{width:64px;height:64px;border-radius:50%;background:var(--color-primary-xlight);border:1px dashed var(--color-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
 .empty-state .es-title{font-size:15px;font-weight:700;color:var(--color-text)}
 .empty-state .es-desc{font-size:13px;color:var(--color-text-secondary);max-width:420px;line-height:1.7}
-.empty-state .es-value{font-size:12.5px;color:var(--color-text-tertiary);max-width:420px;line-height:1.7;margin-top:2px}
+.empty-state .es-value{font-size:12.5px;color:var(--color-text-tertiary);max-width:440px;line-height:1.7;margin-top:2px}
 
 /* ===== Tags / buttons ===== */
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.2px;white-space:nowrap}
-.tag-success{background:#E6F9F1;color:#0D7B57}
-.tag-warning{background:#FFF4E0;color:#B27A1B}
 .tag-gray{background:#F0F2F3;color:#637089}
-.tag-primary{background:var(--color-primary-light);color:var(--color-primary-dark)}
-.tag-info{background:#E8F0FE;color:#1A56C4}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:all var(--transition-fast)}
 .btn-primary{background:var(--color-primary);color:#fff}
 .btn-primary:hover{background:var(--color-primary-dark)}
 .btn-outline{border:1px solid var(--color-border);color:var(--color-text-secondary);background:var(--color-surface)}
 .btn-outline:hover{border-color:var(--color-primary);color:var(--color-primary)}
 .btn-sm{padding:6px 12px;font-size:12px}
+.btn:disabled{opacity:.6;cursor:not-allowed}
 
-/* ===== Toast / state ===== */
+/* ===== Toast / loading ===== */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--color-text);color:#fff;padding:12px 24px;border-radius:var(--radius-md);font-size:13px;font-weight:500;z-index:2000;opacity:0;transition:all .3s ease;box-shadow:var(--shadow-lg);pointer-events:none;max-width:80vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast-success{background:var(--color-success)}
 .toast-error{background:var(--color-danger)}
-.state-message{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 20px;gap:10px;color:var(--color-text-secondary);font-size:13px;grid-column:1/-1}
-.data-source-note{margin-top:24px;font-size:12px;color:var(--color-text-tertiary);text-align:left}
-.insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
-.insight-point{padding:12px 0;border-bottom:1px solid var(--color-border-light)}
-.insight-point:last-child{border-bottom:none}
-.insight-point .ip-tag{display:inline-block;font-size:11px;font-weight:700;color:var(--color-primary);background:var(--color-primary-light);border-radius:var(--radius-sm);padding:2px 8px;margin-bottom:6px}
-.insight-point .ip-title{font-size:13px;font-weight:700;line-height:1.6}
-.insight-point .ip-impact{font-size:12.5px;color:var(--color-text-secondary);line-height:1.7;margin-top:6px}
-.insight-point .ip-impact strong{color:var(--color-primary-dark)}
-.itl{list-style:none;position:relative;margin-left:6px}
-.itl li{position:relative;padding:0 0 20px 26px}
-.itl li:last-child{padding-bottom:0}
-.itl li::before{content:'';position:absolute;left:8px;top:16px;bottom:-2px;width:2px;background:var(--color-border)}
-.itl li:last-child::before{display:none}
-.itl-dot{position:absolute;left:1px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--color-primary);border:3px solid var(--color-primary-light);z-index:1}
-.itl-date{font-size:11px;color:var(--color-text-tertiary);font-variant-numeric:tabular-nums}
-.itl-title{font-size:13px;font-weight:600;line-height:1.5;margin:2px 0}
-.itl-tag{font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;margin-left:6px}
-.itl-tag.tag-warn{background:#FFF4E0;color:#B27A1B}
-.itl-tag.tag-opp{background:#E6F9F1;color:#0D7B57}
-.itl-note{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
-@media(max-width:860px){.insight-grid{grid-template-columns:1fr}}
 .loading-row{display:flex;align-items:center;gap:10px;color:var(--color-text-secondary);font-size:13px;padding:40px 0;justify-content:center}
 .loading-spinner{width:20px;height:20px;border:2.5px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
+.data-source-note{font-size:12px;color:var(--color-text-tertiary);line-height:1.7;margin-top:4px}
 
+@media(max-width:1100px){
+  .funnel{flex-direction:column}
+  .funnel-arrow{flex-direction:row;padding:6px 0;min-width:0}
+  .funnel-arrow .fa-line{transform:rotate(90deg);margin:0}
+}
 @media(max-width:860px){
   .sidebar{width:56px;min-width:56px}
-  .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section,.sidebar .sidebar-user .user-info{display:none}
+  .sidebar .sidebar-logo span,.sidebar .nav-item span,.sidebar .nav-section{display:none}
   .sidebar-logo{padding:16px 8px;text-align:left}
   .sidebar-logo img{height:28px;margin:0 auto}
   .sidebar-nav .nav-item{padding:12px 0;justify-content:center;border-left:none;border-bottom:2px solid transparent}
   .sidebar-nav .nav-item.active{border-bottom-color:var(--color-primary)}
   .content-area{padding:16px}
   .metric-grid{grid-template-columns:1fr 1fr}
-  .dashboard-grid{grid-template-columns:1fr}
   .bar-label{width:84px;font-size:11px}
 }
 @media(max-width:480px){.metric-grid{grid-template-columns:1fr}}
@@ -163,155 +172,285 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
   <div class="sidebar-logo"><img src="https://iili.io/CZ0tVNn.png" alt="RHC Medical"></div>
   <div class="sidebar-nav">
     <div class="nav-section">经营仪表盘</div>
-    <div class="nav-item active" data-page="overview" onclick="switchPage('overview',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>经营概览</span></div>
-    <div class="nav-item" data-page="orders-chart" onclick="switchPage('orders-chart',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>订单状态分布</span></div>
-    <div class="nav-item" data-page="customers-chart" onclick="switchPage('customers-chart',this)" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>客户地区分布</span></div>
+    <a class="nav-item active" href="#sec-overview"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>经营概览</span></a>
+    <a class="nav-item" href="#sec-funnel"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg><span>销售漏斗</span></a>
+    <a class="nav-item" href="#sec-team"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>商机跟进状况</span></a>
+    <a class="nav-item" href="#sec-orders"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>订单状态分布</span></a>
+    <a class="nav-item" href="#sec-regions"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>商机地区分布</span></a>
 
-    <div class="nav-item nav-item-back-home" onclick="window.location.href='panel.html'" role="button" tabindex="0"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></div>
+    <a class="nav-item nav-item-back-home" href="panel.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>返回门户</span></a>
   </div>
 </nav>
 <div class="main-area">
     <main class="content-area">
-    <section class="page active" id="page-overview">
     <div class="page-header">
-      <div><h2>经营概览</h2><p>经营指标总览</p></div>
-      <div class="page-header-actions"><span class="tag tag-gray" id="snapshot-time">快照加载中</span></div>
-    </div>
-    <div class="metric-grid" id="metric-grid">
-      <div class="metric-card"><div class="metric-icon" style="background:var(--color-primary-light)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="metric-value" id="m-customers">—</div><div class="metric-label">客户总数</div><div class="metric-note" id="m-customers-note">正在读取快照数据…</div></div>
-      <div class="metric-card"><div class="metric-icon" style="background:#FFF4E0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B27A1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg></div><div class="metric-value" id="m-ongoing">—</div><div class="metric-label">进行中订单数</div><div class="metric-note">未完成履约的订单</div></div>
-      <div class="metric-card"><div class="metric-icon" style="background:#E6F9F1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D7B57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="metric-value" id="m-done">—</div><div class="metric-label">本月已完成订单数</div><div class="metric-note">状态为「已完成」的订单</div></div>
-      <div class="metric-card"><div class="metric-icon" style="background:#E8F0FE"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A56C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="metric-value" id="m-transit">—</div><div class="metric-label">在途货值（原币口径）</div><div class="metric-note" id="m-transit-note">进行中订单金额，按币种分列</div></div>
+      <div><h2>经营仪表盘</h2><p>商机信号 · 线索跟进 · 销售漏斗 实时概览</p></div>
+      <div class="page-header-actions"><span class="tag tag-gray" id="snapshot-time">数据加载中</span></div>
     </div>
 
-    <p class="data-source-note">数据来源：飞书多维表格「RHC智能工作平台」。当前尚未接入业务数据，指标为 0 / 待接入状态；完成对接后，客户、订单与货值数据将自动同步并实时更新。</p>
+    <!-- ① 经营概览：指标卡 + AI 经营速览 -->
+    <section id="sec-overview">
+    <div class="metric-grid">
+      <button type="button" class="metric-card" onclick="goSales('pool')">
+        <div class="metric-icon" style="background:var(--color-primary-light)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <div class="metric-value" id="m-today">—</div>
+        <div class="metric-label">今日新增商机信号</div>
+        <div class="metric-note">当日采集并经 AI 识别的新商机</div>
+        <div class="metric-jump">去信号池查看 →</div>
+      </button>
+      <button type="button" class="metric-card" onclick="goSales('pool')">
+        <div class="metric-icon" style="background:#E8F0FE"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A56C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <div class="metric-value" id="m-unclaimed">—</div>
+        <div class="metric-label">待认领信号</div>
+        <div class="metric-note">公共信号池中尚未认领的商机</div>
+        <div class="metric-jump">去认领 →</div>
+      </button>
+      <button type="button" class="metric-card" onclick="goSales('mine')">
+        <div class="metric-icon" style="background:#E6F9F1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D7B57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="metric-value" id="m-following">—</div>
+        <div class="metric-label">跟进中线索</div>
+        <div class="metric-note">已认领、正在跟进的商机线索</div>
+        <div class="metric-jump">去我的线索 →</div>
+      </button>
+      <button type="button" class="metric-card m-danger" onclick="goSales('mine',true)">
+        <div class="metric-icon" style="background:#FFF1F2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="metric-value" id="m-overdue">—</div>
+        <div class="metric-label">超期未跟进线索</div>
+        <div class="metric-note">跟进中且认领超 3 天无跟进备注</div>
+        <div class="metric-jump">立即处理 →</div>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>AI 经营速览</h3>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-refresh-brief" onclick="loadAiBrief(true)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          刷新诊断
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="ai-brief" id="ai-brief-box">
+          <div class="ai-brief-loading"><span class="loading-spinner"></span> 正在基于今日真实经营数据生成诊断…</div>
+        </div>
+      </div>
+    </div>
     </section>
 
-    <section class="page" id="page-orders-chart">
-    <div class="page-header">
-      <div><h2>订单状态分布</h2><p>各履约状态订单数量分布</p></div>
+    <!-- ② 销售漏斗 -->
+    <section id="sec-funnel">
+    <div class="card">
+      <div class="card-header"><h3>销售漏斗</h3><span class="card-sub">从商机信号到成交的转化全貌</span></div>
+      <div class="card-body">
+        <div class="funnel" id="funnel-box"><div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div></div>
+        <div class="funnel-note">发信及之后环节随邮件助手与订单数据接入自动点亮；层间百分比为下一层相对上一层的转化率。</div>
+      </div>
     </div>
-    <div class="card" id="chart-orders"><div class="card-body"><div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div></div></div>
     </section>
 
-    <section class="page" id="page-customers-chart">
-    <div class="page-header">
-      <div><h2>客户地区分布</h2><p>客户所在地区分布</p></div>
+    <!-- ③ 商机跟进状况（admin 全员 / 销售仅本人） -->
+    <section id="sec-team">
+    <div class="card">
+      <div class="card-header"><h3 id="team-title">商机跟进状况</h3><span class="card-sub" id="team-sub">按认领人汇总跟进产出</span></div>
+      <div class="card-body" id="team-box"><div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div></div>
     </div>
-    <div class="card" id="chart-customers"><div class="card-body"><div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div></div></div>
     </section>
 
+    <!-- ④ 订单状态分布（订单数据未接入，诚实空状态） -->
+    <section id="sec-orders">
+    <div class="card">
+      <div class="card-header"><h3>订单状态分布</h3><span class="card-sub">各履约状态订单数量分布</span></div>
+      <div class="card-body">
+        <div class="empty-state">
+          <div class="es-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg></div>
+          <div class="es-title">订单数据接入后自动汇聚</div>
+          <div class="es-desc">订单履约表接入飞书多维表格后，已成交 → 单据制作 → 配置校验 → 仓库配货 → 提货 → 报关 → 发运 → 完成等 9 大节点的订单数量将自动分布呈现。</div>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <!-- ⑤ 商机地区分布（信号 regions 真数据） -->
+    <section id="sec-regions">
+    <div class="card">
+      <div class="card-header"><h3>商机地区分布</h3><span class="card-sub" id="regions-sub">按商机信号覆盖地区统计</span></div>
+      <div class="card-body" id="regions-box"><div class="loading-row"><span class="loading-spinner"></span> 正在加载经营数据…</div></div>
+    </div>
+    </section>
+
+    <p class="data-source-note">数据来源：飞书多维表格「RHC智能工作平台」与每日行业资讯 AI 商机识别管线；指标随信号采集与线索认领实时更新。客户、订单、邮件环节数据接入后自动纳入统计与诊断。</p>
   </main>
 </div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
-function switchPage(pageId,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById('page-'+pageId);if(t){t.classList.remove('active');void t.offsetWidth;t.classList.add('active')}document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');var ca=document.querySelector('.content-area');if(ca)ca.scrollTop=0}
-document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}})});
-var ORDER_STATUSES=['已成交','单据制作中','待配置校验','已发仓库待配货','可提货','已提货','报关中·已进仓','已发运','已完成'];
+/* ===== 基础工具 ===== */
 var toastTimer=null;
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' toast-'+type:'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className='toast'+(type?' toast-'+type:'')},3000)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function parseMoney(s){var m=String(s||'').match(/^([^\d]*)([\d,\.]+)/);if(!m)return{cur:String(s||'').trim(),val:0};return{cur:m[1].trim(),val:parseFloat(m[2].replace(/,/g,''))||0}}
-function fmtMoney(cur,val){return cur+val.toLocaleString('en-US',{maximumFractionDigits:0})}
-
-var ICON_CHART_ORDERS='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg>';
-var ICON_CHART_GLOBE='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
-function emptyStateHtml(icon,title,desc,value){
-  return '<div class="empty-state"><div class="es-icon">'+icon+'</div>'+
-    '<div class="es-title">'+esc(title)+'</div>'+
-    '<div class="es-desc">'+esc(desc)+'</div>'+
-    (value?'<div class="es-value">'+esc(value)+'</div>':'')+'</div>';
+function authHeaders(){var token=localStorage.getItem('rhc_auth_token');return token?{'Authorization':'Bearer '+token}:{}}
+function fmtNum(v){return v==null?'—':String(v)}
+function pctText(rate){return rate==null?'—':(rate*100).toFixed(1)+'%'}
+/* 指标卡跳转销售页：view=pool 公共信号池 / view=mine 我的线索；overdue=1 只看超期 */
+function goSales(view,overdue){
+  var url='sales.html?view='+encodeURIComponent(view||'pool');
+  if(overdue)url+='&overdue=1';
+  window.location.href=url;
 }
 
-function barChartHtml(rows,fillClass,rowFillFn){
-  var max=0;rows.forEach(function(r){if(r.count>max)max=r.count});
-  return '<div class="bar-chart">'+rows.map(function(r){
+/* ===== 数据加载 ===== */
+var DASH=null;
+function loadStats(){
+  return fetch('/api/dashboard/stats',{headers:authHeaders(),cache:'no-store'})
+    .then(function(r){
+      if(r.status===401)throw new Error('UNAUTHORIZED');
+      if(!r.ok)throw new Error('stats '+r.status);
+      return r.json();
+    })
+    .then(function(d){
+      if(!d||d.ok===false)throw new Error((d&&d.message)||'stats bad payload');
+      DASH=d;
+      renderMetrics(d);
+      renderFunnel(d);
+      renderTeam(d);
+      renderRegions(d);
+      document.getElementById('snapshot-time').textContent='统计时间 '+esc(d.generated_at||'');
+    })
+    .catch(function(e){
+      if(String(e&&e.message)==='UNAUTHORIZED'){
+        showToast('登录已过期，请重新登录','error');
+        setTimeout(function(){window.location.href='login.html';},900);
+        return;
+      }
+      document.getElementById('snapshot-time').textContent='数据暂不可用';
+      ['m-today','m-unclaimed','m-following','m-overdue'].forEach(function(id){
+        document.getElementById(id).textContent='—';
+      });
+      document.getElementById('funnel-box').innerHTML='<div class="empty-state"><div class="es-title">经营数据暂时不可用</div><div class="es-desc">无法连接数据服务，请稍后刷新页面重试。</div></div>';
+      document.getElementById('team-box').innerHTML='<div class="empty-state"><div class="es-title">经营数据暂时不可用</div><div class="es-desc">请稍后刷新页面重试。</div></div>';
+      document.getElementById('regions-box').innerHTML='<div class="empty-state"><div class="es-title">经营数据暂时不可用</div><div class="es-desc">请稍后刷新页面重试。</div></div>';
+    });
+}
+
+/* ===== ① 指标卡 ===== */
+function renderMetrics(d){
+  var s=d.signals||{},l=d.leads||{};
+  document.getElementById('m-today').textContent=fmtNum(s.today_new);
+  document.getElementById('m-unclaimed').textContent=fmtNum(s.unclaimed);
+  document.getElementById('m-following').textContent=fmtNum(l.following);
+  document.getElementById('m-overdue').textContent=fmtNum(l.overdue);
+}
+
+/* ===== AI 经营速览 ===== */
+function briefLoadingHtml(){
+  return '<div class="ai-brief-loading"><span class="loading-spinner"></span> 正在基于今日真实经营数据生成诊断…</div>';
+}
+function briefFallbackHtml(){
+  return '<div class="ai-brief-fallback">诊断生成中，请稍后刷新</div>';
+}
+function loadAiBrief(force){
+  var box=document.getElementById('ai-brief-box');
+  var btn=document.getElementById('btn-refresh-brief');
+  if(force){box.innerHTML=briefLoadingHtml();if(btn){btn.disabled=true;btn.style.opacity=.6}}
+  fetch('/api/dashboard/ai-brief'+(force?'?refresh=1':''),{headers:authHeaders(),cache:'no-store'})
+    .then(function(r){
+      if(r.status===401)throw new Error('UNAUTHORIZED');
+      if(!r.ok)throw new Error('brief '+r.status);
+      return r.json();
+    })
+    .then(function(d){
+      if(!d||d.ok===false||!d.brief)throw new Error('brief empty');
+      var tag='<span class="ai-brief-tag"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.3 4 1.3 5.5h11.4C17.7 13 19 11.5 19 9a7 7 0 0 0-7-7z"/><path d="M9 18h6"/><path d="M10 21h4"/></svg>AI 经营诊断</span>';
+      var time=d.generated_at?('<span class="ai-brief-time">'+esc(d.cached?'缓存于 ':'生成于 ')+esc(d.generated_at)+(d.stale?'（生成失败，暂显示上次诊断）':'')+'</span>'):'';
+      box.innerHTML='<div class="ai-brief-head">'+tag+time+'</div><div class="ai-brief-text">'+esc(d.brief).replace(/\n/g,'<br>')+'</div>';
+    })
+    .catch(function(e){
+      if(String(e&&e.message)==='UNAUTHORIZED'){return;} // stats 加载已统一处理登录跳转
+      // 生成失败不阻塞页面：显示降级文案
+      box.innerHTML='<div class="ai-brief-head"><span class="ai-brief-tag">AI 经营诊断</span></div>'+briefFallbackHtml();
+    })
+    .finally(function(){if(btn){btn.disabled=false;btn.style.opacity=1}});
+}
+
+/* ===== ② 销售漏斗 ===== */
+function renderFunnel(d){
+  var stages=d.funnel||[],convs=d.conversion||[];
+  var convByKey={};
+  convs.forEach(function(c){convByKey[c.from+'->'+c.to]=c});
+  var html='<div class="funnel">';
+  stages.forEach(function(st,i){
+    var cls=st.available?'fs-on':'fs-off';
+    var val=st.available?fmtNum(st.value):'—';
+    html+='<div class="funnel-stage '+cls+'"><div class="fs-label">'+esc(st.label)+'</div><div class="fs-value">'+val+'</div></div>';
+    if(i<stages.length-1){
+      var c=convByKey[st.key+'->'+stages[i+1].key];
+      var rate=c?c.rate:null;
+      var on=c&&c.available&&rate!=null;
+      html+='<div class="funnel-arrow"><div class="fa-rate'+(on?'':' rate-off')+'">'+(on?pctText(rate):'—')+'</div>'+
+        '<div class="fa-line"><svg width="22" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="6" x2="19" y2="6"/><polyline points="15 2 19 6 15 10"/></svg></div></div>';
+    }
+  });
+  html+='</div>';
+  document.getElementById('funnel-box').innerHTML=html;
+}
+
+/* ===== ③ 商机跟进状况 ===== */
+function renderTeam(d){
+  var box=document.getElementById('team-box');
+  var team=d.team||[];
+  var isTeamScope=(d.team_scope==='team');
+  document.getElementById('team-title').textContent=isTeamScope?'商机跟进状况':'我的跟进';
+  document.getElementById('team-sub').textContent=isTeamScope?'按认领人汇总跟进产出':'仅显示你认领的线索';
+  if(!team.length){
+    box.innerHTML='<div class="empty-state"><div class="es-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'+
+      '<div class="es-title">'+(isTeamScope?'暂无团队跟进数据':'你还没有认领商机')+'</div>'+
+      '<div class="es-desc">团队成员认领商机后，这里自动汇总跟进产出'+(isTeamScope?'':'；去公共信号池认领一条商机开始跟进吧')+'。</div></div>';
+    return;
+  }
+  var maxActive=Math.max.apply(null,team.map(function(t){return t.active||0}))||1;
+  var rows=team.map(function(t){
+    var initial=esc((t.name||'?').charAt(0).toUpperCase());
+    var overdue=t.overdue||0;
+    var overdueHtml=overdue>0
+      ? '<span class="team-overdue"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'+overdue+' 条超期</span>'
+      : '<span class="team-overdue zero">0</span>';
+    var barW=Math.round((t.active||0)/maxActive*100);
+    return '<tr>'+
+      '<td><div class="team-name"><span class="team-avatar">'+initial+'</span>'+esc(t.name||'未署名')+'</div></td>'+
+      '<td class="team-num">'+(t.claimed_total||0)+'</td>'+
+      '<td><div class="team-bar-wrap"><span class="team-num">'+(t.active||0)+'</span><span class="team-bar-track"><span class="team-bar-fill" style="width:'+barW+'%"></span></span></div></td>'+
+      '<td>'+overdueHtml+'</td>'+
+    '</tr>';
+  }).join('');
+  box.innerHTML='<table class="team-table"><thead><tr>'+
+    '<th>认领人</th><th>认领总数</th><th>跟进中</th><th>超期未跟进</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<div class="chart-legend-note">超期口径：跟进中且认领超过 '+esc((d.leads&&d.leads.overdue_days)||3)+' 天未填写跟进备注；超期条目以红色提示，请优先处理。</div>';
+}
+
+/* ===== ⑤ 商机地区分布（纯 CSS 条形图） ===== */
+function renderRegions(d){
+  var box=document.getElementById('regions-box');
+  var rows=(d.regions||[]).filter(function(r){return r.count>0;});
+  document.getElementById('regions-sub').textContent='共 '+rows.reduce(function(n,r){return n+r.count},0)+' 条信号 · 按覆盖地区统计（可多选）';
+  if(!rows.length){
+    box.innerHTML='<div class="empty-state"><div class="es-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>'+
+      '<div class="es-title">暂无商机信号</div><div class="es-desc">商机信号采集后将按覆盖地区自动分布呈现。</div></div>';
+    return;
+  }
+  var max=Math.max.apply(null,rows.map(function(r){return r.count}));
+  var html='<div class="bar-chart">'+rows.map(function(r){
     var pct=max>0?Math.round(r.count/max*100):0;
-    var fc=(rowFillFn?rowFillFn(r):'')||fillClass||'';
-    return '<div class="bar-row" title="'+esc(r.label)+'：'+r.count+'">'+
+    return '<div class="bar-row" title="'+esc(r.label)+'：'+r.count+' 条信号">'+
       '<div class="bar-label">'+esc(r.label)+'</div>'+
-      '<div class="bar-track"><div class="bar-fill '+fc+'" style="width:'+pct+'%"></div></div>'+
+      '<div class="bar-track"><div class="bar-fill fill-blue" style="width:'+pct+'%"></div></div>'+
       '<div class="bar-val">'+r.count+'</div></div>';
-  }).join('')+'</div>';
+  }).join('')+'</div><div class="chart-legend-note">按每条商机信号的 regions 地区标签统计，一条信号覆盖多个地区时分别计入。</div>';
+  box.innerHTML=html;
 }
 
-function render(data){
-  var customers=data.customers||[],orders=data.orders||[];
-  // 指标
-  document.getElementById('m-customers').textContent=customers.length;
-  document.getElementById('m-customers-note').textContent=customers.length?('覆盖 '+[...new Set(customers.map(function(c){return c['国家/地区']}))].length+' 个国家/地区'):'客户档案接入飞书多维表后自动汇聚';
-  var ongoing=orders.filter(function(o){return o['当前状态']!=='已完成'});
-  var done=orders.filter(function(o){return o['当前状态']==='已完成'});
-  document.getElementById('m-ongoing').textContent=ongoing.length;
-  document.getElementById('m-done').textContent=done.length;
-  // 在途货值：按币种分组求和（原币口径，不做汇率折算）
-  var groups={};
-  ongoing.forEach(function(o){var p=parseMoney(o['订单金额（原币）']);if(!groups[p.cur])groups[p.cur]=0;groups[p.cur]+=p.val});
-  var curList=Object.keys(groups).sort(function(a,b){return groups[b]-groups[a]});
-  var mt=document.getElementById('m-transit');
-  if(curList.length){
-    mt.textContent=fmtMoney(curList[0],groups[curList[0]]);
-    if(curList.length>1){
-      var sub=document.createElement('span');sub.className='value-sub';sub.textContent='等'+curList.length+'币种';
-      mt.appendChild(sub);
-    }
-    var rest=curList.slice(1).map(function(c){return fmtMoney(c,groups[c])}).join(' · ');
-    var note=document.getElementById('m-transit-note');
-    note.textContent=(rest?rest+'；':'')+'共 '+ongoing.length+' 单，未做汇率折算';
-    mt.title='在途货值（原币口径）：'+curList.map(function(c){return fmtMoney(c,groups[c])}).join('、');
-  }else{mt.textContent='—';document.getElementById('m-transit-note').textContent='订单接入后，进行中订单金额自动按原币口径汇总'}
-  // 快照时间
-  document.getElementById('snapshot-time').textContent=data.generated_at?('快照时间 '+esc(data.generated_at)):'数据待接入';
-
-  // 图表一：订单状态分布（9状态）
-  var statusRows=ORDER_STATUSES.map(function(s){return{label:s,count:orders.filter(function(o){return o['当前状态']===s}).length}});
-  // 图表二：客户国家/地区分布
-  var cmap={};
-  customers.forEach(function(c){var k=c['国家/地区']||'未填写';cmap[k]=(cmap[k]||0)+1});
-  var countryRows=Object.keys(cmap).map(function(k){return{label:k,count:cmap[k]}}).sort(function(a,b){return b.count-a.count});
-
-  var co=document.getElementById('chart-orders');
-  if(co){
-    if(orders.length===0){
-      co.innerHTML='<div class="card-header"><h3>订单状态分布</h3><span class="card-sub">9 个履约节点</span></div>'+
-        emptyStateHtml(ICON_CHART_ORDERS,'暂无订单数据','订单数据接入飞书多维表后自动汇聚','可查看 9 大履约节点（已成交 → 单据制作 → 配置校验 → 仓库配货 → 提货 → 报关 → 发运 → 完成）的订单数量分布，履约状态一目了然');
-    }else{
-      co.innerHTML='<div class="card-header"><h3>订单状态分布</h3><span class="card-sub">共 '+orders.length+' 单 · 9 个履约节点</span></div><div class="card-body">'+
-        barChartHtml(statusRows,'',function(r){return r.label==='已完成'?'fill-green':''})+
-        '<div class="chart-legend-note">红色为进行中节点，绿色为已完成节点</div>';
-    }
-  }
-  var cc=document.getElementById('chart-customers');
-  if(cc){
-    if(customers.length===0){
-      cc.innerHTML='<div class="card-header"><h3>客户国家 / 地区分布</h3><span class="card-sub">按客户档案统计</span></div>'+
-        emptyStateHtml(ICON_CHART_GLOBE,'暂无客户数据','客户档案接入飞书多维表后自动汇聚','询盘客户、成交客户按国家/地区自动分布呈现，重点市场与空白市场一目了然，辅助市场开拓决策');
-    }else{
-      cc.innerHTML='<div class="card-header"><h3>客户国家 / 地区分布</h3><span class="card-sub">共 '+customers.length+' 家客户</span></div><div class="card-body">'+
-        barChartHtml(countryRows,'fill-blue')+
-        '<div class="chart-legend-note">按客户档案所属国家/地区统计</div>';
-    }
-  }
-}
-
-function renderError(err){
-  document.getElementById('snapshot-time').textContent='快照不可用';
-  ['m-customers','m-ongoing','m-done','m-transit'].forEach(function(id){document.getElementById(id).textContent='—'});
-  document.getElementById('m-customers-note').textContent='数据加载失败';
-  var errHtml='<div class="state-message">'+
-    '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'+
-    '<div style="font-weight:600;color:var(--color-text)">数据加载失败</div>'+
-    '<div>无法读取 data/snapshot.json。请通过本地 HTTP 服务访问本页面（例如在 frontend 目录运行 <code>python3 -m http.server</code> 后访问），不要直接双击打开 HTML 文件。</div>'+
-    '<button class="btn btn-outline btn-sm" onclick="location.reload()">重新加载</button>'+
-    '</div>';
-  ['chart-orders','chart-customers'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=errHtml});
-}
-
-fetch('data/snapshot.json',{cache:'no-store'})
-  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
-  .then(render)
-  .catch(renderError);
+/* ===== 启动 ===== */
+loadStats().then(function(){loadAiBrief(false);});
 </script>
 <script src="assets/rhc-widget.js?v=20260831jw"></script>
 </body>

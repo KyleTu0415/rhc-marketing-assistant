@@ -1180,6 +1180,7 @@ var leadsAll=[];                 // GET /api/leads 全部线索
 var leadsLoaded=false;
 var sigView='pool';              // pool=公共信号池 / mine=我的线索
 var leadStatusFilter='跟进中';    // 我的线索状态筛选：跟进中/已转客户/已释放/全部
+var leadOverdueOnly=false;        // 我的线索是否只看「超期未跟进」（仪表盘深链 ?view=mine&overdue=1）
 var leadEmailAdopted={};         // 本卡已「采用」的邮箱来源：{rid: source_url}（保存时随 PUT 落库）
 var currentMailRecipient='';     // 生成邮件时选中线索的收件邮箱
 var LEAD_TYPE_COLORS={'诊所扩张':'#00796B','招标采购':'#C8102E','展会机会':'#0277BD','渠道动态':'#EF6C00','采购动态':'#5B21B6'};
@@ -1466,11 +1467,27 @@ function leadFilterTabsHtml(){
 }
 function setLeadStatusFilter(key){
   leadStatusFilter=key;
+  leadOverdueOnly=false;
   renderLeads();
 }
 function visibleLeads(){
   if(leadStatusFilter==='全部')return leadsAll.slice();
-  return leadsAll.filter(function(l){return (l['状态']||'跟进中')===leadStatusFilter});
+  var rows=leadsAll.filter(function(l){return (l['状态']||'跟进中')===leadStatusFilter});
+  if(leadOverdueOnly){
+    rows=rows.filter(function(l){return (l['状态']||'跟进中')==='跟进中' && isLeadOverdue(l)});
+  }
+  return rows;
+}
+function isLeadOverdue(l){
+  // 超期口径（与后端 /api/dashboard/stats 一致）：跟进中 + 认领超过3天 + 跟进备注为空
+  if((l['状态']||'跟进中')!=='跟进中')return false;
+  if((l['跟进备注']||'').trim())return false;
+  var raw=String(l['认领时间']||'').trim();
+  if(!raw)return false;
+  var m=raw.replace(/\//g,'-').match(/^(\d{4})-(\d{1,2})-(\d{1,2})[ T]?(\d{1,2})?:?(\d{1,2})?/);
+  if(!m)return false;
+  var ct=new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0));
+  return (Date.now()-ct.getTime())>3*24*3600*1000;
 }
 function leadFilterEmptyHtml(){
   var map={'跟进中':'暂无跟进中的线索','已转客户':'暂无已转客户的线索','已释放':'暂无已释放的线索','全部':'暂无线索'};
@@ -1812,6 +1829,17 @@ function applyMailRules(){
 }
 function refreshAfterConfigChange(){
   applyMailRules();
+// 仪表盘指标卡深链：sales.html?view=mine[&overdue=1] 直接打开“我的线索”，
+// overdue=1 时只显示超期未跟进线索
+(function(){
+  try{
+    var qp=new URLSearchParams(location.search);
+    if(qp.get('view')==='mine'){
+      sigView='mine';
+      if(qp.get('overdue')==='1')leadOverdueOnly=true;
+    }
+  }catch(e){}
+})();
   renderGradingRulesCard();
   switchMailTab(mailType);
   if(snapshotData){renderGrading(snapshotData.customers||[])}
