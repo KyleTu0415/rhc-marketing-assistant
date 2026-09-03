@@ -203,12 +203,21 @@ async def api_auth_logout():
 
 @app.get("/api/auth/_debug_users")
 async def api_auth_debug_users():
-    # 临时调试：查看后端当前读到的账号列表（密码做脱敏），调试完删除
+    # 临时调试：查看后端当前读到的账号列表+飞书原始字段，调试完删除
     users = _get_users(force_refresh=True)
     safe = {}
     for k, v in users.items():
         safe[k] = {kk: (("***" + str(vv)[-2:]) if kk == "password" and vv else vv) for kk, vv in v.items()}
-    return {"ok": True, "table_id": _account_table_id, "users": safe}
+    # 额外输出飞书原始字段，定位文本解析问题
+    raw = []
+    try:
+        tid = _ensure_account_table()
+        resp = _feishu_api("GET", f"/bitable/v1/apps/{FEISHU_ATK}/tables/{tid}/records?page_size=100")
+        for it in resp.get("data", {}).get("items", []):
+            raw.append(it.get("fields", {}))
+    except Exception as e:
+        raw = [{"error": str(e)}]
+    return {"ok": True, "table_id": _account_table_id, "users": safe, "raw_fields": raw}
 
 @app.middleware("http")
 async def no_cache_middleware(request, call_next):
