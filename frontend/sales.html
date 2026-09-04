@@ -118,7 +118,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .ms-qty{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
 .ms-qty label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary);border:1px solid var(--color-border-light);border-radius:var(--radius-sm);padding:6px 10px}
 .ms-qty input[type=number]{width:64px;padding:5px 8px}
-.mail-preview{border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;min-height:320px;max-height:480px;overflow-y:auto;padding:22px 24px}
+.mail-preview{border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;min-height:520px;max-height:none;overflow-y:auto;padding:22px 24px}
 .mail-preview-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:280px;gap:10px;color:var(--color-text-tertiary)}
 .mail-subject{font-size:14px;font-weight:700;color:var(--color-text);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--color-border-light);white-space:pre-wrap}
 .mail-body{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:12.5px;line-height:1.8;color:var(--color-text);white-space:pre-wrap;word-break:break-word}
@@ -126,7 +126,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
 .mail-footnote{margin-top:14px;font-size:11px;color:var(--color-text-tertiary);background:var(--color-bg);border-radius:var(--radius-sm);padding:10px 14px;line-height:1.7}
 
 /* ===== PI 工作台 ===== */
-.quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+.quote-grid>div{min-width:0}
 
 /* ===== PI preview ===== */
 .pi-doc{border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;padding:28px;box-shadow:var(--shadow-sm)}
@@ -300,13 +301,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--color-primary);box-sh
       <div><h2>商机信号</h2><p>多信源公开行业资讯每日采集，AI 自动识别商机类型，高价值商机优先响应</p></div>
     </div>
     <div class="card">
-      <div class="card-header" style="justify-content:flex-end"><span class="card-sub sig-stats" id="sig-stats">加载中…</span></div>
-      <div class="card-body">
-        <div class="sig-subtabs" id="sig-subtabs">
+      <div class="card-header" style="flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:10px 12px;flex-wrap:wrap;align-items:center" id="sig-subtabs">
           <button type="button" class="sig-subtab active" data-view="pool" onclick="setSignalView('pool')">公共信号池</button>
           <button type="button" class="sig-subtab" data-view="mine" onclick="setSignalView('mine')">我的线索 <span class="subtab-badge" id="sig-mine-count" style="display:none">0</span></button>
         </div>
-        <div id="sig-filter"></div>
+        <span class="card-sub sig-stats" id="sig-stats">加载中…</span>
+      </div>
+      <div class="card-body">
+        <div id="sig-filter" style="margin-top:-8px;margin-bottom:12px"></div>
         <div id="signal-list">
           <div class="loading-state"><div class="spin"></div><div>正在加载商机信号…</div></div>
         </div>
